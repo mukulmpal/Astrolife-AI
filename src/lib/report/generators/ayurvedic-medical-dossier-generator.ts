@@ -29,7 +29,13 @@ import {
   ALL_NAKSHATRAS,
   getGenderLateralization,
   getDynamicGemstonePrescription,
-  renderHumanImpactCardHtml
+  getPlanetaryDignity,
+  getSignLord,
+  houseFromLagna,
+  ordinal,
+  renderHumanImpactCardHtml,
+  signFromHouse,
+  withArticle
 } from "../../astro/human-translator";
 
 const RASHI_ANATOMY: Record<string, { organ: string; desc: string }> = {
@@ -148,6 +154,7 @@ export function generateAyurvedicMedicalDossierHTML(
 
   const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Aries";
   const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mars";
+  const lagneshData = chart.planets?.[lagnaLord];
   const lagnaIndex = chart.lagnaNum !== undefined ? chart.lagnaNum : SIGN_NAMES.indexOf(lagnaRashi);
   const anatomy = RASHI_ANATOMY[lagnaRashi] || RASHI_ANATOMY["Aries"];
   const fifthSign = SIGN_NAMES[(lagnaIndex + 4) % 12];
@@ -180,14 +187,92 @@ export function generateAyurvedicMedicalDossierHTML(
   const dominantDosha = med.tridoshaBreakdown?.dominant || "Pitta-Vata";
   const ojasScore = med.ojasScore ?? 78;
   const ojasRating = med.ojasRating || "Robust Resilience";
-  const agniTitle = med.agniProfile?.title || "Samagni (Balanced Agni)";
-  const agniSanskrit = med.agniProfile?.sanskrit || "समाग्नि (Balanced Digestive Metabolism)";
+  const agniType = med.agniProfile?.type || "Samagni";
+  const agniTitle = med.agniProfile?.title || `${agniType} (${agniType === "Samagni" ? "Balanced" : agniType === "Tikshnagni" ? "Sharp Pitta" : agniType === "Vishamagni" ? "Variable Vata" : "Slow Kapha"} Agni)`;
+  const agniSanskrit = med.agniProfile?.sanskrit || "समाग्नि (Digestive Metabolism)";
+  const agniSub = agniType === "Samagni" ? "Balanced Enzymatic Tone" : agniType === "Tikshnagni" ? "Sharp Pitta Fire" : agniType === "Vishamagni" ? "Irregular Vata Digestion" : "Sluggish Kapha Metabolism";
+  const agniDesc = agniType === "Samagni"
+    ? "Your metabolic fire is classified as <strong>Samagni (Balanced Agni)</strong>. Unlike <em>Tikshnagni</em> (excessive burning fire) or <em>Mandagni</em> (sluggish fire), Samagni digests meals smoothly within 3 to 4 hours and maintains steady blood glucose."
+    : agniType === "Tikshnagni"
+    ? "Your metabolic fire is classified as <strong>Tikshnagni (Sharp Pitta Agni)</strong>. Your digestive enzymes burn rapidly, creating strong appetite and occasional acidity if meals are delayed. Cooling grains, ghee, and regular meal times prevent hyperacidity."
+    : agniType === "Vishamagni"
+    ? "Your metabolic fire is classified as <strong>Vishamagni (Variable Vata Agni)</strong>. Appetite and digestion fluctuate with stress, travel, or irregular schedules. Warm cooked meals, ginger-cumin infusions, and fixed meal timings stabilize absorption."
+    : "Your metabolic fire is classified as <strong>Mandagni (Slow Kapha Agni)</strong>. Digestion proceeds steadily but slowly, requiring light, warm, gently spiced meals and zero iced beverages to prevent sluggishness or Ama accumulation.";
 
-  const d9Rows = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"].map(p => {
+  const prakritiSub = dominantDosha.includes("-") ? "Dual-Dosha Metabolic Core" : "Single-Dosha Metabolic Core";
+  const sunHouse = sunPlanet?.house || 1;
+  const sunDignity = getPlanetaryDignity("Sun", sunRashi);
+  const sunBadge = sunHouse === 10 ? "10th House Digbala" : `${ordinal(sunHouse)} House &middot; ${sunDignity}`;
+  const moonHouse = moonPlanet?.house || 1;
+  const marsHouse = marsPlanet?.house || 1;
+  const mercuryHouse = mercuryPlanet?.house || 1;
+  const rahuHouse = rahuPlanet?.house || 1;
+
+  // Compute real Jaimini AK & AmK across 7 grahas
+  const sevenGrahas = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+  const sortedByDeg = sevenGrahas
+    .map(p => ({ p, deg: ((chart.planets?.[p]?.longitude ?? chart.planets?.[p]?.degree ?? 0) % 30 + 30) % 30 }))
+    .sort((a, b) => b.deg - a.deg);
+  const akPlanet = sortedByDeg[0]?.p || "Moon";
+  const amkPlanet = sortedByDeg[1]?.p || "Mercury";
+  const akPd = chart.planets?.[akPlanet];
+  const akDegStr = formatDMS(akPd?.longitude ?? akPd?.degree ?? 0).slice(0, 6);
+
+  // Dynamic Dusthana (6, 8, 12) and Recovery/Family houses
+  const occupantsInHouse = (h: number): string[] =>
+    Object.entries(chart.planets || {})
+      .filter(([, pd]) => pd && pd.house === h)
+      .map(([name]) => name);
+
+  const h6Sign = signFromHouse(lagnaRashi, 6);
+  const h6Lord = getSignLord(h6Sign);
+  const h6LordHouse = chart.planets?.[h6Lord]?.house || 6;
+  const h6Occ = occupantsInHouse(6);
+
+  const h8Sign = signFromHouse(lagnaRashi, 8);
+  const h8Lord = getSignLord(h8Sign);
+  const h8LordHouse = chart.planets?.[h8Lord]?.house || 8;
+  const h8Occ = occupantsInHouse(8);
+
+  const h12Sign = signFromHouse(lagnaRashi, 12);
+  const h12Lord = getSignLord(h12Sign);
+  const h12LordHouse = chart.planets?.[h12Lord]?.house || 12;
+  const h12Occ = occupantsInHouse(12);
+
+  const h5Sign = signFromHouse(lagnaRashi, 5);
+  const h5Lord = getSignLord(h5Sign);
+  const SIGN_ELEMENT_MAP: Record<string, string> = {
+    Aries: "Fire", Leo: "Fire", Sagittarius: "Fire",
+    Taurus: "Earth", Virgo: "Earth", Capricorn: "Earth",
+    Gemini: "Air", Libra: "Air", Aquarius: "Air",
+    Cancer: "Water", Scorpio: "Water", Pisces: "Water",
+  };
+  const h5Element = SIGN_ELEMENT_MAP[h5Sign] || "Earth";
+  const h5Modality = h5Element === "Earth"
+    ? "Naturopathy, Osteopathic Structural Alignment, and Ayurvedic Panchakarma"
+    : h5Element === "Fire"
+    ? "Metabolic Agni Conditioning, Marma Acupressure, and Surya Chikitsa"
+    : h5Element === "Water"
+    ? "Hydrotherapy (Snan-Aushadhi), Rasayana Tonics, and Sound Healing"
+    : "Pranayama Breathwork, Nervous System Reset, and Herbal Aromatherapy";
+
+  // D-9 rows with real dignity-aware synthesis
+  const d9Rows = sevenGrahas.map(p => {
     const pd = chart.planets?.[p];
     const sign = pd?.sign || "Aries";
     const house = pd?.house || 1;
     const d9 = pd?.navamsha?.sign || pd?.navamsha || sign;
+    const isVargottama = d9 === sign;
+    const d9Dignity = getPlanetaryDignity(p, String(d9));
+    const dignitySynthesis = isVargottama
+      ? `Vargottama in ${d9}; deep constitutional lock and high cellular recovery`
+      : d9Dignity === "Exalted"
+      ? `Exalted in ${d9}; peak latent tissue vitality and immune reserve`
+      : d9Dignity === "Own" || d9Dignity === "Moolatrikona"
+      ? `${d9Dignity} sign ${d9}; self-sufficient cellular repair and stability`
+      : d9Dignity === "Debilitated"
+      ? `Debilitated in ${d9}; requires conscious lifestyle &amp; Rasayana support`
+      : `${d9Dignity} placement in ${d9}; steady tissue regeneration with routine care`;
     const tissueMap: Record<string, string> = {
       Sun: "Asthi (Bones), Eye Vitality",
       Moon: "Rasa (Lymph), Pineal Cycle",
@@ -199,12 +284,69 @@ export function generateAyurvedicMedicalDossierHTML(
     };
     return `<tr>
       <td><strong style="color:var(--gold-bright);">${p}</strong></td>
-      <td>${sign} &middot; House ${house}</td>
-      <td>${d9}</td>
-      <td>Cellular synthesis anchored in ${d9}; harmonizes tissue regeneration</td>
+      <td>${sign} &middot; ${ordinal(house)}</td>
+      <td>${d9}${isVargottama ? " (Vargottama)" : ""}</td>
+      <td>${dignitySynthesis}</td>
       <td>${tissueMap[p] || "Somatic Equilibrium"}</td>
     </tr>`;
   }).join("\n");
+
+  // Compact Dual-Layer HumanImpactCard strips for Pages 4, 5, 11, 15, 17
+  const dusthanaHumanCard = renderHumanImpactCardHtml({
+    tier: ojasScore >= 75 ? "TIER_HIGH" : ojasScore >= 60 ? "TIER_MID" : "TIER_LOW",
+    badge: ojasScore >= 75 ? "Your Natural Edge" : ojasScore >= 60 ? "Steady Engine (Needs Structure)" : "Your Blind Spot & Fix",
+    title: `Stress & Recovery Snapshot (${lagnaRashi} Lagna)`,
+    plainWords: `Your body handles daily workload best when you protect your ${ordinal(h6LordHouse)} and ${ordinal(h12LordHouse)} house rhythms. Acute fatigue shows up first in your ${RASHI_ANATOMY[h6Sign]?.organ.split(",")[0].toLowerCase() || "nervous system"} before affecting deeper stamina.`,
+    watchOutFor: `Ignoring early sleep or hydration signals when ${h12Occ.length ? h12Occ.join(" & ") : h12Lord} pressure builds up.`,
+    nextMove: `Schedule a fixed 10-minute wind-down before sleep tonight and hydrate with warm water first thing tomorrow.`,
+    shastricProof: `6th: ${h6Sign} (${h6Lord} in H${h6LordHouse}) · 8th: ${h8Sign} (${h8Lord} in H${h8LordHouse}) · 12th: ${h12Sign} (${h12Occ.join("+") || h12Lord})`
+  }, { customStyle: "margin-bottom:8px;padding:8px 10px;" });
+
+  const d9HumanCard = renderHumanImpactCardHtml({
+    tier: "TIER_MID",
+    badge: "Steady Engine (Needs Structure)",
+    title: `Long-Term Cellular Resilience (${akPlanet} Atmakaraka)`,
+    plainWords: `Your deeper tissue resilience is anchored by ${lagnaLord} in ${lagneshData?.navamsha?.sign || lagneshData?.navamsha || lagnaRashi} (D-9) and your Atmakaraka ${akPlanet}. As you mature, consistent daily habits compound faster than short bursts of intensity.`,
+    watchOutFor: `Relying on youthful stamina instead of building sustainable meal and sleep routines.`,
+    nextMove: `Pick one daily Rasayana habit (warm water + fixed lunch hour) and track it for 14 days.`,
+    shastricProof: `Lagnesh ${lagnaLord} D-9: ${lagneshData?.navamsha?.sign || lagneshData?.navamsha || lagnaRashi} · AK: ${akPlanet} (${akDegStr})`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const cognitiveHumanCard = renderHumanImpactCardHtml({
+    tier: moonHouse === 6 || moonHouse === 8 || moonHouse === 12 ? "TIER_LOW" : "TIER_MID",
+    badge: moonHouse === 6 || moonHouse === 8 || moonHouse === 12 ? "Your Blind Spot & Fix" : "Steady Engine (Needs Structure)",
+    title: `Mental Bandwidth & Stress Buffer (${moonRashi} Moon)`,
+    plainWords: `With Moon in ${moonRashi} (${ordinal(moonHouse)} house) and Mercury in ${mercuryPlanet?.sign || "its sign"} (${ordinal(mercuryHouse)} house), your mind processes information quickly. ${moonHouse === 12 ? "Solitude and quiet evenings are essential to recharge." : "Clear boundaries around work hours keep mental clarity sharp."}`,
+    watchOutFor: `Mental rumination or late-night screen exposure overstimulating your nervous system.`,
+    nextMove: `Take a 20-minute screen-free walk or silent break before dinner today.`,
+    shastricProof: `Moon: ${moonRashi} H${moonHouse} · Mercury: ${mercuryPlanet?.sign || "-"} H${mercuryHouse} · Rahu: ${rahuPlanet?.sign || "-"} H${rahuHouse}`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const dashaHumanCard = renderHumanImpactCardHtml({
+    tier: "TIER_MID",
+    badge: "Steady Engine (Needs Structure)",
+    title: `Current Health Chapter: ${activeDasha} Mahadasha`,
+    plainWords: `Your ${activeDasha} period sets the pace for which body systems carry the heaviest load right now. Matching your exercise and meal timing to ${activeDasha}'s rhythm prevents burnout.`,
+    watchOutFor: `Pushing through fatigue during high-output weeks without recovery days.`,
+    nextMove: `Block 7.5 hours for sleep tonight and keep dinner light before 8:30 PM.`,
+    shastricProof: `Active MD: ${activeDasha} · Lagnesh: ${lagnaLord} (H${lagneshData?.house || 1}) · Ojas: ${ojasScore}/100`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const piscesSaturnH = houseFromLagna("Pisces", lagnaRashi);
+  const cancerJupH = houseFromLagna("Cancer", lagnaRashi);
+  const leoJupH = houseFromLagna("Leo", lagnaRashi);
+  const ariesSaturnH = houseFromLagna("Aries", lagnaRashi);
+  const capricornRahuH = houseFromLagna("Capricorn", lagnaRashi);
+
+  const transitHumanCard = renderHumanImpactCardHtml({
+    tier: cancerJupH === 6 || cancerJupH === 8 || cancerJupH === 12 ? "TIER_MID" : "TIER_HIGH",
+    badge: cancerJupH === 6 || cancerJupH === 8 || cancerJupH === 12 ? "Steady Engine (Needs Structure)" : "Your Natural Edge",
+    title: `2026–2027 Transit Outlook (Jupiter in ${ordinal(cancerJupH)} House)`,
+    plainWords: `Exalted Jupiter in Cancer activates your ${ordinal(cancerJupH)} house, while Saturn in Pisces tests discipline in your ${ordinal(piscesSaturnH)} house. Together, they reward structured preventive care and steady posture.`,
+    watchOutFor: `Skipping mobility or hydration during busy work sprints.`,
+    nextMove: `Add 10 minutes of morning stretching and warm hydration tomorrow.`,
+    shastricProof: `Saturn Pisces: H${piscesSaturnH} · Jupiter Cancer: H${cancerJupH} · Saturn Aries (2028): H${ariesSaturnH}`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
 
   const headerRail = (sectionTitle: string) => `
     <div class="page-rail">
@@ -492,7 +634,7 @@ body {
       <div>
         <div class="kicker">SUN (SURYA)</div>
         <div style="font-weight:700;font-size:12.5px;color:var(--gold-bright);">${sunRashi}</div>
-        <div style="font-size:9px;color:var(--ivory-mute);">10th House Digbala</div>
+        <div style="font-size:9px;color:var(--ivory-mute);">${sunBadge}</div>
       </div>
       <div>
         <div class="kicker">ACTIVE DASHA</div>
@@ -512,12 +654,12 @@ body {
     <div class="luxury-card" style="border-top:2px solid var(--teal-bright);">
       <div class="kicker" style="color:var(--teal-bright);">2. NATAL PRAKRITI</div>
       <div style="font-weight:700;font-size:13.5px;color:var(--gold-bright);margin:2px 0;">${dominantDosha}</div>
-      <div style="font-size:9px;color:var(--ivory-dim);">Dual-Dosha Metabolic Core</div>
+      <div style="font-size:9px;color:var(--ivory-dim);">${prakritiSub}</div>
     </div>
     <div class="luxury-card" style="border-top:2px solid var(--amber);">
       <div class="kicker" style="color:var(--amber);">3. JATHARAGNI</div>
-      <div style="font-weight:700;font-size:13.5px;color:var(--gold-bright);margin:2px 0;">${med.agniProfile?.type || 'Samagni'}</div>
-      <div style="font-size:9px;color:var(--ivory-dim);">Balanced Enzymatic Tone</div>
+      <div style="font-weight:700;font-size:13.5px;color:var(--gold-bright);margin:2px 0;">${agniType}</div>
+      <div style="font-size:9px;color:var(--ivory-dim);">${agniSub}</div>
     </div>
     <div class="luxury-card" style="border-top:2px solid var(--purple-bright);">
       <div class="kicker" style="color:var(--purple-bright);">4. RESTORATIVE HZ</div>
@@ -586,9 +728,9 @@ body {
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);">
       <div class="kicker" style="color:var(--gold-bright);margin-bottom:4px;">✦ 3 CARDINAL CLINICAL-VEDIC MANDATES</div>
       <div style="font-size:10.5px;color:var(--ivory-dim);line-height:1.5;">
-        1. <strong>Protect Somatic Equilibrium:</strong> As a ${lagnaRashi} native, mental and emotional stress directly impacts your ${anatomy.organ.toLowerCase()}. Never consume food while rushed or anxious.<br/>
+        1. <strong>Protect Somatic Equilibrium:</strong> As ${withArticle(lagnaRashi)} native, mental and emotional stress directly impacts your ${anatomy.organ.toLowerCase()}. Never consume food while rushed or anxious.<br/>
         2. <strong>Synchronize with Midday Agni:</strong> Consume your heaviest nutritious meal between 12:00 PM and 1:30 PM when the Solar plexus is at its peak metabolic intensity.<br/>
-        3. <strong>Guard ${moonPlanet?.house || 12}th House Lunar Rest:</strong> With Moon in ${moonRashi} (${moonPlanet?.house || 12}th house), nocturnal sleep is your sacred recharge portal. Maintain strict digital darkness 2 hours before bed.
+        3. <strong>Guard ${ordinal(moonHouse)} House Lunar Rest:</strong> With Moon in ${moonRashi} (${ordinal(moonHouse)} house), nocturnal sleep is your sacred recharge portal. Maintain strict digital darkness 2 hours before bed.
       </div>
     </div>
   </div>
@@ -624,7 +766,7 @@ body {
         ✦ LAGNA LORD ${lagnaLord.toUpperCase()} IN HOUSE ${lagneshData?.house || 1} (${lagneshData?.sign || lagnaRashi})
       </div>
       <p class="body-text" style="font-size:11px;margin-top:2px;">
-        Your vital ruler ${lagnaLord} occupies ${lagneshData?.sign || lagnaRashi} in the ${lagneshData?.house || 1}th house. This placement governs constitutional vitality, cellular immunity, and natural recovery rhythm. Your physical recuperation operates through steady rhythm, clean hydration, and harmonious environments.
+        Your vital ruler ${lagnaLord} occupies ${lagneshData?.sign || lagnaRashi} in the ${ordinal(lagneshData?.house || 1)} house. This placement governs constitutional vitality, cellular immunity, and natural recovery rhythm. Your physical recuperation operates through steady rhythm, clean hydration, and harmonious environments.
       </p>
     </div>
 
@@ -647,20 +789,20 @@ body {
         </tr>
         <tr>
           <td><strong>Metabolic Heat (Sun)</strong></td>
-          <td>Gemini &middot; 10th House</td>
-          <td>Strong enzymatic furnace; prone to mental heat &amp; eye fatigue</td>
-          <td><span class="tag-badge tag-gold">80 / 100 &middot; Robust</span></td>
+          <td>${sunRashi} &middot; ${ordinal(sunHouse)} House</td>
+          <td>Enzymatic furnace (${sunDignity}); governs vitality &amp; eye tone</td>
+          <td><span class="tag-badge tag-gold">80 / 100 &middot; ${sunDignity}</span></td>
         </tr>
         <tr>
           <td><strong>Lymph &amp; Fluids (Moon)</strong></td>
-          <td>Leo &middot; 12th House</td>
-          <td>Fluid retention risk under chronic stress; sensitive mucous membranes</td>
-          <td><span class="tag-badge tag-amber">72 / 100 &middot; Delicate</span></td>
+          <td>${moonRashi} &middot; ${ordinal(moonHouse)} House</td>
+          <td>Fluid balance &amp; emotional resilience; sensitive to sleep rhythm</td>
+          <td><span class="tag-badge tag-amber">72 / 100 &middot; Responsive</span></td>
         </tr>
         <tr>
           <td><strong>Cellular Repair (Mars)</strong></td>
-          <td>Leo &middot; 12th House</td>
-          <td>Rapid tissue regeneration; high muscular tone</td>
+          <td>${marsPlanet?.sign || lagnaRashi} &middot; ${ordinal(marsHouse)} House</td>
+          <td>Tissue regeneration &amp; muscular endurance (${getPlanetaryDignity("Mars", marsPlanet?.sign || lagnaRashi)})</td>
           <td><span class="tag-badge tag-teal">78 / 100 &middot; Good</span></td>
         </tr>
       </tbody>
@@ -678,38 +820,39 @@ body {
       In classical Parashari medical astrology, the three <em>Dusthana</em> houses (6th, 8th, and 12th) govern the genesis, chronicity, and hospitalization vectors of disease. Auditing these houses prevents acute imbalances from transmuting into chronic systemic strain.
     </p>
 
+    ${dusthanaHumanCard}
     <!-- 3 Dusthana Cards -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
       <!-- 6th House -->
-      <div class="luxury-card" style="border:1.5px solid var(--amber);background:var(--surface);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-          <div class="kicker" style="color:var(--amber);">6TH HOUSE (ROGA BHAVA &middot; ACUTE AILMENTS): AQUARIUS (KUMBHA)</div>
-          <span class="tag-badge tag-amber">RULER: SATURN IN 7TH</span>
+      <div class="luxury-card" style="border:1.5px solid var(--amber);background:var(--surface);padding:8px 10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+          <div class="kicker" style="color:var(--amber);">6TH HOUSE (ROGA BHAVA &middot; ACUTE AILMENTS): ${h6Sign.toUpperCase()}</div>
+          <span class="tag-badge tag-amber">RULER: ${h6Lord.toUpperCase()} IN ${ordinal(h6LordHouse).toUpperCase()}${h6Occ.length ? " &middot; OCC: " + h6Occ.join(", ").toUpperCase() : ""}</span>
         </div>
-        <p class="body-text" style="font-size:11px;">
-          Aquarius on the 6th cusp governs the calves, shins, lower circulatory system, and peripheral venous return. Ruled by Saturn placed in the 7th house (Pisces), acute health issues in your chart manifest as physical stagnation, dry skin, cold extremities, or joint stiffness during ungrounded winter seasons. Saturn's aspect on Lagna requires warm circulatory movement.
+        <p class="body-text" style="font-size:10px;">
+          ${h6Sign} on the 6th cusp governs ${RASHI_ANATOMY[h6Sign]?.organ.toLowerCase() || "metabolic recovery"}. Ruled by ${h6Lord} placed in the ${ordinal(h6LordHouse)} house${h6Occ.length ? ` (occupied by ${h6Occ.join(" and ")})` : ""}, acute health issues manifest first as routine stress or digestive/circulatory stagnation when daily rhythms slip.
         </p>
       </div>
 
       <!-- 8th House -->
-      <div class="luxury-card" style="border:1.5px solid var(--ruby);background:var(--surface);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-          <div class="kicker" style="color:var(--ruby-bright);">8TH HOUSE (MRITYU/AYUR BHAVA &middot; CHRONIC/SURGICAL AXIS): ARIES (MESHA)</div>
-          <span class="tag-badge tag-ruby">RULER: MARS IN 12TH</span>
+      <div class="luxury-card" style="border:1.5px solid var(--ruby);background:var(--surface);padding:8px 10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+          <div class="kicker" style="color:var(--ruby-bright);">8TH HOUSE (AYUR BHAVA &middot; CHRONIC AXIS): ${h8Sign.toUpperCase()}</div>
+          <span class="tag-badge tag-ruby">RULER: ${h8Lord.toUpperCase()} IN ${ordinal(h8LordHouse).toUpperCase()}${h8Occ.length ? " &middot; OCC: " + h8Occ.join(", ").toUpperCase() : ""}</span>
         </div>
-        <p class="body-text" style="font-size:11px;">
-          Aries on the 8th cusp governs the cranial vessels, adrenal glands, and deep pelvic regeneration. Ruled by fiery Mars placed in the 12th house (Leo), your chronic vulnerability is inflammatory exhaustion and internal heat. Mars placed in 12th acts as a protective shield against external pathogen invasions, but internal adrenaline must be discharged through calm athletic exercise.
+        <p class="body-text" style="font-size:10px;">
+          ${h8Sign} on the 8th cusp governs ${RASHI_ANATOMY[h8Sign]?.organ.toLowerCase() || "deep cellular regeneration"}. Ruled by ${h8Lord} placed in the ${ordinal(h8LordHouse)} house${h8Occ.length ? ` (with ${h8Occ.join(" and ")} present)` : ""}, chronic resilience depends on pacing stress and discharging excess internal strain through steady movement.
         </p>
       </div>
 
       <!-- 12th House -->
-      <div class="luxury-card" style="border:1.5px solid var(--purple);background:var(--surface);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-          <div class="kicker" style="color:var(--purple-bright);">12TH HOUSE (VYAYA BHAVA &middot; SLEEP, LYMPH &amp; ISOLATION): LEO (SIMHA)</div>
-          <span class="tag-badge tag-purple">OCCUPANTS: MOON + MARS</span>
+      <div class="luxury-card" style="border:1.5px solid var(--purple);background:var(--surface);padding:8px 10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+          <div class="kicker" style="color:var(--purple-bright);">12TH HOUSE (VYAYA BHAVA &middot; SLEEP &amp; LYMPH): ${h12Sign.toUpperCase()}</div>
+          <span class="tag-badge tag-purple">${h12Occ.length ? "OCCUPANTS: " + h12Occ.join(" + ").toUpperCase() : "RULER: " + h12Lord.toUpperCase() + " IN " + ordinal(h12LordHouse).toUpperCase()}</span>
         </div>
-        <p class="body-text" style="font-size:11px;">
-          Leo on the 12th cusp holds both your Atmakaraka Moon (29° 11') and Mars (26° 23'). The 12th house governs sleep architecture, subconscious dream processing, lymphatic drainage, and left-eye vitality. The Moon-Mars conjunction in fiery Leo creates vivid, active dreams and occasional midnight wakefulness. Solitude and acoustic grounding pacify this axis effortlessly.
+        <p class="body-text" style="font-size:10px;">
+          ${h12Sign} on the 12th cusp ${h12Occ.length ? `holds ${h12Occ.join(" and ")}` : `is ruled by ${h12Lord} in the ${ordinal(h12LordHouse)} house`}. The 12th house governs sleep architecture, subconscious dream processing, lymphatic drainage, and left-eye vitality. Quiet evening routines and acoustic grounding pacify this axis effortlessly.
         </p>
       </div>
     </div>
@@ -764,10 +907,11 @@ body {
         ✦ CELLULAR HEALTH ANCHORS IN NAVAMSHA (D-9)
       </div>
       <p class="body-text" style="font-size:11px;margin-top:2px;">
-        1. <strong>Lagnesh ${lagnaLord} in D-9 (${lagneshData?.navamsha?.sign || lagneshData?.navamsha || 'Navamsha'}):</strong> Confers deep cellular resilience, constitutional longevity, and robust immune mucosal integrity.<br/>
-        2. <strong>Atmakaraka ${moonPlanet?.sign ? 'Moon' : 'Sun'} in D-9:</strong> Anchors spiritual vitality, cellular regeneration, and steady tissue recuperation across mid-life cycles.
+        1. <strong>Lagnesh ${lagnaLord} in D-9 (${lagneshData?.navamsha?.sign || lagneshData?.navamsha || lagnaRashi}):</strong> Confers deep cellular resilience, constitutional longevity, and robust immune mucosal integrity.<br/>
+        2. <strong>Atmakaraka ${akPlanet} in D-9 (${akPd?.navamsha?.sign || akPd?.navamsha || akPd?.sign || lagnaRashi}):</strong> Anchors spiritual vitality, cellular regeneration, and steady tissue recuperation across mid-life cycles.
       </p>
     </div>
+    ${d9HumanCard}
   </div>
   ${footerRail("Pillar I: D1/D9 Cellular Durability", 5)}
 </section>
@@ -866,7 +1010,7 @@ body {
         ${agniSanskrit}
       </div>
       <p class="body-text" style="font-size:11px;">
-        Your metabolic fire is classified as <strong>Samagni (Balanced Agni)</strong>. Unlike <em>Tikshnagni</em> (excessive burning fire that causes ulcers) or <em>Mandagni</em> (sluggish fire that accumulates toxic Ama), Samagni digests meals smoothly within 3 to 4 hours, absorbs micro-nutrients cleanly, and maintains steady blood glucose levels throughout the workday.
+        ${agniDesc}
       </p>
     </div>
 
@@ -950,7 +1094,7 @@ body {
           <span class="tag-badge tag-amber">GOVERNOR: MOON &middot; DELICATE</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Rasa is the primary nutrient fluid providing cellular hydration, lymphatic immunity, and emotional contentment (<em>Preenana</em>). Because your Moon occupies the 12th house (Leo), chronic mental fatigue immediately causes sub-clinical dehydration, dry mucosal linings, or sluggish morning lymphatic drainage. <em>Protocol: Hydrate with warm water infused with fennel seeds.</em>
+          Rasa is the primary nutrient fluid providing cellular hydration, lymphatic immunity, and emotional contentment (<em>Preenana</em>). Because your Moon occupies the ${ordinal(moonHouse)} house (${moonRashi}), emotional fatigue can show up as sub-clinical dehydration or sluggish morning lymphatic drainage. <em>Protocol: Hydrate with warm water infused with fennel seeds.</em>
         </p>
       </div>
 
@@ -972,7 +1116,7 @@ body {
           <span class="tag-badge tag-amber">GOVERNOR: MARS &middot; MODERATE TONE</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Mamsa covers and protects vital organs (<em>Lepana</em>), enabling physical movement and muscular endurance. Ruled by Mars in 12th, your muscle tone responds rapidly to calisthenics and strength training, but prolonged desk immobility creates trapezius and cervical muscle tightness. <em>Protocol: Daily 10-minute upper-back stretching and warm sesame oil massage.</em>
+          Mamsa covers and protects vital organs (<em>Lepana</em>), enabling physical movement and muscular endurance. Ruled by Mars in the ${ordinal(marsHouse)} house (${marsPlanet?.sign || lagnaRashi}), your muscle tone responds rapidly to calisthenics and strength training, while prolonged desk immobility creates upper-back tightness. <em>Protocol: Daily 10-minute upper-back stretching and warm sesame oil massage.</em>
         </p>
       </div>
 
@@ -1031,7 +1175,7 @@ body {
           <span class="tag-badge tag-gold">GOVERNOR: VENUS &middot; RADIANT RESILIENCE</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Shukra governs endocrine vitality, cellular regeneration, and reproductive stamina (<em>Garbhotpadana</em>). From the distillation of Shukra arises <strong>Ojas</strong> &mdash; the ultimate golden biological shield that prevents viral infections and premature cellular senescence. Your Ojas score of <strong>78/100</strong> represents a top-tier constitutional fortress.
+          Shukra governs endocrine vitality, cellular regeneration, and reproductive stamina (<em>Garbhotpadana</em>). From the distillation of Shukra arises <strong>Ojas</strong> &mdash; the ultimate golden biological shield that prevents viral infections and premature cellular senescence. Your Ojas score of <strong>${ojasScore}/100</strong> (${ojasRating}) reflects your constitutional reserve.
         </p>
       </div>
     </div>
@@ -1120,13 +1264,15 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--amber);">
         <div class="kicker" style="color:var(--amber);">CARDIOVASCULAR &amp; HEMODYNAMIC PRESSURE DYNAMICS</div>
         <p style="font-size:10px;color:var(--ivory-dim);margin-top:2px;">
-          Mars (vascular pressure, adrenaline) and Moon (systemic plasma, emotional heartbeat rhythm) reside in the 12th house. Monitor resting blood pressure periodically, avoid excessive dietary table salt, and practice evening Sheetali pranayama.
+          ${moonHouse === marsHouse
+            ? `Mars (vascular pressure, adrenaline) and Moon (systemic plasma, emotional heartbeat rhythm) co-reside in your ${ordinal(moonHouse)} house (${moonRashi}). Monitor resting blood pressure periodically, avoid excessive table salt, and practice evening Sheetali pranayama.`
+            : `Mars in your ${ordinal(marsHouse)} house (${marsPlanet?.sign || lagnaRashi}) governs vascular pressure and adrenaline, while Moon in your ${ordinal(moonHouse)} house (${moonRashi}) regulates plasma and heart rhythm. Maintain steady hydration, moderate sodium, and evening pranayama.`}
         </p>
       </div>
       <div class="luxury-card" style="border-left:3px solid var(--teal-bright);">
         <div class="kicker" style="color:var(--teal-bright);">5TH CUSP TREATMENT MODALITY</div>
         <p style="font-size:10px;color:var(--ivory-dim);margin-top:2px;">
-          Your 5th House of healing is Capricorn (ruled by Saturn). In AstroLife's verified medical matrix, Earth/Saturn signifies that <strong>Naturopathy, Osteopathic Structural Alignment, and Ayurvedic Panchakarma</strong> are the most synergistic modalities.
+          Your 5th House of healing is ${h5Sign} (ruled by ${h5Lord}). In AstroLife's verified medical matrix, ${h5Element}/${h5Lord} signifies that <strong>${h5Modality}</strong> are your most synergistic healing modalities.
         </p>
       </div>
     </div>
@@ -1153,39 +1299,40 @@ body {
 
     <!-- Cognitive Triad Cards -->
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
-      <!-- Moon in 12th -->
-      <div class="luxury-card" style="border:1.5px solid var(--purple);background:var(--surface);">
+      <!-- Moon -->
+      <div class="luxury-card" style="border:1.5px solid var(--purple);background:var(--surface);padding:8px 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--purple-bright);">MOON IN LEO (12TH HOUSE &middot; 29° 11' &middot; ATMAKARAKA)</div>
-          <span class="tag-badge tag-purple">INTUITIVE &middot; SOLITARY PROCESSING</span>
+          <div class="kicker" style="color:var(--purple-bright);">MOON IN ${moonRashi.toUpperCase()} (${ordinal(moonHouse).toUpperCase()} HOUSE &middot; ${formatDMS(moonPlanet?.longitude ?? moonPlanet?.degree ?? 0).slice(0, 6)}${akPlanet === "Moon" ? " &middot; ATMAKARAKA" : ""})</div>
+          <span class="tag-badge tag-purple">${moonHouse === 12 ? "INTUITIVE &middot; SOLITARY PROCESSING" : "EMOTIONAL &amp; SENSORY ANCHOR"}</span>
         </div>
-        <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          The Atmakaraka Moon placed in the 12th house indicates that your emotional equilibrium requires <strong>conscious solitary sanctuary</strong>. You absorb the subconscious emotional vibrations of your surrounding environment like a sponge. When forced into continuous chaotic social interaction, your emotional nervous system experiences sensory drainage. <em>Remedy: Daily 20-minute silent digital disconnect.</em>
+        <p class="body-text" style="font-size:10px;margin-top:2px;">
+          Moon placed in ${moonRashi} (${ordinal(moonHouse)} house) shapes how you absorb emotional stress. ${moonHouse === 12 ? "Your equilibrium requires conscious solitary sanctuary and daily silent resets." : "Regular emotional expression and calm evening routines keep your nervous system steady."} <em>Remedy: Daily 20-minute silent digital disconnect.</em>
         </p>
       </div>
 
-      <!-- Mercury in 9th -->
-      <div class="luxury-card" style="border:1.5px solid var(--emerald);background:var(--surface);">
+      <!-- Mercury -->
+      <div class="luxury-card" style="border:1.5px solid var(--emerald);background:var(--surface);padding:8px 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--emerald-bright);">MERCURY IN TAURUS (9TH HOUSE &middot; 26° 54' &middot; AMATYAKARAKA)</div>
-          <span class="tag-badge tag-emerald">ANALYTICAL RIGOR &middot; GROUNDED BUDDHI</span>
+          <div class="kicker" style="color:var(--emerald-bright);">MERCURY IN ${(mercuryPlanet?.sign || lagnaRashi).toUpperCase()} (${ordinal(mercuryHouse).toUpperCase()} HOUSE &middot; ${formatDMS(mercuryPlanet?.longitude ?? mercuryPlanet?.degree ?? 0).slice(0, 6)}${amkPlanet === "Mercury" ? " &middot; AMATYAKARAKA" : ""})</div>
+          <span class="tag-badge tag-emerald">BUDDHI &amp; SYNAPTIC TONE</span>
         </div>
-        <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Amatyakaraka Mercury in Taurus gives an extraordinarily grounded, unshakeable intellectual architecture. You possess immense patience for complex mathematical systems, code structures, and classical shastras. Your cognitive risk is not intellectual scatter, but mental stubbornness or mental rumination (<em>Chinta</em>) when plans stall. <em>Remedy: Fresh air walks and creative music.</em>
+        <p class="body-text" style="font-size:10px;margin-top:2px;">
+          Mercury in ${mercuryPlanet?.sign || lagnaRashi} (${ordinal(mercuryHouse)} house) governs analytical speed and nerve signaling. Your cognitive risk is over-analysis or mental rumination (<em>Chinta</em>) when plans stall. <em>Remedy: Fresh air walks and structured breaks between deep focus blocks.</em>
         </p>
       </div>
 
-      <!-- Rahu in 2nd -->
-      <div class="luxury-card" style="border:1.5px solid var(--amber);background:var(--surface);">
+      <!-- Rahu -->
+      <div class="luxury-card" style="border:1.5px solid var(--amber);background:var(--surface);padding:8px 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--amber);">RAHU IN LIBRA (2ND HOUSE &middot; 08° 12')</div>
-          <span class="tag-badge tag-amber">SENSORY ACCELERATION &middot; SPEECH INTENSITY</span>
+          <div class="kicker" style="color:var(--amber);">RAHU IN ${(rahuPlanet?.sign || "Libra").toUpperCase()} (${ordinal(rahuHouse).toUpperCase()} HOUSE &middot; ${formatDMS(rahuPlanet?.longitude ?? rahuPlanet?.degree ?? 0).slice(0, 6)})</div>
+          <span class="tag-badge tag-amber">SENSORY AMPLIFICATION</span>
         </div>
-        <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          Rahu in the 2nd house of speech and oral intake creates rapid vocal transmission and occasional digital eye strain from multi-screen environments. Under extreme fatigue, it can trigger irregular eating habits or late-night snacking cravings. <em>Remedy: Avoid eating while staring at monitors; chew food deliberately.</em>
+        <p class="body-text" style="font-size:10px;margin-top:2px;">
+          Rahu in ${rahuPlanet?.sign || "Libra"} (${ordinal(rahuHouse)} house) amplifies sensory focus and multi-tasking drive. Under fatigue, it can trigger irregular meal times or screen-induced eye strain. <em>Remedy: Avoid eating while staring at screens; chew food deliberately.</em>
         </p>
       </div>
     </div>
+    ${cognitiveHumanCard}
 
     <!-- Cognitive Stress Index -->
     <div class="luxury-card" style="border-top:2px solid var(--teal-bright);">
@@ -1212,9 +1359,9 @@ body {
 
     <!-- Sleep Latency Card -->
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:4px solid var(--purple-bright);margin-bottom:10px;">
-      <div class="kicker" style="color:var(--purple-bright);margin-bottom:3px;">12TH HOUSE LUNAR-MARTIAN SLEEP DYNAMICS</div>
+      <div class="kicker" style="color:var(--purple-bright);margin-bottom:3px;">12TH HOUSE (${h12Sign.toUpperCase()}) SLEEP &amp; NOCTURNAL DYNAMICS</div>
       <p class="body-text" style="font-size:10.8px;">
-        With both Moon and Mars residing in Leo in the 12th house (the house of nocturnal withdrawal), your sleep pattern is characterized by <strong>rapid dream onset</strong>, <strong>vivid tactical dreamscapes</strong>, and occasional sudden wakefulness between 2:00 AM and 3:30 AM (the Pitta-Vata shift). While your physical body rests, your subconscious mind continues running architectural simulations.
+        Your 12th house of sleep and subconscious withdrawal falls in <strong>${h12Sign}</strong> (ruled by ${h12Lord} in the ${ordinal(h12LordHouse)} house${h12Occ.length ? `, occupied by ${h12Occ.join(" and ")}` : ""}). When overstimulated late at night, your mind continues processing unresolved tasks during REM cycles. Protecting a dark, quiet wind-down window before 10:30 PM restores deep Delta sleep.
       </p>
     </div>
 
@@ -1250,7 +1397,7 @@ body {
         <tr>
           <td><strong>Sleep Latency (Falling Asleep)</strong></td>
           <td>Transition from Beta to Alpha brainwaves</td>
-          <td>Moon in 12th &middot; Leo</td>
+          <td>Moon in ${ordinal(moonHouse)} &middot; ${moonRashi}</td>
           <td>Listen to 432 Hz Solfeggio audio for 10 minutes</td>
         </tr>
         <tr>
@@ -1284,7 +1431,7 @@ body {
     <div class="luxury-card" style="border:1.5px solid var(--border-gold);margin-bottom:10px;background:var(--surface);">
       <div class="kicker" style="color:var(--gold-bright);margin-bottom:2px;">THE ${lagnaRashi.toUpperCase()} SOMATIC CIRCUIT</div>
       <p class="body-text" style="font-size:10.8px;">
-        For a ${lagnaRashi} Ascendant, unresolved professional tension or mental perfectionism does not remain in the cranium &mdash; it translates into immediate gut motor changes. High stress triggers excessive metabolic and nervous fluctuations, causing gut hyper-motility, abdominal bloating, or intermittent appetite loss.
+        For ${withArticle(lagnaRashi)} Ascendant, unresolved professional tension or mental perfectionism does not remain in the cranium &mdash; it translates into immediate gut motor changes. High stress triggers excessive metabolic and nervous fluctuations, causing gut hyper-motility, abdominal bloating, or intermittent appetite loss.
       </p>
     </div>
 
@@ -1341,10 +1488,10 @@ body {
     <!-- Atmakaraka Moon Protection -->
     <div class="luxury-card" style="border:1.5px solid var(--gold-bright);background:var(--surface);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;margin-bottom:3px;">
-        ✦ PROTECTING THE ATMAKARAKA MOON (KING OF THE SOUL)
+        ✦ PROTECTING THE ATMAKARAKA ${akPlanet.toUpperCase()} (KING OF THE SOUL)
       </div>
       <p class="body-text" style="font-size:10.8px;">
-        Because your Moon holds the supreme rank of <strong>Atmakaraka (AK &middot; ${moonRashi} ${moonPlanet?.degree || 29}&deg;)</strong>, your emotional state directly dictates your cellular vitality. When your mind is serene, your immune system is impenetrable; when your mind is troubled by toxic relationships or unexpressed grief, your physical body suffers immediate fatigue. Protecting your peace is not a luxury &mdash; it is biological medicine.
+        Because ${akPlanet} holds the supreme rank of <strong>Atmakaraka (AK &middot; ${akPd?.sign || moonRashi} ${akDegStr})</strong>, its emotional and nervous equilibrium directly dictates your cellular vitality. Meanwhile, Moon in ${moonRashi} (${ordinal(moonHouse)} house) governs daily emotional recharge. Protecting your peace is biological medicine.
       </p>
     </div>
 
@@ -1360,7 +1507,7 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div class="kicker" style="color:var(--emerald-bright);">2. PSYCHIC BOUNDARY ARCHITECTURE</div>
         <p class="body-text" style="font-size:10.5px;margin-top:2px;">
-          With Moon in the 12th house, you possess natural emotional porosity. Learn to mentally erect an impenetrable psychic firewall against passive-aggressive co-workers or draining personalities. Visualize an emerald-green energetic sphere surrounding your bio-field.
+          With Moon in the ${ordinal(moonHouse)} house (${moonRashi}), you carry heightened emotional sensitivity. Learn to set clear mental boundaries against draining environments and prioritize restorative quiet time.
         </p>
       </div>
 
@@ -1420,28 +1567,28 @@ body {
         <tr>
           <td><strong style="color:var(--gold-bright);">Venus (Shukra)</strong></td>
           <td>20 Years</td>
-          <td>Endocrine system, kidneys, reproductive vitality</td>
+          <td>${lagnaLord === "Venus" ? "<strong>Lagna Lord!</strong> " : ""}Endocrine system, kidneys, reproductive vitality</td>
           <td>Excellent Ojas; watch for rich dietary indulgence</td>
           <td><span class="tag-badge tag-emerald">Low &middot; 20%</span></td>
         </tr>
         <tr>
           <td><strong style="color:var(--ruby-bright);">Sun (Surya)</strong></td>
           <td>6 Years</td>
-          <td>Cardiac rhythm, spine, eyesight, cranial heat</td>
+          <td>${lagnaLord === "Sun" ? "<strong>Lagna Lord!</strong> " : ""}Cardiac rhythm, spine, eyesight, cranial heat</td>
           <td>Pitta flare-ups, seasonal fever, eye strain</td>
           <td><span class="tag-badge tag-gold">Moderate &middot; 45%</span></td>
         </tr>
         <tr>
           <td><strong style="color:var(--teal-bright);">Moon (Chandra)</strong></td>
           <td>10 Years</td>
-          <td>Lymphatic drainage, sleep quality, mucous membranes</td>
+          <td>${lagnaLord === "Moon" ? "<strong>Lagna Lord!</strong> " : ""}Lymphatic drainage, sleep quality, mucous membranes</td>
           <td>Emotional burnout, fluid retention, sleep latency</td>
           <td><span class="tag-badge tag-amber">Moderate &middot; 50%</span></td>
         </tr>
         <tr>
           <td><strong style="color:var(--ruby);">Mars (Mangala)</strong></td>
           <td>7 Years</td>
-          <td>Muscular tissue, blood pressure, bile, adrenal drive</td>
+          <td>${lagnaLord === "Mars" ? "<strong>Lagna Lord!</strong> " : ""}Muscular tissue, blood pressure, bile, adrenal drive</td>
           <td>High physical stamina; watch for sports/traffic sprains</td>
           <td><span class="tag-badge tag-amber">Mod-High &middot; 55%</span></td>
         </tr>
@@ -1455,26 +1602,28 @@ body {
         <tr>
           <td><strong style="color:var(--gold);">Jupiter (Guru)</strong></td>
           <td>16 Years</td>
-          <td>Liver metabolism, arterial lipid balance, cellular repair</td>
+          <td>${lagnaLord === "Jupiter" ? "<strong>Lagna Lord!</strong> " : ""}Liver metabolism, arterial lipid balance, cellular repair</td>
           <td>Supreme restorative era; high cellular wisdom</td>
           <td><span class="tag-badge tag-emerald">Low &middot; 18%</span></td>
         </tr>
         <tr>
           <td><strong style="color:var(--teal);">Saturn (Shani)</strong></td>
           <td>19 Years</td>
-          <td>Skeletal bones, teeth, knees, joints, longevity</td>
+          <td>${lagnaLord === "Saturn" ? "<strong>Lagna Lord!</strong> " : ""}Skeletal bones, teeth, knees, joints, longevity</td>
           <td>Vata joint stiffness; requires warm abhyanga oil massage</td>
           <td><span class="tag-badge tag-amber">Moderate &middot; 52%</span></td>
         </tr>
         <tr>
           <td><strong style="color:var(--emerald);">Mercury (Budha)</strong></td>
           <td>17 Years</td>
-          <td>Lagna Lord! Nervous system, speech, respiratory ease</td>
-          <td>Golden intellectual vitality; rapid physical recovery</td>
+          <td>${lagnaLord === "Mercury" ? "<strong>Lagna Lord!</strong> " : ""}Nervous system, speech, respiratory ease</td>
+          <td>Intellectual vitality; rapid physical recovery with rest</td>
           <td><span class="tag-badge tag-emerald">Low &middot; 15%</span></td>
         </tr>
       </tbody>
     </table>
+
+    ${dashaHumanCard}
 
     <!-- Lifetime Summary Box -->
     <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
@@ -1505,10 +1654,10 @@ body {
         <span class="tag-badge tag-purple">ACTIVE: ${activeDasha.toUpperCase()} PERIOD</span>
       </div>
       <h3 style="font-family:'Cinzel',serif;font-size:14px;color:var(--gold-bright);margin-bottom:4px;">
-        Biological Agenda of the Active Mahadasha
+        Biological Agenda of Your ${activeDasha} Mahadasha (${chart.planets?.[activeDasha]?.sign || lagnaRashi} &middot; ${ordinal(chart.planets?.[activeDasha]?.house || 1)} House)
       </h3>
       <p class="body-text" style="font-size:11px;">
-        During the current epoch, planetary currents are focused on structural career expansion and intellectual output. The bodily systems under active demand are the <strong>nervous transmission pathways</strong>, <strong>ocular muscles</strong>, and <strong>adrenal reserve</strong>.
+        During your active <strong>${activeDasha}</strong> period (placed in ${chart.planets?.[activeDasha]?.sign || lagnaRashi}, ${ordinal(chart.planets?.[activeDasha]?.house || 1)} house), bodily demand centers on ${activeDasha === "Ketu" ? "nerve endings, pineal sleep cycles, and immune boundary clarity" : activeDasha === "Mars" ? "muscular drive, blood pressure regulation, and Pitta heat discharge" : activeDasha === "Saturn" ? "skeletal joints, posture, and steady metabolic pacing" : activeDasha === "Jupiter" ? "liver glycogen, lipid balance, and Ojas expansion" : "nervous transmission pathways, ocular muscles, and adrenal reserve"}.
       </p>
     </div>
 
@@ -1569,33 +1718,33 @@ body {
       <tbody>
         <tr>
           <td><strong style="color:var(--amber);">2025 &ndash; Mid 2026</strong></td>
-          <td>Saturn in Pisces &middot; 7th House (Aspecting Lagna &amp; 4th)</td>
-          <td>Lower limbs, lumbar flexibility, emotional heart pace</td>
-          <td>Daily hamstring stretching; warm sesame oil massage; avoid cold drafty winds</td>
+          <td>Saturn in Pisces &middot; ${ordinal(piscesSaturnH)} House${occupantsInHouse(piscesSaturnH).length ? ` (over ${occupantsInHouse(piscesSaturnH).join(", ")})` : ""}</td>
+          <td>${RASHI_ANATOMY["Pisces"].organ}</td>
+          <td>Daily stretching; warm sesame oil massage; avoid cold drafty winds</td>
         </tr>
         <tr>
           <td><strong style="color:var(--emerald-bright);">Mid 2026 &ndash; Mid 2027</strong></td>
-          <td>Jupiter Exalted in Cancer &middot; 11th House (Trining 3rd, 5th, 7th)</td>
-          <td>Supreme Ojas surge, cellular immunity, liver rejuvenation</td>
-          <td>Golden recovery phase! Excellent window for elective dental/eye checkups and rejuvenation</td>
+          <td>Jupiter Exalted in Cancer &middot; ${ordinal(cancerJupH)} House${occupantsInHouse(cancerJupH).length ? ` (over ${occupantsInHouse(cancerJupH).join(", ")})` : ""}</td>
+          <td>Ojas surge, cellular immunity, hepatic rejuvenation</td>
+          <td>Strong recovery window; ideal for preventive checkups and rejuvenation</td>
         </tr>
         <tr>
           <td><strong style="color:var(--purple-bright);">Mid 2027 &ndash; 2028</strong></td>
-          <td>Jupiter in Leo &middot; 12th House (Conjoining Moon &amp; Mars)</td>
-          <td>Spiritual awakening, lymphatic cleanse, sleep deepening</td>
-          <td>Schedule regular nature retreats; practice high-volume hydration; detoxify liver</td>
+          <td>Jupiter in Leo &middot; ${ordinal(leoJupH)} House${occupantsInHouse(leoJupH).length ? ` (over ${occupantsInHouse(leoJupH).join(", ")})` : ""}</td>
+          <td>${RASHI_ANATOMY["Leo"].organ}</td>
+          <td>Schedule regular nature retreats; practice steady hydration; support liver</td>
         </tr>
         <tr>
           <td><strong style="color:var(--ruby-bright);">2028 &ndash; 2029</strong></td>
-          <td>Saturn enters Aries &middot; 8th House (Debilitated Transit)</td>
-          <td>Chronic inflammatory caution, pelvic vitality, head/cranial heat</td>
-          <td>Strictly avoid reckless driving/speed; maintain routine blood work; avoid dehydration</td>
+          <td>Saturn enters Aries &middot; ${ordinal(ariesSaturnH)} House (Debilitated Transit)</td>
+          <td>${RASHI_ANATOMY["Aries"].organ}</td>
+          <td>Maintain routine blood work; avoid dehydration and hurried movement</td>
         </tr>
         <tr>
           <td><strong style="color:var(--teal-bright);">2029 &ndash; 2030</strong></td>
-          <td>Rahu enters Capricorn &middot; 5th House (Arudha Lagna)</td>
-          <td>Enteric digestive acid, discretionary focus, creative endurance</td>
-          <td>Favor cooling Pitta diet; practice mindfulness during high-volume intellectual output</td>
+          <td>Rahu enters Capricorn &middot; ${ordinal(capricornRahuH)} House${occupantsInHouse(capricornRahuH).length ? ` (over ${occupantsInHouse(capricornRahuH).join(", ")})` : ""}</td>
+          <td>${RASHI_ANATOMY["Capricorn"].organ}</td>
+          <td>Favor balanced warm meals; practice mindfulness during high-output periods</td>
         </tr>
       </tbody>
     </table>
@@ -1603,12 +1752,13 @@ body {
     <!-- Critical Caution Box -->
     <div class="luxury-card" style="border:1.5px solid var(--amber);background:var(--surface);">
       <div class="card-title" style="color:var(--amber);font-size:11.5px;margin-bottom:3px;">
-        ✦ STRATEGIC HEALTH FOCUS FOR 2025&ndash;2026 (SATURN IN 7TH OPPOSING LAGNA)
+        ✦ STRATEGIC HEALTH FOCUS FOR 2025&ndash;2026 (SATURN IN ${ordinal(piscesSaturnH).toUpperCase()} HOUSE)
       </div>
       <p class="body-text" style="font-size:10.8px;">
-        In classical Jyotish, major Saturn transits enforce physical discipline: if you have been ignoring postural ergonomics, hydration, or sleep, Saturn manifests temporary joint stiffness or fatigue to force rest. Embracing daily stretching turns this transit into an era of ironclad physical resilience.
+        In classical Jyotish, Saturn transiting your ${ordinal(piscesSaturnH)} house enforces physical discipline: if you have been ignoring postural ergonomics, hydration, or sleep, Saturn manifests temporary stiffness or fatigue to prompt rest. Embracing daily stretching turns this transit into steady resilience.
       </p>
     </div>
+    ${transitHumanCard}
   </div>
   ${footerRail("Pillar IV: 5-Year Transit Radar", 17)}
 </section>
@@ -1627,44 +1777,44 @@ body {
       <!-- Father -->
       <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--gold-bright);">1. FATHER'S HEALTH AXIS (9TH HOUSE &middot; TAURUS &middot; SURYA KARAKA)</div>
-          <span class="tag-badge tag-emerald">STABLE CONSTITUTION</span>
+          <div class="kicker" style="color:var(--gold-bright);">1. FATHER'S HEALTH AXIS (9TH HOUSE &middot; ${signFromHouse(lagnaRashi, 9).toUpperCase()} &middot; SURYA KARAKA)</div>
+          <span class="tag-badge tag-emerald">LORD: ${getSignLord(signFromHouse(lagnaRashi, 9)).toUpperCase()} IN ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 9))]?.house || 9).toUpperCase()}</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          The 9th house (Taurus) holds Mercury, with Sun placed in the adjacent 10th house. Indicates good longevity and structural bone stamina. Preventive focus: Monitor blood pressure stability, cardiac tone, and ensure routine ophthalmic eye checkups.
+          The 9th house (${signFromHouse(lagnaRashi, 9)}) ${occupantsInHouse(9).length ? `holds ${occupantsInHouse(9).join(" and ")}` : `is unoccupied`}, with ruler ${getSignLord(signFromHouse(lagnaRashi, 9))} in the ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 9))]?.house || 9)} house. Preventive focus: Monitor blood pressure stability, cardiac tone, and routine ophthalmic checkups.
         </p>
       </div>
 
       <!-- Mother -->
       <div class="luxury-card" style="border-left:3px solid var(--teal-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--teal-bright);">2. MOTHER'S HEALTH AXIS (4TH HOUSE &middot; SAGITTARIUS &middot; CHANDRA KARAKA)</div>
-          <span class="tag-badge tag-amber">SENSITIVE FLUID &amp; JOINT TONE</span>
+          <div class="kicker" style="color:var(--teal-bright);">2. MOTHER'S HEALTH AXIS (4TH HOUSE &middot; ${signFromHouse(lagnaRashi, 4).toUpperCase()} &middot; CHANDRA KARAKA)</div>
+          <span class="tag-badge tag-amber">LORD: ${getSignLord(signFromHouse(lagnaRashi, 4)).toUpperCase()} IN ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 4))]?.house || 4).toUpperCase()}</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          The 4th house (Sagittarius) is ruled by Jupiter (placed in 3rd Scorpio), while Moon occupies Leo (9th from 4th). Indicates deep spiritual empathy. Preventive focus: Joint mobility, lower back flexibility, and respiratory ease during seasonal shifts.
+          The 4th house (${signFromHouse(lagnaRashi, 4)}) ${occupantsInHouse(4).length ? `holds ${occupantsInHouse(4).join(" and ")}` : `is ruled by ${getSignLord(signFromHouse(lagnaRashi, 4))} in the ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 4))]?.house || 4)} house`}. Preventive focus: Joint mobility, lower back flexibility, and respiratory ease during seasonal shifts.
         </p>
       </div>
 
       <!-- Spouse -->
       <div class="luxury-card" style="border-left:3px solid var(--purple-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--purple-bright);">3. SPOUSE'S HEALTH AXIS (7TH HOUSE &middot; PISCES &middot; SHUKRA KARAKA)</div>
-          <span class="tag-badge tag-emerald">ROBUST &middot; WATER CONSTITUTION</span>
+          <div class="kicker" style="color:var(--purple-bright);">3. SPOUSE'S HEALTH AXIS (7TH HOUSE &middot; ${signFromHouse(lagnaRashi, 7).toUpperCase()} &middot; SHUKRA KARAKA)</div>
+          <span class="tag-badge tag-emerald">LORD: ${getSignLord(signFromHouse(lagnaRashi, 7)).toUpperCase()} IN ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 7))]?.house || 7).toUpperCase()}</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          The 7th house (Pisces) holds Saturn, with Upapada Lagna in Aries (ruled by Mars). Reveals a life partner with dynamic athletic stamina and high drive. Preventive focus: Endocrine balance, hydration, and avoiding excessive physical exhaustion.
+          The 7th house (${signFromHouse(lagnaRashi, 7)}) ${occupantsInHouse(7).length ? `holds ${occupantsInHouse(7).join(" and ")}` : `is ruled by ${getSignLord(signFromHouse(lagnaRashi, 7))} in the ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 7))]?.house || 7)} house`}. Preventive focus: Endocrine balance, steady hydration, and avoiding physical exhaustion.
         </p>
       </div>
 
       <!-- Siblings / Team -->
       <div class="luxury-card" style="border-left:3px solid var(--ruby-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--ruby-bright);">4. SIBLINGS &amp; PEERS (3RD HOUSE &middot; SCORPIO &middot; MANGALA KARAKA)</div>
-          <span class="tag-badge tag-teal">HIGH METABOLIC DRIVE</span>
+          <div class="kicker" style="color:var(--ruby-bright);">4. SIBLINGS &amp; PEERS (3RD HOUSE &middot; ${signFromHouse(lagnaRashi, 3).toUpperCase()} &middot; MANGALA KARAKA)</div>
+          <span class="tag-badge tag-teal">LORD: ${getSignLord(signFromHouse(lagnaRashi, 3)).toUpperCase()} IN ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 3))]?.house || 3).toUpperCase()}</span>
         </div>
         <p class="body-text" style="font-size:10.8px;margin-top:2px;">
-          The 3rd house (Scorpio) holds Jupiter, with ruler Mars placed in 12th Leo. Indicates resilient muscular tone and decisive action. Preventive focus: Avoid sudden athletic strains, sports injuries, and stay mindful during competitive workouts.
+          The 3rd house (${signFromHouse(lagnaRashi, 3)}) ${occupantsInHouse(3).length ? `holds ${occupantsInHouse(3).join(" and ")}` : `is ruled by ${getSignLord(signFromHouse(lagnaRashi, 3))} in the ${ordinal(chart.planets?.[getSignLord(signFromHouse(lagnaRashi, 3))]?.house || 3)} house`}. Preventive focus: Warm up before workouts and avoid sudden muscular strains.
         </p>
       </div>
     </div>
@@ -1761,7 +1911,7 @@ body {
         ✦ PRIMARY PERSONAL PRESCRIPTION FOR SEEKER
       </div>
       <p class="body-text" style="font-size:10.8px;">
-        With Moon in the 12th house, your master formulation is <strong>Kustha Root Powder on Monday evenings</strong> alternating with <strong>Mulethi on Thursday mornings</strong>. This dual hydrotherapy protocol balances the water and earth elements, ensuring emotional equanimity and cellular Ojas.
+        With Moon in the ${ordinal(moonHouse)} house (${moonRashi}) and active ${activeDasha} Mahadasha, your master formulation is <strong>Kustha Root Powder on Monday evenings</strong> alternating with <strong>Mulethi on Thursday mornings</strong>. This dual hydrotherapy protocol balances water and earth elements for emotional equanimity and cellular Ojas.
       </p>
     </div>
   </div>
@@ -1844,7 +1994,7 @@ body {
     <!-- 16-Day Burn & Flow Protocol Box -->
     <div class="luxury-card" style="border-left:3px solid var(--purple-bright);margin-bottom:8px;background:var(--surface);">
       <div class="card-title" style="color:var(--purple-bright);font-size:11px;margin-bottom:2px;">
-        ✦ ASTROLIFE PROPRIETARY 16-DAY BURN &amp; FLOW PROTOCOL (FOR 12TH HOUSE MOON)
+        ✦ ASTROLIFE PROPRIETARY 16-DAY BURN &amp; FLOW PROTOCOL (${moonHouse === 12 ? "FOR 12TH HOUSE MOON" : `FOR ${ordinal(moonHouse).toUpperCase()} HOUSE MOON &middot; ${activeDasha.toUpperCase()} CYCLE`})
       </div>
       <p class="body-text" style="font-size:10.2px;">
         Prepare <strong>16 small packets</strong> using pure white cotton cloth. Place <strong>1 teaspoon of whole raw white rice</strong> in each packet. Every night right before retiring to bed, place one packet inside a stainless steel tea strainer and burn it completely over the kitchen gas flame (<em>safety mandate: use a long-handled stainless steel tea strainer or metal tongs in a well-ventilated kitchen to avoid burning handles or fingers</em>). Take a clean glass tumbler with 2 tablespoons of raw cow milk, mix the burned ash into the milk, and wash it down the kitchen sink with cold running tap water. <em>Mandate: Strictly avoid drinking plain milk at night during this 16-day cycle.</em> Clears psychosomatic anxiety, nocturnal dream static, and restores deep restorative sleep.
@@ -1857,7 +2007,7 @@ body {
         ⚠️ CRITICAL SHASTRA WARNING: NEVER WEAR GEMSTONES FOR 6TH/8TH LORDS
       </div>
       <p class="body-text" style="font-size:10.5px;">
-        Commercial astrologers often recklessly prescribe gemstones to 'strengthen' diseased houses. In classical shastra, <strong>wearing a gemstone amplifies that planet's radiation indiscriminately</strong>. Wearing gems for Dusthana or Badhaka lords accelerates inflammatory friction. For a ${lagnaRashi} native, ensure you only wear gemstones suited to your functional benefics. Use <em>Daan</em>, <em>Snan-Aushadhi</em>, and <em>16-Day Protocols</em> to pacify; never wear physical stones for functional malefics.
+        Commercial astrologers often recklessly prescribe gemstones to 'strengthen' diseased houses. In classical shastra, <strong>wearing a gemstone amplifies that planet's radiation indiscriminately</strong>. Wearing gems for Dusthana or Badhaka lords accelerates inflammatory friction. For ${withArticle(lagnaRashi)} native, ensure you only wear gemstones suited to your functional benefics. Use <em>Daan</em>, <em>Snan-Aushadhi</em>, and <em>16-Day Protocols</em> to pacify; never wear physical stones for functional malefics.
       </p>
     </div>
   </div>
@@ -2001,7 +2151,7 @@ body {
     <!-- Dietary Do's & Don'ts Table -->
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11px;margin-bottom:4px;">
-        ✦ PITTA-VATA DIETARY RECONCILIATION TABLE
+        ✦ ${dominantDosha.toUpperCase()} DIETARY RECONCILIATION TABLE
       </div>
       <table class="data-table" style="font-size:9.5px;">
         <thead>

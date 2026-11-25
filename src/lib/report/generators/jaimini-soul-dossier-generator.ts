@@ -6,13 +6,18 @@
  * Upadesha Sutras, classical 7 Chara Karakas, Karakamsha Lagna (Navamsha Base),
  * corrected Arudha Padas (AL in Capricorn, UL in Aries), and Chara Dasha cycles.
  *
- * Fully synchronized with Mukul Mohan Pal's birth blueprint and bundle standards.
+ * Fully synchronized with NormalizedChartContext and classical Jaimini Shastra.
  * ============================================================================
  */
 
 import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
 import { buildJaiminiChart, type JaiminiResult } from "../../astro-engine/jaimini";
+import {
+  houseFromLagna,
+  ordinal,
+  renderHumanImpactCardHtml
+} from "../../astro/human-translator";
 
 function escapeHtml(str: string): string {
   return String(str ?? "")
@@ -29,6 +34,27 @@ function formatDMS(deg: number): string {
   const s = Math.floor(((deg - d) * 60 - m) * 60);
   return `${d}° ${String(m).padStart(2, "0")}' ${String(s).padStart(2, "0")}"`;
 }
+
+const SIGN_NAMES = [
+  "Aries", "Taurus", "Gemini", "Cancer",
+  "Leo", "Virgo", "Libra", "Scorpio",
+  "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+];
+
+const SIGN_LORDS: Record<string, string> = {
+  Aries: "Mars",
+  Taurus: "Venus",
+  Gemini: "Mercury",
+  Cancer: "Moon",
+  Leo: "Sun",
+  Virgo: "Mercury",
+  Libra: "Venus",
+  Scorpio: "Mars",
+  Sagittarius: "Jupiter",
+  Capricorn: "Saturn",
+  Aquarius: "Saturn",
+  Pisces: "Jupiter"
+};
 
 // North Indian Diamond Chart House Coordinates [cx, cy] for 360x360 SVG
 const HOUSE_POSITIONS: Record<number, [number, number]> = {
@@ -85,20 +111,21 @@ export function generateJaiminiSoulDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
 ): string {
-  const subjectName = escapeHtml(options.customerName || chart.name || "Mukul Mohan Pal");
-  const orderId = escapeHtml(options.orderId || "AL-ORD-MUKUL-JAIMINI-2026");
-  const certificateId = escapeHtml(options.paymentId || "AL-VERIFIED-SHASTRA-CERT-JAIMINI");
+  const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
+  const orderId = escapeHtml(options.orderId || `AL-ORD-${Date.now().toString(36).toUpperCase()}`);
+  const certificateId = escapeHtml(options.paymentId || `AL-CERT-${Date.now().toString(36).toUpperCase()}`);
 
   const birthDate = chart.dob || "1995-07-04";
-  const birthTime = chart.tob || "12:30";
+  const birthTime = chart.tob || "12:00";
   const birthCity = escapeHtml(chart.city || "Delhi");
   const lat = chart.lat ?? 28.6139;
   const lon = chart.lon ?? 77.2090;
 
-  const lagnaRashi = chart.lagnaRashi || "Virgo";
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum ?? 0] || "Aries";
+  const lagnaNum = chart.lagnaNum ?? 0;
   const moonP = chart.planets?.Moon;
-  const moonNakshatra = moonP?.nakshatra || "Uttara Phalguni";
-  const moonRashi = moonP?.sign || "Leo";
+  const moonNakshatra = moonP?.nakshatra || "Ashwini";
+  const moonRashi = moonP?.sign || "Aries";
 
   // Build authentic Jaimini Chart
   const jaimini: JaiminiResult = buildJaiminiChart(chart);
@@ -138,21 +165,198 @@ export function generateJaiminiSoulDossierHTML(
     klHousePlanets[h.house] = h.planets.map(p => PLANET_ABBR[p] || p.slice(0, 2));
   });
 
-  // Authentic Arudhas (Corrected Math: AL in Capricorn, UL in Aries)
-  const al = jaimini.arudhas.find(a => a.shortName === "AL") || { sign: "Capricorn", house: 1 };
-  const ul = jaimini.arudhas.find(a => a.shortName === "UL") || { sign: "Aries", house: 12 };
-  const a2 = jaimini.arudhas.find(a => a.shortName === "A2") || { sign: "Aquarius", house: 2 };
-  const a7 = jaimini.arudhas.find(a => a.shortName === "A7") || { sign: "Cancer", house: 7 };
-  const a10 = jaimini.arudhas.find(a => a.shortName === "A10") || { sign: "Aries", house: 10 };
-  const a11 = jaimini.arudhas.find(a => a.shortName === "A11") || { sign: "Virgo", house: 11 };
+  const klTwelfthSignNum = (klSignNum + 11) % 12;
+  const klTwelfthSign = SIGN_NAMES[klTwelfthSignNum];
+  const klTwelfthLord = SIGN_LORDS[klTwelfthSign];
+  const klTwelfthOccupants = jaimini.karakamsha.houses.find(h => h.house === 12)?.planets || [];
+  const ishtaPlanet = klTwelfthOccupants.length > 0 ? klTwelfthOccupants[0] : klTwelfthLord;
+  const ishtaSourceText = klTwelfthOccupants.length > 0
+    ? `Occupant ${klTwelfthOccupants.join(" & ")} in 12th from KL (${klTwelfthSign})`
+    : `12th Lord ${klTwelfthLord} from KL (${klTwelfthSign}, unoccupied)`;
 
-  // Chara Dasha Active
-  const activeDasha = jaimini.charaDasha.find(d => d.isActive) || jaimini.charaDasha[3] || {
-    sign: "Sagittarius",
-    years: 11,
-    startDate: new Date("2016-07-04"),
-    endDate: new Date("2027-07-04")
+  const ISHTA_MAP: Record<string, { deity: string; desc: string }> = {
+    Sun: { deity: "Lord Shiva & Sri Rama", desc: "Soul sovereignty, solar truth, and divine radiance" },
+    Moon: { deity: "Sri Krishna & Devi Parvati", desc: "Supreme devotion, emotional tranquility, and compassionate grace" },
+    Mars: { deity: "Lord Hanuman & Sri Kartikeya", desc: "Fearlessness, righteous courage, and triumph over inner obstacles" },
+    Mercury: { deity: "Lord Maha Vishnu & Sri Narayana", desc: "Cosmic balance, intellectual discernment, and preservation of dharma" },
+    Jupiter: { deity: "Lord Shiva & Sri Dakshinamurthy", desc: "Supreme wisdom, spiritual guidance, and transcendent enlightenment" },
+    Venus: { deity: "Maha Lakshmi & Divine Mother", desc: "Auspicious grace, creative abundance, and reciprocal harmony" },
+    Saturn: { deity: "Lord Kurma & Lord Shiva", desc: "Enduring tapasya, karmic purification, and timeless patience" },
+    Rahu: { deity: "Maa Durga & Sri Varaha", desc: "Shield against illusion, victory over cosmic chaos, and radical transformation" },
+    Ketu: { deity: "Lord Ganesha & Sri Matsya", desc: "Moksha, intuitive transcendence, and effortless dissolution of karmic knots" },
   };
+  const ishtaInfo = ISHTA_MAP[klTwelfthLord] || { deity: "Sri Vishnu & Shiva", desc: "Sovereign cosmic guidance and spiritual liberation" };
+
+  // Authentic Arudhas
+  const al = jaimini.arudhas.find(a => a.shortName === "AL") || { shortName: "AL", name: "Arudha Lagna", sign: "Aries", house: 1, meaning: "World image" };
+  const ul = jaimini.arudhas.find(a => a.shortName === "UL") || { shortName: "UL", name: "Upapada Lagna", sign: "Aries", house: 12, meaning: "Spousal karma" };
+  const a2 = jaimini.arudhas.find(a => a.shortName === "A2") || { shortName: "A2", name: "Dhana Pada", sign: "Taurus", house: 2, meaning: "Liquid assets" };
+  const a7 = jaimini.arudhas.find(a => a.shortName === "A7") || { shortName: "A7", name: "Dara Pada", sign: "Libra", house: 7, meaning: "Trade & partnership" };
+  const a10 = jaimini.arudhas.find(a => a.shortName === "A10") || { shortName: "A10", name: "Rajya Pada", sign: "Capricorn", house: 10, meaning: "Executive power" };
+  const a11 = jaimini.arudhas.find(a => a.shortName === "A11") || { shortName: "A11", name: "Labha Pada", sign: "Aquarius", house: 11, meaning: "Compound gains" };
+
+  // Chara Dasha Active & Helpers
+  const activeDashaIdx = jaimini.charaDasha.findIndex(d => d.isActive);
+  const activeDasha = (activeDashaIdx >= 0 ? jaimini.charaDasha[activeDashaIdx] : null) || jaimini.charaDasha[0] || {
+    sign: "Aries",
+    years: 10,
+    startDate: new Date("2020-01-01"),
+    endDate: new Date("2030-01-01")
+  };
+  const nextDasha = (activeDashaIdx >= 0 && jaimini.charaDasha[activeDashaIdx + 1])
+    ? jaimini.charaDasha[activeDashaIdx + 1]
+    : (jaimini.charaDasha[1] || jaimini.charaDasha[0]);
+
+  const activeDashaStartYear = new Date(activeDasha.startDate).getFullYear();
+  const activeDashaEndYear = new Date(activeDasha.endDate).getFullYear();
+  const nextDashaStartYear = new Date(nextDasha.startDate).getFullYear();
+  const nextDashaEndYear = new Date(nextDasha.endDate).getFullYear();
+
+  const akData = chart.planets?.[ak.planet];
+  const amkData = chart.planets?.[amk.planet];
+  const bkData = chart.planets?.[bk.planet];
+  const pkData = chart.planets?.[pk.planet];
+  const gkData = chart.planets?.[gk.planet];
+  const dkData = chart.planets?.[dk.planet];
+
+  const akHouse = akData?.house ? `House ${akData.house}` : "Kendra";
+  const amkHouse = amkData?.house ? `House ${amkData.house}` : "Trikona";
+  const bkHouse = bkData?.house ? `House ${bkData.house}` : "Upachaya";
+  const pkHouse = pkData?.house ? `House ${pkData.house}` : "Purva Punya";
+  const gkHouse = gkData?.house ? `House ${gkData.house}` : "Shatru Bhava";
+  const dkHouse = dkData?.house ? `House ${dkData.house}` : "Jaya Bhava";
+
+  const klNinthSignNum = (klSignNum + 8) % 12;
+  const klNinthSign = SIGN_NAMES[klNinthSignNum];
+  const klNinthLord = SIGN_LORDS[klNinthSign];
+  const klLord = SIGN_LORDS[klSign];
+
+  const PLANET_MANTRAS: Record<string, { devanagari: string; latin: string; name: string }> = {
+    Sun: { name: "SURYA BEEJA MANTRA", devanagari: "ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः ॥", latin: "OM HRAAM HREEM HROUM SAH SURYAYA NAMAH ||" },
+    Moon: { name: "CHANDRA BEEJA MANTRA", devanagari: "ॐ श्रां श्रीं श्रौं सः चन्द्रमसे नमः ॥", latin: "OM SHRAM SHREEM SHROUM SAH CHANDRAMASE NAMAH ||" },
+    Mars: { name: "MANGALA BEEJA MANTRA", devanagari: "ॐ क्रां क्रीं क्रौं सः भौमाय नमः ॥", latin: "OM KRAAM KREEM KROUM SAH BHOUMAYA NAMAH ||" },
+    Mercury: { name: "BUDHA BEEJA MANTRA", devanagari: "ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः ॥", latin: "OM BRAAM BREEM BROUM SAH BUDHAYA NAMAH ||" },
+    Jupiter: { name: "GURU BEEJA MANTRA", devanagari: "ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः ॥", latin: "OM GRAAM GREEM GROUM SAH GURAVE NAMAH ||" },
+    Venus: { name: "SHUKRA BEEJA MANTRA", devanagari: "ॐ द्रां द्रीं द्रौं सः शुक्राय नमः ॥", latin: "OM DRAAM DREEM DROUM SAH SHUKRAYA NAMAH ||" },
+    Saturn: { name: "SHANI BEEJA MANTRA", devanagari: "ॐ प्रां प्रीं प्रौं सः शनैश्चराय नमः ॥", latin: "OM PRAAM PREEM PROUM SAH SHANAISHCHARAYA NAMAH ||" },
+    Rahu: { name: "RAHU BEEJA MANTRA", devanagari: "ॐ भ्रां भ्रीं भ्रौं सः राहवे नमः ॥", latin: "OM BHRAAM BHREEM BHROUM SAH RAHAVE NAMAH ||" },
+    Ketu: { name: "KETU BEEJA MANTRA", devanagari: "ॐ स्त्रां स्त्रीं स्त्रौं सः केतवे नमः ॥", latin: "OM STRAAM STREEM STROUM SAH KETAVE NAMAH ||" },
+  };
+
+  const DEITY_ISHTA_MANTRAS: Record<string, { devanagari: string; latin: string }> = {
+    Sun: { devanagari: "ॐ नमो भगवते रामाय नमः ॥", latin: "OM NAMO BHAGAVATE RAMAYA NAMAH ||" },
+    Moon: { devanagari: "ॐ नमो भगवते वासुदेवाय ॥", latin: "OM NAMO BHAGAVATE VASUDEVAYA ||" },
+    Mars: { devanagari: "ॐ हं हनुमते नमः ॥", latin: "OM HAM HANUMATE NAMAH ||" },
+    Mercury: { devanagari: "ॐ नमो नारायणाय ॥", latin: "OM NAMO NARAYANAYA ||" },
+    Jupiter: { devanagari: "ॐ नमः शिवाय ॥", latin: "OM NAMAH SHIVAYA ||" },
+    Venus: { devanagari: "ॐ श्रीं महालक्ष्म्यै नमः ॥", latin: "OM SHREEM MAHALAKSHMYAI NAMAH ||" },
+    Saturn: { devanagari: "ॐ नमः शिवाय ॥", latin: "OM NAMAH SHIVAYA ||" },
+    Rahu: { devanagari: "ॐ दुं दुर्गायै नमः ॥", latin: "OM DUM DURGAYAI NAMAH ||" },
+    Ketu: { devanagari: "ॐ गं गणपतये नमः ॥", latin: "OM GAM GANAPATAYE NAMAH ||" },
+  };
+  const ishtaMantra = DEITY_ISHTA_MANTRAS[ishtaPlanet] || DEITY_ISHTA_MANTRAS.Mercury;
+  const akMantra = PLANET_MANTRAS[ak.planet] || PLANET_MANTRAS.Moon;
+  const amkMantra = PLANET_MANTRAS[amk.planet] || PLANET_MANTRAS.Mercury;
+
+  const akHumanCard = renderHumanImpactCardHtml({
+    tier: "TIER_HIGH",
+    badge: "Your Natural Edge",
+    title: `Soul Compass: ${ak.planet} in ${ak.sign}`,
+    plainWords: `Your Atmakaraka ${ak.planet} in ${ak.sign} (${akHouse}) shows what gives your life real meaning beyond money. You feel most energized when your daily choices match your core values.`,
+    watchOutFor: `Chasing external approval or status in areas that drain your inner conviction.`,
+    nextMove: `Spend 10 quiet minutes tomorrow morning writing down your top priority before checking messages.`,
+    shastricProof: `AK: ${ak.planet} ${akDegreeStr} in ${ak.sign} (${akHouse}) · KL: ${klSign}`
+  }, { customStyle: "margin-bottom:8px;padding:8px 10px;" });
+
+  const amkHumanCard = renderHumanImpactCardHtml({
+    tier: "TIER_HIGH",
+    badge: "Your Natural Edge",
+    title: `Career Engine: ${amk.planet} in ${amk.sign}`,
+    plainWords: `Your Amatyakaraka ${amk.planet} in ${amk.sign} (${amkHouse}) powers how you earn respect and build lasting income. Steady execution in your craft compounds faster than chasing quick trends.`,
+    watchOutFor: `Spreading your focus across too many unaligned projects at once.`,
+    nextMove: `Pick one high-leverage skill or deliverable this week and finish it end-to-end.`,
+    shastricProof: `AmK: ${amk.planet} ${amkDegreeStr} in ${amk.sign} (${amkHouse})`
+  }, { customStyle: "margin-bottom:8px;padding:8px 10px;" });
+
+  const ROLE_BADGE_CLASS: Record<string, string> = {
+    AK: "tag-purple",
+    AmK: "tag-emerald",
+    BK: "tag-ruby",
+    MK: "tag-gold",
+    PK: "tag-sapphire",
+    GK: "tag-amber",
+    DK: "tag-sapphire"
+  };
+  const ROLE_TITLES: Record<string, string> = {
+    AK: "Atmakaraka",
+    AmK: "Amatyakaraka",
+    BK: "Bhratrukaraka",
+    MK: "Matrukaraka",
+    PK: "Putrakaraka",
+    GK: "Gnatikaraka",
+    DK: "Darakaraka"
+  };
+  const karakaTableRowsHtml = jaimini.karakas.map((k) => {
+    const pData = chart.planets?.[k.planet];
+    const house = pData?.house ? `House ${pData.house}` : "Kendra";
+    const badgeCls = ROLE_BADGE_CLASS[k.role] || "tag-gold";
+    const title = ROLE_TITLES[k.role] || k.role;
+    const degStr = formatDMS(k.degreeInSign);
+    return `
+      <tr>
+        <td><span class="tag-badge ${badgeCls}">${k.role}</span></td>
+        <td><strong>${title}</strong></td>
+        <td><strong style="color:var(--gold-bright);">${k.planet}</strong></td>
+        <td>${degStr}</td>
+        <td>${k.sign} (${house})</td>
+        <td>${k.signifies || k.meaning}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const arudhaRowsHtml = jaimini.arudhas.map((a) => {
+    const bhavaFromLagna = houseFromLagna(a.sign, lagnaRashi);
+    const color = a.shortName === "AL" ? "var(--gold-bright)" : a.shortName === "UL" ? "var(--purple-bright)" : a.shortName === "A11" ? "var(--emerald-bright)" : "var(--ivory)";
+    const bg = a.shortName === "AL" ? 'style="background:rgba(201,169,97,0.1);border-left:3px solid var(--gold-bright);"' : a.shortName === "UL" ? 'style="background:rgba(139,92,246,0.12);border-left:3px solid var(--purple-bright);"' : "";
+    return `
+      <tr ${bg}>
+        <td><strong style="color:${color};">${a.shortName}</strong></td>
+        <td><strong>${a.name}</strong></td>
+        <td>${a.sign}</td>
+        <td>${ordinal(bhavaFromLagna)} House</td>
+        <td>${a.meaning || "Karmic reflection of " + a.shortName}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const charaDashaRowsHtml = jaimini.charaDasha.slice(0, 8).map((d) => {
+    const startYear = new Date(d.startDate).getFullYear();
+    const endYear = new Date(d.endDate).getFullYear();
+    const activeBadge = d.isActive ? `<span class="tag-badge tag-emerald">ACTIVE NOW</span> ` : "";
+    const bgStyle = d.isActive ? `style="background:rgba(201,169,97,0.12);border-left:3px solid var(--gold-bright);"` : "";
+    const karakasInSign = jaimini.karakas.filter(k => k.sign === d.sign).map(k => `${k.role} (${k.planet})`);
+    const arudhasInSign = jaimini.arudhas.filter(a => a.sign === d.sign).map(a => a.shortName);
+    const axisTags = [...karakasInSign, ...arudhasInSign];
+    const axisLabel = axisTags.length > 0 ? axisTags.join(" &middot; ") : `${SIGN_LORDS[d.sign] || ""} Ruled Bhava (${ordinal(houseFromLagna(d.sign, lagnaRashi))})`;
+    const windowDesc = d.isActive
+      ? "Current pivotal soul evolution chapter"
+      : arudhasInSign.includes("AL") || arudhasInSign.includes("A10") || arudhasInSign.includes("A11")
+      ? `Activates ${arudhasInSign.join("/")} worldly growth`
+      : arudhasInSign.includes("UL")
+      ? "Activates UL partnership &amp; family milestones"
+      : karakasInSign.length > 0
+      ? `Maturation of ${karakasInSign.join(", ")}`
+      : `${ordinal(houseFromLagna(d.sign, lagnaRashi))} house karmic development`;
+    return `
+      <tr ${bgStyle}>
+        <td><strong>${d.sign}</strong></td>
+        <td>${d.years} Years</td>
+        <td>${startYear} &ndash; ${endYear}</td>
+        <td>${axisLabel}</td>
+        <td>${activeBadge}${windowDesc}</td>
+      </tr>
+    `;
+  }).join("");
 
   const headerRail = (kicker: string) => `
     <div class="page-rail">
@@ -237,6 +441,11 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.page:last-child,
+.page:last-of-type {
+  page-break-after: avoid !important;
 }
 
 .page-cover {
@@ -376,6 +585,11 @@ body {
   padding: 8px;
 }
 
+.devanagari-safe {
+  letter-spacing: 0 !important;
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif !important;
+}
+
 .mantra-devanagari {
   font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif;
   font-weight: 600;
@@ -384,6 +598,7 @@ body {
   text-align: center;
   margin: 4px 0;
   line-height: 1.6;
+  letter-spacing: 0 !important;
 }
 </style>
 </head>
@@ -431,27 +646,27 @@ body {
       </div>
       <div>
         <span class="kicker">Atmakaraka (AK · Soul King)</span>
-        <div style="color:var(--purple-bright);font-weight:700;">Moon in Leo (${akDegreeStr} · H12 Moksha)</div>
+        <div style="color:var(--purple-bright);font-weight:700;">${ak.planet} in ${ak.sign} (${akDegreeStr} · ${akHouse})</div>
       </div>
       <div>
         <span class="kicker">Amatyakaraka (AmK · Career Mind)</span>
-        <div style="color:var(--emerald-bright);font-weight:700;">Mercury in Taurus (${amkDegreeStr} · H9 Dharma)</div>
+        <div style="color:var(--emerald-bright);font-weight:700;">${amk.planet} in ${amk.sign} (${amkDegreeStr} · ${amkHouse})</div>
       </div>
       <div>
         <span class="kicker">Karakamsha Lagna (KL · D9 Base)</span>
-        <div style="color:var(--gold-bright);font-weight:700;">${klSign} (Ruled by Devaguru Jupiter)</div>
+        <div style="color:var(--gold-bright);font-weight:700;">${klSign} (Ruled by ${klLord})</div>
       </div>
       <div>
         <span class="kicker">Arudha Lagna (AL · World Image)</span>
-        <div style="color:var(--sapphire-bright);font-weight:700;">${al.sign} (H5 · Strategic Intellect &amp; Systems)</div>
+        <div style="color:var(--sapphire-bright);font-weight:700;">${al.sign} (House ${al.house} · World Perception)</div>
       </div>
       <div>
         <span class="kicker">Active Operating Chara Dasha</span>
-        <div style="color:var(--gold-bright);font-weight:700;">${activeDasha.sign} Mahadasha (2016&ndash;2027)</div>
+        <div style="color:var(--gold-bright);font-weight:700;">${activeDasha.sign} Mahadasha (${activeDashaStartYear}&ndash;${activeDashaEndYear})</div>
       </div>
       <div>
         <span class="kicker">Ishta Devata (12th from KL in D9)</span>
-        <div style="color:var(--ruby-bright);font-weight:700;">Lord Hanuman &middot; Sri Kartikeya (Maha Lakshmi)</div>
+        <div style="color:var(--ruby-bright);font-weight:700;">${ishtaInfo.deity}</div>
       </div>
     </div>
   </div>
@@ -497,19 +712,19 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.2px;">
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--purple);">
-          <strong style="color:var(--purple-bright);">PILLAR I (Pages 3&ndash;6): The 7 Chara Karakas Sovereign Hierarchy</strong> &mdash; Comprehensive audit of the Soul King (AK Moon in Leo H12), Prime Minister (AmK Mercury in Taurus H9), and the supreme AK-AmK Raja Yoga dynamics.
+          <strong style="color:var(--purple-bright);">PILLAR I (Pages 3&ndash;6): The 7 Chara Karakas Sovereign Hierarchy</strong> &mdash; Comprehensive audit of the Soul King (AK ${ak.planet} in ${ak.sign} ${akHouse}), Prime Minister (AmK ${amk.planet} in ${amk.sign} ${amkHouse}), and the supreme AK-AmK Raja Yoga dynamics.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--gold);">
-          <strong style="color:var(--gold-bright);">PILLAR II (Pages 7&ndash;10): Karakamsha Lagna (KL) &amp; Navamsha Swamsha</strong> &mdash; The spiritual throne in Sagittarius (Dhanu), the 12-house soul chart, 12th house Moksha portal, and Ishta Devata revelation (Hanuman / Kartikeya).
+          <strong style="color:var(--gold-bright);">PILLAR II (Pages 7&ndash;10): Karakamsha Lagna (KL) &amp; Navamsha Swamsha</strong> &mdash; The spiritual throne in ${klSign}, the 12-house soul chart, 12th house Moksha portal, and Ishta Devata revelation (${ishtaInfo.deity}).
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--sapphire);">
-          <strong style="color:var(--sapphire-bright);">PILLAR III (Pages 11&ndash;14): Arudha Padas &amp; The Mirror of Maya</strong> &mdash; Worldly perception vs inner truth: Arudha Lagna (AL in Capricorn H5), Upapada Lagna (UL in Aries H8), and Financial Arudhas (A2, A10, A11).
+          <strong style="color:var(--sapphire-bright);">PILLAR III (Pages 11&ndash;14): Arudha Padas &amp; The Mirror of Maya</strong> &mdash; Worldly perception vs inner truth: Arudha Lagna (AL in ${al.sign} House ${al.house}), Upapada Lagna (UL in ${ul.sign}), and Financial Arudhas (${a2.shortName}, ${a10.shortName}, ${a11.shortName}).
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--ruby);">
-          <strong style="color:var(--ruby-bright);">PILLAR IV (Pages 15&ndash;16): Gnatikaraka (GK) Shadow &amp; Karmic Hurdles</strong> &mdash; Auditing Venus (GK in Gemini H10), relationship projections, creative hurdles, and Bhratrukaraka Mars as the inner Kshetrapala.
+          <strong style="color:var(--ruby-bright);">PILLAR IV (Pages 15&ndash;16): Gnatikaraka (GK) Shadow &amp; Karmic Hurdles</strong> &mdash; Auditing ${gk.planet} (GK in ${gk.sign} ${gkHouse}), karmic friction, and Bhratrukaraka ${bk.planet} as the inner Kshetrapala.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">PILLAR V (Pages 17&ndash;22): Chara Dasha Master System &amp; Sacred Upayas</strong> &mdash; Full lifecycle Rashi Dasha timeline, active Sagittarius Dasha (2016&ndash;2027), upcoming Capricorn harvest (2027&ndash;2037), and Ishta Devata mantras.
+          <strong style="color:var(--emerald-bright);">PILLAR V (Pages 17&ndash;22): Chara Dasha Master System &amp; Sacred Upayas</strong> &mdash; Full lifecycle Rashi Dasha timeline, active ${activeDasha.sign} Dasha (${activeDashaStartYear}&ndash;${activeDashaEndYear}), upcoming ${nextDasha.sign} horizon (${nextDashaStartYear}&ndash;${nextDashaEndYear}), and sacred soul mantras.
         </div>
       </div>
     </div>
@@ -539,69 +754,14 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><span class="tag-badge tag-purple">AK</span></td>
-          <td><strong>Atmakaraka</strong></td>
-          <td><strong style="color:var(--purple-bright);">Moon</strong></td>
-          <td>${akDegreeStr}</td>
-          <td>Leo (12th House)</td>
-          <td>The Soul King: Identity, inner longing, ego dissolution, spiritual liberation</td>
-        </tr>
-        <tr>
-          <td><span class="tag-badge tag-emerald">AmK</span></td>
-          <td><strong>Amatyakaraka</strong></td>
-          <td><strong style="color:var(--emerald-bright);">Mercury</strong></td>
-          <td>${amkDegreeStr}</td>
-          <td>Taurus (9th House)</td>
-          <td>The Prime Minister: Profession, intellectual capital, code, shastra advisory</td>
-        </tr>
-        <tr>
-          <td><span class="tag-badge tag-ruby">BK</span></td>
-          <td><strong>Bhratrukaraka</strong></td>
-          <td><strong style="color:var(--ruby-bright);">Mars</strong></td>
-          <td>${bkDegreeStr}</td>
-          <td>Leo (12th House)</td>
-          <td>The Guru &amp; Protector: Spiritual courage, inner warrior, sibling karma</td>
-        </tr>
-        <tr>
-          <td><span class="tag-badge tag-gold">MK</span></td>
-          <td><strong>Matrukaraka</strong></td>
-          <td><strong>Sun</strong></td>
-          <td>${mkDegreeStr}</td>
-          <td>Gemini (10th House)</td>
-          <td>The Foundation: Emotional anchoring, ancestral roots, executive authority</td>
-        </tr>
-        <tr>
-          <td><span class="tag-badge tag-sapphire">PK</span></td>
-          <td><strong>Putrakaraka</strong></td>
-          <td><strong>Jupiter</strong></td>
-          <td>${pkDegreeStr}</td>
-          <td>Scorpio (3rd House)</td>
-          <td>The Disciple &amp; Intellect: Purva Punya, deep research, future disciples</td>
-        </tr>
-        <tr>
-          <td><span class="tag-badge tag-amber">GK</span></td>
-          <td><strong>Gnatikaraka</strong></td>
-          <td><strong style="color:var(--amber);">Venus</strong></td>
-          <td>${gkDegreeStr}</td>
-          <td>Gemini (10th House)</td>
-          <td>The Karmic Friction: Tests of desire, creative perfectionism, 6th-house debts</td>
-        </tr>
-        <tr>
-          <td><span class="tag-badge tag-sapphire">DK</span></td>
-          <td><strong>Darakaraka</strong></td>
-          <td><strong style="color:var(--sapphire-bright);">Saturn</strong></td>
-          <td>${dkDegreeStr}</td>
-          <td>Pisces (7th House)</td>
-          <td>The Sacred Counterparty: Life partner, spiritual marriage, institutional contracts</td>
-        </tr>
+        ${karakaTableRowsHtml}
       </tbody>
     </table>
 
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--purple-bright);">
       <div class="kicker" style="color:var(--purple-bright);">The Sovereign Hierarchy Principle:</div>
       <p style="font-size:11.5px;color:var(--ivory-dim);margin-top:2px;">
-        The Atmakaraka (Moon at ${akDegreeStr}) is the supreme monarch of your chart. Whatever the AK desires, the entire horoscope must ultimately conspire to deliver. The Amatyakaraka (Mercury at ${amkDegreeStr}) is the chief executive executor. In your chart, <strong>both the Soul King (Moon) and the Career Executor (Mercury) hold mature, end-of-sign degrees (29° and 26°)</strong>, indicating an incarnation of intellectual synthesis, deep karmic completion, and spiritual autonomy.
+        The Atmakaraka (${ak.planet} at ${akDegreeStr}) is the supreme monarch of your chart. Whatever the AK desires, the entire horoscope must ultimately conspire to deliver. The Amatyakaraka (${amk.planet} at ${amkDegreeStr}) is the chief executive executor. In your chart, both the Soul King (${ak.planet}) and the Career Executor (${amk.planet}) anchor your primary life arc, indicating an incarnation of specialized mastery, deep karmic completion, and spiritual autonomy.
       </p>
     </div>
   </div>
@@ -612,31 +772,32 @@ body {
 <section class="page">
   ${headerRail("PILLAR I: ATMAKARAKA DEEP AUDIT")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Atmakaraka Moon in Leo (12th House): The Monastic King</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Atmakaraka ${ak.planet} in ${ak.sign}: The Sovereign Soul Path</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Holding the highest longitude in your chart (<strong>${akDegreeStr}</strong>), the Moon is your <strong>Atmakaraka (AK)</strong>.
+      Holding the highest longitude in your chart (<strong>${akDegreeStr}</strong>), ${ak.planet} is your <strong>Atmakaraka (AK)</strong>.
     </p>
 
+    ${akHumanCard}
     <!-- AK Core Analysis Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--purple-bright);">
       <div class="card-title" style="color:var(--purple-bright);font-size:12px;">
-        ✦ THE SOUL ESSENCE: HIGH PSYCHIC SENSITIVITY &amp; ABSOLUTE AUTONOMY
+        ✦ THE SOUL ESSENCE: ${ak.planet.toUpperCase()} IN ${ak.sign.toUpperCase()} (${akDegreeStr})
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        When the Moon is Atmakaraka, the soul contracted to master <strong>emotional purity, mental detachment, and deep empathy without self-destruction</strong>. Moon at ${akDegreeStr} sits at the very edge of Leo&mdash;the final degree of a royal sign (<em>extreme Rashi Sandhi cusp threshold</em>)&mdash;reflecting a soul that has exhausted mundane worldly vanity and now hungers for authentic spiritual truth.
+        When ${ak.planet} is Atmakaraka, the soul contracted to master its archetypal virtues. Placed in ${ak.sign} at ${akDegreeStr}, it reflects an evolutionary trajectory where worldly ambition must align with authentic spiritual truth.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
-        <strong style="color:var(--gold-bright);">The 12th House Paradox:</strong> Placing the Soul King in the 12th house (Vyaya / Moksha Bhava) means your true power emerges when you work in quiet isolation, solitary digital architecture, or behind closed doors. Mundane retail visibility exhausts you; private sovereign creation elevates you.
+        <strong style="color:var(--gold-bright);">Soul Alignment:</strong> Placing the Soul King in ${ak.sign} means your greatest resilience emerges when your daily decisions reflect pure internal conviction, ethical integrity, and quiet reflection.
       </div>
     </div>
 
-    <!-- The Leo Dynamic -->
+    <!-- The Sign Dynamic -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;">
-        ✦ LEO VIRTUE: CREATING EMPIRES FROM SACRED SOLITUDE
+        ✦ ${ak.sign.toUpperCase()} VIRTUE: PURPOSEFUL MASTERY
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Leo is ruled by the Sun (Royalty, Authority, Solar Radiance), while the 12th house rules the unmanifest cosmos and foreign lands. This combination creates the archetype of the <strong>Monastic Sovereign</strong>: an individual capable of designing vast intellectual platforms, algorithms, and institutions that influence thousands, while personally remaining detached and unentangled by public clamor.
+        ${ak.sign} imparts distinct fortitude to ${ak.planet}. This combination creates an individual capable of patient cultivation, enduring strategic focus, and building substantial achievements while remaining centered and unentangled by superficial noise.
       </p>
     </div>
 
@@ -644,7 +805,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--ruby-bright);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;">✦ THE ATMAKARAKA KARMIC LESSON</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        The primary trap of Moon AK in the 12th house is <strong>psychic sponge syndrome</strong>&mdash;absorbing the chaotic emotional turbulence of environments and collaborators. You must strictly guard your bedtime hours, maintain unbroken silence upon waking, and retreat to nature or sacred waters to cleanse your etheric field.
+        The primary karmic test of ${ak.planet} as Atmakaraka is learning non-attachment to external outcomes and ego validation. Dedicate regular moments of quiet stillness, conscious boundary-setting, and mindful introspection to maintain clarity.
       </p>
     </div>
   </div>
@@ -655,33 +816,34 @@ body {
 <section class="page">
   ${headerRail("PILLAR I: AMATYAKARAKA INTELLECTUAL MISSION")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Amatyakaraka Mercury in Taurus (9th House): The Sovereign Architect</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Amatyakaraka ${amk.planet} in ${amk.sign}: The Sovereign Architect</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Holding the second highest longitude (<strong>${amkDegreeStr}</strong>), Mercury is your <strong>Amatyakaraka (AmK)</strong>&mdash;the Prime Minister governing your worldly vocation, professional intellect, and financial architecture.
+      Holding the second highest longitude (<strong>${amkDegreeStr}</strong>), ${amk.planet} is your <strong>Amatyakaraka (AmK)</strong>&mdash;the Prime Minister governing your worldly vocation, professional intellect, and financial architecture.
     </p>
 
+    ${amkHumanCard}
     <!-- AmK Core Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--emerald-bright);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;">
-        ✦ MERCURY IN 9TH HOUSE: INTELLECTUAL CAPITAL AS SACRED DHARMA
+        ✦ ${amk.planet.toUpperCase()} IN ${amk.sign.toUpperCase()}: INTELLECTUAL CAPITAL AS SACRED DHARMA
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        In classical Jaimini, the placement of the Amatyakaraka defines your primary vehicle of contribution. Mercury in the <strong>9th House of Higher Shastra, Philosophy &amp; Dharma</strong> indicates that your career is inherently tied to:
+        In classical Jaimini, the placement of the Amatyakaraka defines your primary vehicle of contribution. ${amk.planet} in ${amk.sign} indicates that your career is inherently tied to:
       </p>
       <ul style="padding-left:16px;font-size:11.2px;color:var(--ivory-dim);margin-top:4px;line-height:1.5;">
-        <li>Translating complex classical wisdom (Vedic Shastra, metaphysics) into elegant, algorithmic, deterministic software systems.</li>
-        <li>Acting as a high-status institutional counselor, strategic advisor, and technical architect.</li>
-        <li>Building compounding intellectual property (IP), proprietary code engines, and sovereign digital assets.</li>
+        <li>Translating specialized analysis, principles, and strategic vision into structured, durable real-world systems.</li>
+        <li>Acting as a high-conviction counselor, trusted advisor, and technical or executive architect.</li>
+        <li>Building compounding intellectual capital, enduring professional authority, and sovereign value.</li>
       </ul>
     </div>
 
     <!-- Earthy Taurus Precision -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--sapphire-bright);">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;">
-        ✦ TAURUS DIGNITY: TURNING ABSTRACT IDEAS INTO MONETIZABLE FORM
+        ✦ ${amk.sign.toUpperCase()} DIGNITY: TURNING CONCEPTS INTO DURABLE FORM
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Mercury in airy or watery signs produces fleeting, theoretical ideas. But Mercury in <strong>Taurus (an earth sign ruled by Venus)</strong> demands physical manifestation, aesthetic beauty, and long-term economic durability. You construct foundational frameworks engineered to compound over decades.
+        ${amk.planet} in ${amk.sign} demands grounded execution, practical value, and economic durability. You are built to construct foundational frameworks engineered to compound sustainably over decades.
       </p>
     </div>
 
@@ -689,7 +851,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ THE AMATYAKARAKA PROFESSIONAL MANDATE</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Mercury as 10th lord placed in 9th forms a supreme <strong>Dharma-Karmadhipati Maha Parivartana Yoga</strong> with 9th lord Venus in the 10th. Whenever your commercial enterprises honor ethical dharma and intellectual truth, your revenue and authority expand exponentially.
+        Whenever your commercial enterprises honor ethical excellence, rigorous truth, and meticulous standards, your professional influence and prosperity expand exponentially.
       </p>
     </div>
   </div>
@@ -710,35 +872,35 @@ body {
       <thead>
         <tr>
           <th>Dynamic Vector</th>
-          <th>Atmakaraka (Moon in Leo H12)</th>
-          <th>Amatyakaraka (Mercury in Taurus H9)</th>
+          <th>Atmakaraka (${ak.planet} in ${ak.sign})</th>
+          <th>Amatyakaraka (${amk.planet} in ${amk.sign})</th>
           <th>Harmonized Synthesis</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong>Element</strong></td>
-          <td>Royal Fire (Leo / Surya Kshetra)</td>
-          <td>Practical Earth (Taurus / Shukra Kshetra)</td>
-          <td>Creative fire channeled into permanent structural forms</td>
+          <td><strong>Core Domain</strong></td>
+          <td>Soul awareness &amp; spiritual longing</td>
+          <td>Worldly vocation &amp; practical intellect</td>
+          <td>Inner purpose expressed through structured external action</td>
         </tr>
         <tr>
-          <td><strong>Bhava Role</strong></td>
-          <td>12th House (Dissolution, Moksha, Solitude)</td>
-          <td>9th House (Dharma, Advisory, Higher Code)</td>
-          <td>10/4 Kendriya disposition: Career serves spiritual liberation</td>
+          <td><strong>Cognitive Vector</strong></td>
+          <td>Intuitive reflection, moral alignment</td>
+          <td>Structured analysis, disciplined execution</td>
+          <td>Intuition validated by rigorous practical methodology</td>
         </tr>
         <tr>
           <td><strong>Psychology</strong></td>
-          <td>Introspective intuition, poetic depth</td>
-          <td>Sharp mathematical logic, code syntax</td>
-          <td>The Mystic Technologist: Intuition validated by rigorous math</td>
+          <td>Seeks inner meaning and truth</td>
+          <td>Seeks clarity, systems, and results</td>
+          <td>Balanced mastery: Meaningful purpose driven by clear systems</td>
         </tr>
         <tr>
-          <td><strong>Mundane Danger</strong></td>
-          <td>Recluse withdrawal, apathy to worldly games</td>
-          <td>Overthinking, perfectionist paralysis</td>
-          <td>Aligned action: Coding sovereign tools during solitary hours</td>
+          <td><strong>Evolutionary Path</strong></td>
+          <td>Detachment from ego noise</td>
+          <td>Fulfilling responsibilities with integrity</td>
+          <td>Engaged in worldly achievement while anchored within</td>
         </tr>
       </tbody>
     </table>
@@ -749,7 +911,7 @@ body {
         ✦ JAIMINI SUTRA: THE MAHA RAJA YOGA OF AK AND AMK
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Maharishi Jaimini states: <em>"When Atmakaraka and Amatyakaraka are mutually configured in auspicious Bhavas or Rashi Drishti, the native achieves extraordinary renown and wealth."</em> In your chart, Mercury in Taurus and Moon in Leo sit in a mutual 10th/4th relationship, meaning your career actions (10th from AK) directly nourish your soul's peace (4th from AmK).
+        Maharishi Jaimini states: <em>"When Atmakaraka and Amatyakaraka are mutually configured in auspicious Bhavas or Rashi Drishti, the native achieves extraordinary renown and wealth."</em> In your chart, ${amk.planet} in ${amk.sign} and ${ak.planet} in ${ak.sign} anchor your career actions and soul peace.
       </p>
     </div>
 
@@ -757,7 +919,7 @@ body {
     <div class="luxury-card">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ THE SOUL ALIGNMENT RULE</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Never accept projects or contracts that violate your inner sense of spiritual dignity, no matter the financial compensation. When your AmK (Mercury) works in service of projects that excite your AK (Moon's search for timeless truth), wealth and recognition follow as effortless byproducts.
+        Never accept projects or contracts that violate your inner sense of spiritual dignity, no matter the financial compensation. When your AmK (${amk.planet}) works in service of projects that excite your AK (${ak.planet}), wealth and recognition follow as effortless byproducts.
       </p>
     </div>
   </div>
@@ -768,7 +930,7 @@ body {
 <section class="page">
   ${headerRail("PILLAR II: KARAKAMSHA LAGNA REVELATION")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">The Gateway to the Soul: Karakamsha in Sagittarius (Dhanu)</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">The Gateway to the Soul: Karakamsha in ${klSign}</h2>
     <p class="body-text" style="margin-bottom:10px;">
       In classical Jaimini Shastra, the sign occupied by the Atmakaraka in the <strong>Navamsha Chart (D-9)</strong> is crowned as the <strong>Karakamsha Lagna (KL)</strong>. It is the unvarnished spiritual seat of the soul.
     </p>
@@ -779,30 +941,29 @@ body {
         ✦ MATHEMATICAL DERIVATION OF KARAKAMSHA LAGNA
       </div>
       <div style="font-size:11px;color:var(--ivory-dim);line-height:1.5;margin-top:4px;">
-        1. <strong>Natal AK Position:</strong> Moon at <strong>${akDegreeStr}</strong> in Leo.<br/>
-        2. <strong>Rashi Modality:</strong> Leo is a Fixed Sign (<em>Sthira Rashi</em>). In classical Navamsha computation for Fixed Signs, the 9 padas begin from the 9th sign from Leo, which is <strong>Aries (Mesha)</strong>.<br/>
-        3. <strong>Navamsha Pada Span:</strong> Each Navamsha spans 3° 20'. The 9th pada (from 26° 40' to 30° 00') maps to the 9th sign from Aries: <strong>Sagittarius (Dhanu)</strong>.<br/>
-        4. <strong>Conclusion:</strong> Your <strong>Karakamsha Lagna is indisputably SAGITTARIUS (धनु)</strong>, ruled by Devaguru Jupiter.
+        1. <strong>Natal AK Position:</strong> ${ak.planet} at <strong>${akDegreeStr}</strong> in ${ak.sign}.<br/>
+        2. <strong>Navamsha Mapping:</strong> Evaluated through the Navamsha division where the soul intent crystallizes.<br/>
+        3. <strong>Conclusion:</strong> Your <strong>Karakamsha Lagna is ${klSign.toUpperCase()}</strong>, ruled by ${SIGN_LORDS[klSign]}.
       </div>
     </div>
 
-    <!-- Sagittarius Meaning -->
+    <!-- Meaning -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--purple-bright);">
       <div class="card-title" style="color:var(--purple-bright);font-size:12px;">
-        ✦ SAGITTARIUS KARAKAMSHA: THE ARCHER OF TRANSCENDENT TRUTH
+        ✦ ${klSign.toUpperCase()} KARAKAMSHA: THE SOUL'S HIGHER CALLING
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Having Sagittarius as Karakamsha indicates a soul whose innate dharma is that of the <strong>Spiritual Archer (<em>Dharma Dhanurdhara</em>)</strong>. You are born with an unquenchable thirst for higher philosophies, systemic synthesis, and universal laws. You cannot tolerate pettiness, dogmatic orthodoxy, or shallow intellectual games.
+        Having ${klSign} as Karakamsha indicates a soul whose innate dharma aligns with the higher principles of ${klSign}. You are endowed with an internal drive toward truth, structured clarity, and purpose.
       </p>
     </div>
 
     <!-- KL to AL Dynamics -->
     <div class="luxury-card" style="background:var(--surface-elevated);border:1.5px solid var(--emerald);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-        ✦ THE SACRED 12/2 DYNAMICS: KARAKAMSHA (KL) &amp; ARUDHA LAGNA (AL)
+        ✦ THE DYNAMICS: KARAKAMSHA (KL) &amp; ARUDHA LAGNA (AL)
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        While your soul throne sits in <strong>Sagittarius (Karakamsha)</strong>, your worldly vehicle sits in the adjacent sign: <strong>Capricorn (Arudha Lagna in 5th House)</strong>. In classical mechanics, this 12/2 configuration means your spiritual philosophy (Sagittarius) directly feeds, finances, and inspires your worldly engineering systems (Capricorn).
+        While your soul throne sits in <strong>${klSign} (Karakamsha)</strong>, your worldly vehicle sits in <strong>${al.sign} (Arudha Lagna in House ${al.house})</strong>. In classical mechanics, this configuration means your internal philosophy directly inspires, guides, and empowers your external achievements.
       </p>
     </div>
   </div>
@@ -815,7 +976,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">The 12 Houses from Karakamsha: Interior Soul Blueprint</h2>
     <p class="body-text" style="margin-bottom:8px;">
-      Projecting your natal planetary grid from the Karakamsha throne in Sagittarius reveals the spiritual wiring of your internal life.
+      Projecting your natal planetary grid from the Karakamsha throne in ${klSign} reveals the spiritual wiring of your internal life.
     </p>
 
     <!-- SVG Kundli -->
@@ -826,22 +987,22 @@ body {
     <!-- House Overlay Grid -->
     <div class="grid-2" style="font-size:10.5px;row-gap:6px;">
       <div class="luxury-card">
-        <strong style="color:var(--gold-bright);">KL 1st House (Sagittarius):</strong> Philosophical autonomy, ethical backbone, innate teaching capacity.
+        <strong style="color:var(--gold-bright);">KL 1st House (${klSign}):</strong> Philosophical autonomy, ethical backbone, innate teaching capacity.
       </div>
       <div class="luxury-card">
-        <strong style="color:var(--gold-bright);">KL 2nd House (Capricorn):</strong> Wealth generated through structured, patient, long-term engineering systems.
+        <strong style="color:var(--gold-bright);">KL 2nd House (${SIGN_NAMES[(klSignNum + 1) % 12]}):</strong> Wealth generated through structured, patient, long-term systems.
       </div>
       <div class="luxury-card">
-        <strong style="color:var(--gold-bright);">KL 4th House (Pisces · Saturn):</strong> Finds emotional peace in ascetic quietude, water bodies, and silent contemplation.
+        <strong style="color:var(--gold-bright);">KL 4th House (${SIGN_NAMES[(klSignNum + 3) % 12]}):</strong> Finds emotional peace in quiet contemplation and grounded focus.
       </div>
       <div class="luxury-card">
-        <strong style="color:var(--gold-bright);">KL 5th House (Aries · Ketu):</strong> Lightning mathematical intuition, esoteric intelligence, abstract coding genius.
+        <strong style="color:var(--gold-bright);">KL 5th House (${SIGN_NAMES[(klSignNum + 4) % 12]}):</strong> Sharp intellectual discernment, esoteric intelligence, and creative vision.
       </div>
       <div class="luxury-card">
-        <strong style="color:var(--gold-bright);">KL 6th House (Taurus · Mercury):</strong> Overcomes intellectual opposition through factual precision and shastric evidence.
+        <strong style="color:var(--gold-bright);">KL 6th House (${SIGN_NAMES[(klSignNum + 5) % 12]}):</strong> Overcomes intellectual opposition through factual precision and evidence.
       </div>
       <div class="luxury-card">
-        <strong style="color:var(--gold-bright);">KL 9th House (Leo · Moon, Mars):</strong> Boundless ancestral merit; soul acts as a courageous defender of dharma.
+        <strong style="color:var(--gold-bright);">KL 9th House (${SIGN_NAMES[(klSignNum + 8) % 12]}):</strong> High ancestral merit; soul acts as a courageous defender of dharma.
       </div>
     </div>
   </div>
@@ -860,23 +1021,23 @@ body {
     <!-- Shastric Derivation Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--purple-bright);">
       <div class="card-title" style="color:var(--purple-bright);font-size:12px;">
-        ✦ NAVAMSHA D-9 DERIVATION: SCORPIO 12TH HOUSE OCCUPIED BY MARS &amp; VENUS
+        ✦ NAVAMSHA D-9 DERIVATION: ${klTwelfthSign.toUpperCase()} 12TH HOUSE RULED BY ${klTwelfthLord.toUpperCase()}
       </div>
       <div style="font-size:11.2px;color:var(--ivory-dim);line-height:1.5;margin-top:4px;">
-        • <strong>Karakamsha in Navamsha (D9):</strong> Sagittarius (occupied by Moon AK &amp; Rahu).<br/>
-        • <strong>12th House from Karakamsha in D9:</strong> <strong>Scorpio (Vrishchika)</strong>.<br/>
-        • <strong>Occupants in Navamsha (D9):</strong> <strong>Mars (own sign) &amp; Venus</strong>.<br/>
-        • <strong>Classical Jaimini Sutra:</strong> When Mars occupies the 12th from Karakamsha in D9, the primary Ishta Devata is <strong>Lord Hanuman &amp; Sri Kartikeya (Skanda / Subrahmanya)</strong>. With Venus accompanying, the grace of <strong>Maha Lakshmi (Divine Mother)</strong> harmonizes the spiritual field.
+        • <strong>Karakamsha in Navamsha (D9):</strong> ${klSign} (throne of Atmakaraka ${ak.planet}).<br/>
+        • <strong>12th House from Karakamsha in D9:</strong> <strong>${klTwelfthSign}</strong>${klTwelfthOccupants.length ? ` (occupied by <strong>${klTwelfthOccupants.join(", ")}</strong>)` : " (unoccupied)"}.<br/>
+        • <strong>Primary Ishta Determinant:</strong> <strong>${ishtaSourceText}</strong>.<br/>
+        • <strong>Classical Jaimini Sutra:</strong> Under Maharishi Jaimini's Upadesha Sutras, ${klTwelfthOccupants.length ? "the strongest occupant in" : "the lord of"} the 12th from Karakamsha reveals the Ishta Devata portal: <strong>${ishtaInfo.deity}</strong>.
       </div>
     </div>
 
     <!-- Sacred Archetype -->
     <div class="luxury-card" style="margin-bottom:10px;border:1.5px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;">
-        ✦ THE REVELATION: SRI HANUMAN &amp; LORD KARTIKEYA
+        ✦ THE REVELATION: ${ishtaInfo.deity.toUpperCase()}
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        In alignment with your D-9 Navamsha blueprint, your Ishta Devata is <strong>Lord Hanuman and Sri Kartikeya (The Commander of Divine Forces)</strong>. Mars in Scorpio in the 12th from Karakamsha represents the conquest of inner demons, absolute brahmacharya/discipline, and fearless defense of truth. Whenever you chant the Hanuman Chalisa or Kartikeya stotrams, mental fear evaporates and extraordinary physical stamina returns.
+        In alignment with your D-9 Navamsha blueprint, your Ishta Devata is <strong>${ishtaInfo.deity}</strong> (${ishtaInfo.desc}). This divine archetype represents your soul's natural portal for meditation, higher protection, and spiritual liberation.
       </p>
     </div>
 
@@ -884,7 +1045,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">✦ DHARMA DEVATA (9TH FROM KARAKAMSHA)</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        The 9th house from Karakamsha in D9 is Cancer, aspected by the Sun from Pisces. Your Dharma Devata&mdash;the deity guiding your righteous actions in the physical world&mdash;is <strong>Surya Narayana and Sri Rama</strong>. Offering water to the rising Sun aligns your intellect with unyielding moral clarity.
+        The 9th house from Karakamsha in D9 is ${SIGN_NAMES[(klSignNum + 8) % 12]}, ruled by ${SIGN_LORDS[SIGN_NAMES[(klSignNum + 8) % 12]]}. Your Dharma Devata guides righteous actions in the physical world, bringing moral clarity and auspicious purpose.
       </p>
     </div>
   </div>
@@ -900,23 +1061,23 @@ body {
       The 9th house from Karakamsha Lagna reveals the spiritual merit (<em>Purva Punya</em>), ancestral blessings, and the nature of gurus who guide your incarnation.
     </p>
 
-    <!-- 9th House Leo Card -->
+    <!-- 9th House Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;">
-        ✦ LEO 9TH FROM KL IN D1: THE SOLAR LINEAGE OF DHARMA
+        ✦ ${klNinthSign.toUpperCase()} 9TH FROM KL IN D1: THE DHARMA LINEAGE
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        In your birth chart, the 9th from Sagittarius is <strong>Leo (Simha)</strong>, occupied by your natal Moon (AK) and Mars (BK). This produces an intense, luminous spiritual lineage. You are carrying forward unfulfilled spiritual scholarship and temple-building merits from previous lifetimes.
+        In your birth chart, the 9th from ${klSign} is <strong>${klNinthSign}</strong>, governed by ${klNinthLord}. In Jaimini astrology, the 9th from Karakamsha reveals the soul's guru lineage, past-life spiritual vows, and guiding philosophy.
       </p>
     </div>
 
-    <!-- Mars as Spiritual Kshetrapala -->
+    <!-- BK as Spiritual Protector -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--ruby-bright);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:12px;">
-        ✦ BHRATRUKARAKA MARS AS THE INNER SPIRITUAL WARRIOR
+        ✦ BHRATRUKARAKA ${bk.planet.toUpperCase()} AS THE INNER PROTECTOR
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        In Jaimini, the Bhratrukaraka (BK) is the significator of the Guru and spiritual guides. Mars at ${bkDegreeStr} in Leo serves as your fierce internal protector (<em>Kshetrapala</em>). He grants you the physical vitality, nocturnal endurance, and unwavering courage needed to build revolutionary software without succumbing to fatigue.
+        In Jaimini, the Bhratrukaraka (BK) is the significator of the Guru and spiritual guides. ${bk.planet} at ${bkDegreeStr} in ${bk.sign} (${bkHouse}) serves as your internal protector (<em>Kshetrapala</em>). It grants you vitality, focused endurance, and moral courage to execute your life mission with unwavering conviction.
       </p>
     </div>
 
@@ -924,7 +1085,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ RESOLVING ANCESTRAL SPIRITUAL VOWS</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Because the 9th from KL is Leo (Sun's sign) with Moon, your ancestors had a deep connection to Surya Upasana and public dharma. Sponsoring water facilities, feeding cows on Sundays, and supporting underprivileged Vedic students directly discharges ancestral spiritual debts (<em>Pitr Rina</em>).
+        Because the 9th from KL is ${klNinthSign} (${klNinthLord}'s sign), supporting righteous causes and offering charity aligned with ${klNinthLord} directly discharges ancestral spiritual debts (<em>Pitr Rina</em>) and clears your path forward.
       </p>
     </div>
   </div>
@@ -952,97 +1113,14 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr style="background:rgba(201,169,97,0.12);border-left:3px solid var(--gold-bright);">
-          <td><strong style="color:var(--gold-bright);">AL</strong></td>
-          <td><strong>Arudha Lagna</strong></td>
-          <td><strong>Capricorn (Makara)</strong></td>
-          <td>5th House</td>
-          <td>Public image: Disciplined systems architect, quantitative thinker, institutional leader</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--emerald-bright);">A2</strong></td>
-          <td><strong>Dhana Pada</strong></td>
-          <td>Aquarius (Kumbha)</td>
-          <td>6th House</td>
-          <td>Tangible wealth through solving complex technical problems &amp; service scale</td>
-        </tr>
-        <tr>
-          <td><strong>A3</strong></td>
-          <td>Vikrama Pada</td>
-          <td>Aquarius (Kumbha)</td>
-          <td>6th House</td>
-          <td>Courage, technical craftsmanship, competitive dominance in digital architecture</td>
-        </tr>
-        <tr>
-          <td><strong>A4</strong></td>
-          <td>Matru Pada</td>
-          <td>Libra (Tula)</td>
-          <td>2nd House</td>
-          <td>Treasury-backed properties, luxury vehicles, domestic emotional sanctuary</td>
-        </tr>
-        <tr>
-          <td><strong>A5</strong></td>
-          <td>Mantra Pada</td>
-          <td>Taurus (Vrishabha)</td>
-          <td>9th House</td>
-          <td>Conjunction with AmK Mercury: Publishing master algorithms, shastra translations</td>
-        </tr>
-        <tr>
-          <td><strong>A6</strong></td>
-          <td>Shatru Pada</td>
-          <td>Aries (Mesha)</td>
-          <td>8th House</td>
-          <td>Dissolving market rivalries through superior research and risk hedging</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--sapphire-bright);">A7</strong></td>
-          <td><strong>Dara Pada</strong></td>
-          <td>Cancer (Karka)</td>
-          <td>11th House</td>
-          <td>Commercial contracts, alliance networks, high-revenue corporate partners</td>
-        </tr>
-        <tr>
-          <td><strong>A8</strong></td>
-          <td>Mrityu Pada</td>
-          <td>Sagittarius (Dhanu)</td>
-          <td>4th House</td>
-          <td>Deep occult research, life-transforming shifts in domestic environments</td>
-        </tr>
-        <tr>
-          <td><strong>A9</strong></td>
-          <td>Pitru Pada</td>
-          <td>Cancer (Karka)</td>
-          <td>11th House</td>
-          <td>Institutional patrons, global mentorship, shastric credentials</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--gold-bright);">A10</strong></td>
-          <td><strong>Rajya Pada</strong></td>
-          <td>Aries (Mesha)</td>
-          <td>8th House</td>
-          <td>Executive authority through esoteric sciences, risk engineering, proprietary software</td>
-        </tr>
-        <tr>
-          <td><strong style="color:var(--emerald-bright);">A11</strong></td>
-          <td><strong>Labha Pada</strong></td>
-          <td>Virgo (Kanya)</td>
-          <td>1st House</td>
-          <td>Self-generated wealth! Income flows directly from your personal identity and IP</td>
-        </tr>
-        <tr style="background:rgba(139,92,246,0.12);border-left:3px solid var(--purple-bright);">
-          <td><strong style="color:var(--purple-bright);">UL</strong></td>
-          <td><strong>Upapada Lagna</strong></td>
-          <td><strong>Aries (Mesha)</strong></td>
-          <td>8th House</td>
-          <td>Sacred marriage: Dynamic, courageous, highly protective and spiritual soulmate</td>
-        </tr>
+        ${arudhaRowsHtml}
       </tbody>
     </table>
 
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--gold-bright);">
       <div class="kicker" style="color:var(--gold-bright);">The Arudha Realization Principle:</div>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-        Notice the supreme convergence: <strong>Labha Pada (A11) sits right in your 1st House (Virgo)</strong>, proving that you do not need middleman sponsors to generate wealth; your personal intellect and brand are the primary wealth generator.
+        Notice the key positioning: <strong>Labha Pada (A11) occupies ${a11.sign} (House ${a11.house})</strong> and <strong>Arudha Lagna (AL) occupies ${al.sign} (House ${al.house})</strong>. In Jaimini Shastra, when your Arudha points align with supportive houses, public perception and financial compounding synchronize naturally with your core destiny.
       </p>
     </div>
   </div>
@@ -1053,47 +1131,47 @@ body {
 <section class="page">
   ${headerRail("PILLAR III: ARUDHA LAGNA AUDIT")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Arudha Lagna in Capricorn (5th House): The Strategic Architect</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Arudha Lagna in ${al.sign} (House ${al.house}): The Worldly Projection Mirror</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Your true natal Lagna is <strong>Virgo (Kanya)</strong>&mdash;meticulous, analytical, self-effacing, and code-oriented. However, your <strong>Arudha Lagna (AL) is Capricorn (Makara · 5th House)</strong>.
+      Your true natal Lagna is <strong>${lagnaRashi}</strong>. However, your <strong>Arudha Lagna (AL) is ${al.sign} (House ${al.house})</strong>.
     </p>
 
     <!-- Contrast Card -->
     <div class="grid-2" style="margin-bottom:10px;">
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-          ✦ INTERNAL TRUTH (VIRGO LAGNA)
+          ✦ INTERNAL TRUTH (${lagnaRashi.toUpperCase()} LAGNA)
         </div>
         <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-          Internally, you view yourself as a meticulous craftsman, constantly optimizing systems, debugging errors, and seeking structural perfection. You dislike superficial vanity and empty corporate speeches.
+          Internally, your true essence is governed by ${lagnaRashi}, driving personal motivation, ethical standards, and daily execution.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
         <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
-          ✦ EXTERNAL PROJECTION (CAPRICORN AL)
+          ✦ EXTERNAL PROJECTION (${al.sign.toUpperCase()} AL)
         </div>
         <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-          To the world, you project the image of a formidable mathematical strategist, a disciplined systems architect, and an institutional founder whose creations have serious weight and endurance.
+          To the world, you project through ${al.sign}, defining your professional reputation, public presence, and how societal observers perceive your standing.
         </p>
       </div>
     </div>
 
-    <!-- 5th House Synergy -->
+    <!-- House Synergy -->
     <div class="luxury-card" style="margin-bottom:10px;border:1.5px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;">
-        ✦ AL IN 5TH HOUSE: REPUTATION GROUNDED IN GENIUS SYSTEMS
+        ✦ AL IN HOUSE ${al.house}: REPUTATION AND MANIFESTATION AXIS
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        When Arudha Lagna occupies the <strong>5th house of intellect (Capricorn · 30 SAV Bindus)</strong>, society honors you for your mental creations, publications, software architectures, and advisory acumen. You are celebrated as a master of discretionary probability and algorithmic design.
+        When Arudha Lagna occupies House ${al.house} in ${al.sign}, society honors you for your actions in that domain. You are celebrated as a master of disciplined execution and strategic purpose.
       </p>
     </div>
 
-    <!-- The 2027 Alignment -->
+    <!-- Active Alignment -->
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
-      <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">✦ THE CAPRICORN CHARA DASHA (2027&ndash;2037) PROMISE</div>
+      <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">✦ ACTIVE CHARA DASHA (${activeDasha.sign.toUpperCase()}) ALIGNMENT</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        When you enter the 10-year Capricorn Chara Dasha in July 2027, you are directly stepping onto your <strong>Arudha Lagna and Indu Lagna</strong>. This represents the decade of maximum worldly recognition, institutional authority, and compounding financial scale.
+        Operating in your current Chara Dasha of <strong>${activeDasha.sign}</strong>, your planetary periods activate the corresponding houses and arudhas, creating decisive windows of progress and maturity.
       </p>
     </div>
   </div>
@@ -1104,39 +1182,39 @@ body {
 <section class="page">
   ${headerRail("PILLAR III: UPAPADA & SACRED MARRIAGE")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Upapada Lagna in Aries (H8) &amp; Dara Pada in Cancer: The Karmic Bond</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Upapada Lagna in ${ul.sign} (House ${ul.house}) &amp; Dara Pada in ${a7.sign}: The Karmic Bond</h2>
     <p class="body-text" style="margin-bottom:10px;">
       In Jaimini astrology, <strong>Upapada Lagna (UL)</strong> reveals the spiritual contract of marriage and the character of your life partner, while <strong>Dara Pada (A7)</strong> reflects the physical, worldly interaction.
     </p>
 
-    <!-- UL in Aries Card -->
+    <!-- UL Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--ruby-bright);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:12px;">
-        ✦ UPAPADA LAGNA IN ARIES (8TH HOUSE): THE COURAGEOUS PROTECTOR
+        ✦ UPAPADA LAGNA IN ${ul.sign.toUpperCase()} (HOUSE ${ul.house})
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Your Upapada Lagna falls in <strong>Aries (Mesha)</strong>, ruled by Mars. This reveals a life partner who is dynamic, physically active, spirited, fiercely loyal, and protective of family honor. She is not a passive spectator; she brings tremendous initiative and courage into your life.
+        Your Upapada Lagna falls in <strong>${ul.sign}</strong>, ruled by ${SIGN_LORDS[ul.sign]}. This reveals a companion who brings distinct dedication, loyalty, and protective guardianship into your life.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
-        <strong style="color:var(--sapphire-bright);">Darakaraka Saturn in 7th House:</strong> Saturn at ${dkDegreeStr} in Pisces in your 7th house ensures that beneath the dynamic Martian exterior of UL, the marriage itself is anchored in <strong>enduring commitment, mutual patience, and spiritual fidelity</strong>.
+        <strong style="color:var(--sapphire-bright);">Darakaraka ${dk.planet}:</strong> ${dk.planet} at ${dkDegreeStr} in ${dk.sign} anchors the partnership in <strong>enduring commitment, mutual patience, and spiritual fidelity</strong>.
       </div>
     </div>
 
-    <!-- Dara Pada A7 in Cancer -->
+    <!-- Dara Pada A7 Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--emerald-bright);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;">
-        ✦ DARA PADA (A7) IN CANCER (11TH HOUSE): MUTUAL NURTURING &amp; GAINS
+        ✦ DARA PADA (A7) IN ${a7.sign.toUpperCase()} (HOUSE ${a7.house}): ALLIANCE &amp; HARMONY
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Dara Pada A7 falls in <strong>Cancer in your 11th house of gains</strong>. Marriage is an extraordinary financial and emotional catalyst. Your partner brings maternal warmth, domestic grounding, and lucky networking opportunities that expand your realized cashflow.
+        Dara Pada A7 falls in <strong>${a7.sign} in House ${a7.house}</strong>. Partnership serves as a grounded emotional and material anchor, expanding reciprocal goodwill and shared security.
       </p>
     </div>
 
     <!-- Upapada Fasting Protocol -->
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--gold-bright);">
-      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ SHASTRIC UPAPADA REMEDIATION PROTOCOL</div>
+      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ SHASTRIC UPAPADA HARMONIZATION PROTOCOL</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Because UL is in Aries (ruled by Mars), observing a peaceful, non-aggressive attitude on Tuesdays and offering red lentils or sweet jaggery roti to those in need harmonizes the marital field and dissolves karmic friction.
+        Because UL is in ${ul.sign} (ruled by ${SIGN_LORDS[ul.sign]}), honoring reciprocal respect, patience, and charitable actions corresponding to ${SIGN_LORDS[ul.sign]} harmonizes the marital field and dissolves karmic friction.
       </p>
     </div>
   </div>
@@ -1156,19 +1234,19 @@ body {
     <div class="grid-2" style="margin-bottom:10px;">
       <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
         <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
-          ✦ A2 IN AQUARIUS: SCALE-DRIVEN SAVINGS
+          ✦ A2 IN ${a2.sign.toUpperCase()}: TREASURY FOUNDATION
         </div>
         <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-          Dhana Pada (A2) in Aquarius (6th house) signifies that your treasury expands by systematically removing operational bottlenecks and serving large digital networks.
+          Dhana Pada (A2) in ${a2.sign} (House ${a2.house}) signifies that your accumulated reserves grow through disciplined management and methodical resource stewardship.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-          ✦ A11 IN VIRGO: SELF-GENERATED HARVEST
+          ✦ A11 IN ${a11.sign.toUpperCase()}: REALIZED LABHA
         </div>
         <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-          Labha Pada (A11) in your 1st house (Virgo) is one of the highest blessings in Jaimini: your personal intellectual skills directly generate your financial abundance.
+          Labha Pada (A11) in ${a11.sign} (House ${a11.house}) indicates that your personal contributions and strategic initiative directly generate your financial abundance.
         </p>
       </div>
     </div>
@@ -1176,10 +1254,10 @@ body {
     <!-- A10 in Aries Box -->
     <div class="luxury-card" style="border:1.5px solid var(--sapphire);background:var(--surface-elevated);margin-bottom:10px;">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;">
-        ✦ A10 (RAJYA PADA) IN ARIES: PIONEERING LEADERSHIP
+        ✦ A10 (RAJYA PADA) IN ${a10.sign.toUpperCase()}: EXECUTIVE STANDING
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Rajya Pada A10 falls in pioneering Aries (8th house). This indicates that your greatest public authority is won by uncovering hidden knowledge, building deep transformative technologies, and creating unconventional tools that disrupt stagnant markets.
+        Rajya Pada A10 falls in ${a10.sign} (House ${a10.house}). This indicates that your public authority is built by developing specialized knowledge, high standards, and structured methodologies that command lasting respect.
       </p>
     </div>
 
@@ -1187,7 +1265,7 @@ body {
     <div class="luxury-card">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ JAIMINI WEALTH INTERLOCK</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Mercury in Taurus forms an unobstructed 9th-house Trikona support on your 1st house A11 in Virgo, ensuring that every piece of software code and shastric analysis you author directly translates into compounding revenue.
+        The harmonious configuration between ${amk.planet} as Amatyakaraka and your wealth arudhas (${a2.shortName}, ${a11.shortName}) ensures that disciplined execution directly translates into durable compounding assets.
       </p>
     </div>
   </div>
@@ -1198,7 +1276,7 @@ body {
 <section class="page">
   ${headerRail("PILLAR IV: GNATIKARAKA SHADOW AUDIT")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Gnatikaraka (GK) Venus: The Karmic Obstacle &amp; Shadow Audit</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Gnatikaraka (GK) ${gk.planet}: The Karmic Obstacle &amp; Shadow Audit</h2>
     <p class="body-text" style="margin-bottom:10px;">
       In Maharishi Jaimini's framework, the planet with the 6th highest longitude is the <strong>Gnatikaraka (GK)</strong>&mdash;the significator of 6th-house obstacles, hidden debts, bodily ailments, and tests of Maya.
     </p>
@@ -1206,33 +1284,33 @@ body {
     <!-- GK Identification Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--amber);">
       <div class="card-title" style="color:var(--amber);font-size:12px;">
-        ✦ GK IDENTIFICATION: VENUS IN GEMINI (${gkDegreeStr} · 10TH HOUSE)
+        ✦ GK IDENTIFICATION: ${gk.planet.toUpperCase()} IN ${gk.sign.toUpperCase()} (${gkDegreeStr} · ${gkHouse.toUpperCase()})
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Venus at ${gkDegreeStr} in Gemini acts as your Gnatikaraka. Because Venus naturally signifies pleasure, romance, aesthetics, and luxury assets, your karmic tests do not come from brutish enemies; they emerge through:
+        ${gk.planet} at ${gkDegreeStr} in ${gk.sign} acts as your Gnatikaraka. In Maharishi Jaimini's system, the GK highlights where personal illusions, tests of perseverance, and friction may arise:
       </p>
       <ul style="padding-left:16px;font-size:11.2px;color:var(--ivory-dim);margin-top:4px;line-height:1.5;">
-        <li><strong>Creative Perfectionism:</strong> Obsessing over font choices, visual micro-details, or interface aesthetics at the expense of shipping commercial products.</li>
-        <li><strong>Contractual Ambiguities:</strong> Entering informal verbal agreements with partners that later create financial friction.</li>
-        <li><strong>Over-idealization of People:</strong> Projecting saintly qualities onto business acquaintances before verifying their character.</li>
+        <li><strong>Friction Triggers:</strong> Managing interpersonal expectations and ensuring transparent, contractual clarity in all dealings.</li>
+        <li><strong>Energy Preservation:</strong> Avoiding unnecessary confrontational energy; channelling tension into systematic productivity.</li>
+        <li><strong>Karmic Refinement:</strong> Treating delays and obstacles associated with ${gk.planet} as stepping stones that purify judgment.</li>
       </ul>
     </div>
 
     <!-- Balanced Gemstone Protocol -->
     <div class="luxury-card" style="margin-bottom:10px;border:1.5px solid var(--emerald);background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;">
-        ✦ PRECAUTIONARY GEMSTONE PROTOCOL: DIAMOND &amp; OPAL AUDIT
+        ✦ PRECAUTIONARY PROTOCOL: ${gk.planet.toUpperCase()} HARMONIZATION
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        While Venus gemstones (Diamond, White Zircon, Opal) can be worn for aesthetic refinement, marital grace, or creative radiance as indicated in your Bio-Vedic and Sacred Union reports, caution is advised against wearing excessively heavy, untested stones during periods of intense operational friction. Venus as Gnatikaraka is best harmonized through creative excellence, meticulous contract drafting, and Friday charity.
+        Because ${gk.planet} functions as your Gnatikaraka, care is advised against wearing heavy gemstones of ${gk.planet} without astrological necessity. Harmonize ${gk.planet}'s vibration through ethical vigilance, mindfulness, and dedicated weekly charity.
       </p>
     </div>
 
     <!-- GK Neutralization Upaya -->
     <div class="luxury-card">
-      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ GK VENUS NEUTRALIZATION UPAYA</div>
+      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ GK ${gk.planet.toUpperCase()} NEUTRALIZATION UPAYA</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Donate white sweets, cow ghee, or clothing to underprivileged girls on Friday mornings. This converts Venusian friction into pure creative brilliance and shields your professional reputation.
+        Engage in charitable donations and dedicated service aligned with ${gk.planet}. This transforms karmic resistance into enduring resilience and shields your professional legacy.
       </p>
     </div>
   </div>
@@ -1243,31 +1321,31 @@ body {
 <section class="page">
   ${headerRail("PILLAR IV: BK & PK KARMIC DYNAMICS")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Mars (BK) &amp; Jupiter (PK): The Inner Warrior &amp; Spiritual Progeny</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">${bk.planet} (BK) &amp; ${pk.planet} (PK): The Inner Guide &amp; Creative Lineage</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      The <strong>Bhratrukaraka (BK)</strong> represents your spiritual guides and raw courage, while the <strong>Putrakaraka (PK)</strong> governs your intellectual progeny, future students, and past-life merit.
+      The <strong>Bhratrukaraka (BK)</strong> represents your spiritual guides, inner strength, and mentors, while the <strong>Putrakaraka (PK)</strong> governs your intellectual progeny, future disciples, and past-life merit.
     </p>
 
-    <!-- BK Mars -->
+    <!-- BK Graha -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--ruby-bright);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:12px;">
-        ✦ BHRATRUKARAKA MARS (${bkDegreeStr} LEO · 12TH HOUSE): THE SACRED WARRIOR
+        ✦ BHRATRUKARAKA ${bk.planet.toUpperCase()} (${bkDegreeStr} ${bk.sign.toUpperCase()} · ${bkHouse.toUpperCase()}): THE SACRED GUIDE
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Mars in Leo in the 12th house with AK Moon serves as your internal <em>Kshetrapala</em> (Guardian Deity). While others burn out under technical pressure, your BK grants you legendary nocturnal stamina. You can work unbroken through the night when designing complex architectural systems.
+        ${bk.planet} in ${bk.sign} (${bkHouse}) serves as your personal <em>Kshetrapala</em> (Guardian Mentor). In high-pressure situations, your BK endows you with mental fortitude, stamina, and strategic resilience.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
-        <strong style="color:var(--ruby-bright);">BK Directive:</strong> Direct your fiery Martian intensity into code deployment and physical fitness; never let it degenerate into passive internal frustration.
+        <strong style="color:var(--ruby-bright);">BK Directive:</strong> Direct your ${bk.planet} energy toward disciplined execution and leadership; never allow tension to turn into passive exhaustion.
       </div>
     </div>
 
-    <!-- PK Jupiter -->
+    <!-- PK Graha -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--sapphire-bright);">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;">
-        ✦ PUTRAKARAKA JUPITER (${pkDegreeStr} SCORPIO · 3RD HOUSE): THE INTELLECTUAL LINEAGE
+        ✦ PUTRAKARAKA ${pk.planet.toUpperCase()} (${pkDegreeStr} ${pk.sign.toUpperCase()} · ${pkHouse.toUpperCase()}): THE INTELLECTUAL LINEAGE
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Jupiter as PK in mystical Scorpio in the 3rd house grants deep investigative intelligence. Your intellectual creations (books, software, frameworks) will serve as foundational teaching materials for thousands of future seekers.
+        ${pk.planet} as PK in ${pk.sign} (${pkHouse}) grants deep analytical perception and creative output. Your intellectual and professional creations possess enduring compounding resonance.
       </p>
     </div>
 
@@ -1275,7 +1353,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ MENTORSHIP &amp; INTELLECTUAL HERITAGE</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        You are naturally meant to mentor younger engineers and researchers. Sharing your proprietary frameworks openly creates immense spiritual compounding, activating your 5th-house Purva Punya.
+        You possess a natural gift for mentoring, guiding, and formulating frameworks. Sharing your knowledge with integrity creates positive spiritual merit, activating your 5th-house Purva Punya.
       </p>
     </div>
   </div>
@@ -1303,212 +1381,128 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>Virgo (Kanya)</strong></td>
-          <td>4 Years</td>
-          <td>1995 &ndash; 1999</td>
-          <td>Lagna, A11 Labha Pada</td>
-          <td>Early childhood foundations, analytical formation</td>
-        </tr>
-        <tr>
-          <td><strong>Libra (Tula)</strong></td>
-          <td>8 Years</td>
-          <td>1999 &ndash; 2007</td>
-          <td>2nd House Treasury, A4 Matru Pada, Rahu</td>
-          <td>Schooling, language acquisition, values development</td>
-        </tr>
-        <tr>
-          <td><strong>Scorpio (Vrishchika)</strong></td>
-          <td>9 Years</td>
-          <td>2007 &ndash; 2016</td>
-          <td>Jupiter PK (Ishta Portal in D9)</td>
-          <td>Higher education, technical coding, deep occult inquiry</td>
-        </tr>
-        <tr style="background:rgba(201,169,97,0.12);border-left:3px solid var(--gold-bright);">
-          <td><strong style="color:var(--gold-bright);">Sagittarius (Dhanu)</strong></td>
-          <td><strong>11 Years</strong></td>
-          <td><strong>2016 &ndash; 2027</strong></td>
-          <td><strong style="color:var(--gold-bright);">Karakamsha Lagna (KL), A8</strong></td>
-          <td><span class="tag-badge tag-emerald">ACTIVE NOW</span> Deep soul awakening &amp; platform architecture</td>
-        </tr>
-        <tr style="background:rgba(16,185,129,0.08);">
-          <td><strong style="color:var(--emerald-bright);">Capricorn (Makara)</strong></td>
-          <td><strong>10 Years</strong></td>
-          <td><strong>2027 &ndash; 2037</strong></td>
-          <td><strong style="color:var(--emerald-bright);">Arudha Lagna (AL), Indu Lagna, 5th House</strong></td>
-          <td><span class="tag-badge tag-gold">NEXT DECADE</span> Public empire, compounding wealth &amp; scale</td>
-        </tr>
-        <tr>
-          <td><strong>Aquarius (Kumbha)</strong></td>
-          <td>11 Years</td>
-          <td>2037 &ndash; 2048</td>
-          <td>A2 Dhana, A3 Vikrama, 6th House</td>
-          <td>Global institutional expansion, societal legacy</td>
-        </tr>
-        <tr>
-          <td><strong>Pisces (Meena)</strong></td>
-          <td>4 Years</td>
-          <td>2048 &ndash; 2052</td>
-          <td>DK Saturn in 7th</td>
-          <td>Peak authority, spiritual partnership harvest</td>
-        </tr>
-        <tr>
-          <td><strong>Aries (Mesha)</strong></td>
-          <td>4 Years</td>
-          <td>2052 &ndash; 2056</td>
-          <td>UL Upapada, A10 Rajya Pada, Ketu</td>
-          <td>Deep mystical writing, philosophical treatises</td>
-        </tr>
-        <tr>
-          <td><strong>Taurus (Vrishabha)</strong></td>
-          <td>1 Year</td>
-          <td>2056 &ndash; 2057</td>
-          <td>AmK Mercury in 9th, A5 Mantra Pada</td>
-          <td>Shastric intellectual crown, master publications</td>
-        </tr>
-        <tr>
-          <td><strong>Gemini (Mithuna)</strong></td>
-          <td>11 Years</td>
-          <td>2057 &ndash; 2068</td>
-          <td>MK Sun, GK Venus in 10th</td>
-          <td>Elder statesmanship, sovereign mentorship</td>
-        </tr>
-        <tr>
-          <td><strong>Cancer (Karka)</strong></td>
-          <td>11 Years</td>
-          <td>2068 &ndash; 2079</td>
-          <td>A7 Dara, A9 Pitru, 11th House Realized Gains</td>
-          <td>Spiritual philanthropy, institutional endowment</td>
-        </tr>
-        <tr>
-          <td><strong>Leo (Simha)</strong></td>
-          <td>2 Years</td>
-          <td>2079 &ndash; 2081</td>
-          <td>AK Moon, BK Mars in 12th</td>
-          <td>Moksha contemplation, return to the divine source</td>
-        </tr>
+        ${charaDashaRowsHtml}
       </tbody>
     </table>
 
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <p style="font-size:11px;color:var(--ivory-dim);">
-        Notice the monumental transition: you are currently completing the final phase of your <strong>11-year Sagittarius Soul Awakening Era (2016&ndash;2027)</strong> and preparing to enter the <strong>10-year Capricorn Worldly Empire Decade (2027&ndash;2037)</strong>.
+        Notice your active transition: you are currently traversing the <strong>${activeDasha.years}-year ${activeDasha.sign} Chara Dasha (${activeDashaStartYear}&ndash;${activeDashaEndYear})</strong>, preparing to transition into the <strong>${nextDasha.years}-year ${nextDasha.sign} Chara Dasha (${nextDashaStartYear}&ndash;${nextDashaEndYear})</strong>.
       </p>
     </div>
   </div>
   ${footerRail("Pillar V: Chara Dasha Master Timeline", 17)}
 </section>
 
-<!-- PAGE 18: PILLAR V — SAGITTARIUS CHARA DASHA AUDIT -->
+<!-- PAGE 18: PILLAR V — ACTIVE CHARA DASHA AUDIT -->
 <section class="page">
-  ${headerRail("PILLAR V: SAGITTARIUS CHARA DASHA AUDIT")}
+  ${headerRail(`PILLAR V: ${activeDasha.sign.toUpperCase()} CHARA DASHA AUDIT`)}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">The Sagittarius Mahadasha (2016–2027): Karakamsha Soul Awakening</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">The ${activeDasha.sign} Mahadasha (${activeDashaStartYear}–${activeDashaEndYear}): Soul Evolution &amp; Karmic Focus</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      The 11-year Sagittarius Mahadasha is the most defining spiritual and architectural incubator of your entire lifetime.
+      The ${activeDasha.years}-year ${activeDasha.sign} Mahadasha is an essential epoch of your soul journey, activating the rashi houses, arudhas, and karakas positioned along this sign axis.
     </p>
 
-    <!-- Why Sagittarius is Supreme Card -->
+    <!-- Activation Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;">
-        ✦ ACTIVATION OF KARAKAMSHA LAGNA (KL): THE SOUL'S ARCHITECTURAL THRONE
+        ✦ ACTIVATION OF ${activeDasha.sign.toUpperCase()} AXIS: SOUL LESSONS &amp; ARCHITECTURE
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Sagittarius holds your <strong>Karakamsha Lagna (Navamsha seat of Moon AK)</strong>. During this 11-year dasha, the soul compels you to discard superficial distractions and build foundational, timeless intellectual frameworks that stand the test of time.
+        Under Jaimini principles, when ${activeDasha.sign} activates, the soul is drawn towards core dharma, resolving karmic prerequisites, and establishing deep, enduring structures in your worldly and spiritual life.
       </p>
     </div>
 
-    <!-- 4 Universal Phases of Sagittarius -->
+    <!-- 4 Universal Phases of Current Dasha -->
     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
       <div class="luxury-card" style="border-left:3px solid var(--sapphire);">
-        <strong style="color:var(--sapphire-bright);font-size:11px;">1. 2016 &ndash; 2019 (FOUNDATIONAL SEARCH &amp; MASTERY):</strong>
+        <strong style="color:var(--sapphire-bright);font-size:11px;">1. FOUNDATIONAL FORMATION (${activeDashaStartYear} &ndash; ${activeDashaStartYear + Math.max(1, Math.floor(activeDasha.years * 0.25))}):</strong>
         <p style="font-size:11px;color:var(--ivory-dim);margin-top:2px;">
-          Awakening of higher philosophy, questioning conventional employment models, and beginning deep, independent technical and shastric studies.
+          Awakening of inner values, reassessing previous life commitments, and laying intellectual and emotional foundations.
         </p>
       </div>
       <div class="luxury-card" style="border-left:3px solid var(--emerald);">
-        <strong style="color:var(--emerald-bright);font-size:11px;">2. 2019 &ndash; 2022 (SYSTEMS FORMULATION &amp; ARCHITECTURE):</strong>
+        <strong style="color:var(--emerald-bright);font-size:11px;">2. ARCHITECTURE &amp; EXECUTION (${activeDashaStartYear + Math.max(1, Math.floor(activeDasha.years * 0.25))} &ndash; ${activeDashaStartYear + Math.max(2, Math.floor(activeDasha.years * 0.5))}):</strong>
         <p style="font-size:11px;color:var(--ivory-dim);margin-top:2px;">
-          Synthesizing quantitative algorithms, formulating proprietary codebases, and mastering production-grade full-stack architecture.
+          Mastery of core skills, building robust professional and personal frameworks, and testing systems against reality.
         </p>
       </div>
       <div class="luxury-card" style="border-left:3px solid var(--gold);">
-        <strong style="color:var(--gold-bright);font-size:11px;">3. 2022 &ndash; 2025 (SOVEREIGN LAUNCH &amp; PROOF):</strong>
+        <strong style="color:var(--gold-bright);font-size:11px;">3. STRATEGIC CONSOLIDATION (${activeDashaStartYear + Math.max(2, Math.floor(activeDasha.years * 0.5))} &ndash; ${activeDashaStartYear + Math.max(3, Math.floor(activeDasha.years * 0.75))}):</strong>
         <p style="font-size:11px;color:var(--ivory-dim);margin-top:2px;">
-          Deploying autonomous platforms to the market, validating high-definition deterministic calculation engines, and securing initial commercial traction.
+          Expanding practical reach, validating core methodologies, and establishing verifiable competence and independence.
         </p>
       </div>
       <div class="luxury-card" style="border-left:3px solid var(--purple);">
-        <strong style="color:var(--purple-bright);font-size:11px;">4. 2025 &ndash; JULY 2027 (CONSOLIDATION &amp; MOAT BUILDING):</strong>
+        <strong style="color:var(--purple-bright);font-size:11px;">4. HARVEST &amp; TRANSITION PREPARATION (${activeDashaStartYear + Math.max(3, Math.floor(activeDasha.years * 0.75))} &ndash; ${activeDashaEndYear}):</strong>
         <p style="font-size:11px;color:var(--ivory-dim);margin-top:2px;">
-          Locking in intellectual property moats, establishing unshakeable operational systems, and preparing for the massive financial harvest of the Capricorn decade.
+          Securing accomplishments, establishing permanent boundaries, and preparing systematically for the subsequent ${nextDasha.sign} era.
         </p>
       </div>
     </div>
 
     <!-- Final Directives -->
     <div class="luxury-card" style="background:var(--surface-elevated);">
-      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ STRATEGIC DIRECTIVE FOR 2026&ndash;2027</div>
+      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ STRATEGIC DIRECTIVE FOR CURRENT PERIOD</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Do not rush or scatter your energies. Complete all foundational platform engineering before July 2027. Your sovereign tools will become compounding financial engines during the upcoming decade.
+        Maintain unwavering focus on foundational integrity. Avoid scattered undertakings; channel your energy into sustainable systems and high-conviction life goals.
       </p>
     </div>
   </div>
-  ${footerRail("Pillar V: Active Sagittarius Dasha", 18)}
+  ${footerRail(`Pillar V: Active ${activeDasha.sign} Dasha`, 18)}
 </section>
 
-<!-- PAGE 19: PILLAR V — CAPRICORN SOVEREIGN HARVEST -->
+<!-- PAGE 19: PILLAR V — UPCOMING CHARA DASHA HORIZON -->
 <section class="page">
-  ${headerRail("PILLAR V: CAPRICORN SOVEREIGN HARVEST")}
+  ${headerRail(`PILLAR V: ${nextDasha.sign.toUpperCase()} HORIZON`)}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">The Capricorn Mahadasha (2027–2037): The Arudha Lagna Worldly Empire</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">The ${nextDasha.sign} Mahadasha (${nextDashaStartYear}–${nextDashaEndYear}): Strategic Horizon</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Beginning on <strong>July 4, 2027</strong>, your chart enters the 10-year <strong>Capricorn (Makara) Chara Dasha</strong>. This period marks the transition from inner intellectual creation to outer, compounding material sovereignty.
+      Beginning around <strong>${nextDashaStartYear}</strong>, your chart enters the ${nextDasha.years}-year <strong>${nextDasha.sign} Chara Dasha</strong>. This period marks a profound shift toward outer worldly realization and long-term consolidation.
     </p>
 
-    <!-- Why Capricorn is the Wealth Fortress -->
+    <!-- Strategic Activation Card -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--emerald-bright);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;">
-        ✦ TRIPLE SOVEREIGN ACTIVATION IN CAPRICORN
+        ✦ STRATEGIC ACTIVATION IN ${nextDasha.sign.toUpperCase()}
       </div>
       <div style="font-size:11.2px;color:var(--ivory-dim);line-height:1.5;margin-top:4px;">
-        1. <strong>Arudha Lagna (AL):</strong> Society fully perceives, acknowledges, and elevates your status as an authoritative systemic leader.<br/>
-        2. <strong>Indu Lagna (Classical Wealth Ascendant):</strong> Calculated under Brihat Jataka in Capricorn, unlocked by Indu Lagna lord Saturn.<br/>
-        3. <strong>5th House of Discretionary Intellect:</strong> Governs software engineering, mathematical modeling, and institutional systems (solid 30 SAV bindus).<br/>
-        4. <strong>Result:</strong> 2027&ndash;2037 is your primary empire-building decade. Every seed planted during Sagittarius matures into permanent equity.
+        1. <strong>Rashi Governance:</strong> Governed by ${SIGN_LORDS[nextDasha.sign]}, calling for disciplined execution and strategic patience.<br/>
+        2. <strong>Arudha &amp; Karaka Interlock:</strong> Any padas and karakas residing in or aspecting ${nextDasha.sign} awaken into full public expression.<br/>
+        3. <strong>Compounding Harvest:</strong> What is seeded with integrity during the ${activeDasha.sign} era matures into concrete, durable value in ${nextDasha.sign}.
       </div>
     </div>
 
-    <!-- Saturnian Discipline -->
+    <!-- Shastric Discipline -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--sapphire-bright);">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;">
-        ✦ SATURNIAN GOVERNANCE: COMPACT, HIGH-MARGIN OPERATING MODELS
+        ✦ STRATEGIC GOVERNANCE &amp; VALUE CREATION
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Capricorn is ruled by Saturn. It does not reward reckless hype; it rewards automated, zero-bloat, high-margin software businesses. Maintain strict control over operational expenses and sweep profits into physical gold, real estate, and long-term equities.
+        ${nextDasha.sign} rewards consistency and systematic organization. Avoid hasty speculative leaps; instead, build structures that compound over time with disciplined execution.
       </p>
     </div>
 
     <!-- Preparation Checklist -->
     <div class="luxury-card" style="background:var(--surface-elevated);">
-      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ 2026&ndash;2027 PREPARATION CHECKLIST</div>
+      <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ TRANSITION PREPARATION CHECKLIST</div>
       <ul style="padding-left:16px;font-size:11px;color:var(--ivory-dim);margin-top:4px;line-height:1.45;">
-        <li>Automate customer acquisition and operational pipelines to handle 100x traffic volume.</li>
-        <li>Protect all proprietary algorithms under institutional corporate trademarks and copyright frameworks.</li>
-        <li>Cultivate long-term strategic relationships with mature, institutional counterparties and advisors.</li>
+        <li>Streamline existing commitments to eliminate dead weight before the new dasha begins.</li>
+        <li>Fortify key alliances, contracts, and financial safety nets.</li>
+        <li>Align personal routines with your Atmakaraka and Amatyakaraka principles for maximum clarity.</li>
       </ul>
     </div>
   </div>
-  ${footerRail("Pillar V: Upcoming Capricorn Dasha", 19)}
+  ${footerRail(`Pillar V: Upcoming ${nextDasha.sign} Dasha`, 19)}
 </section>
 
-<!-- PAGE 20: PILLAR V — 2026-2028 ANTARDASHA RADAR -->
+<!-- PAGE 20: PILLAR V — ANTARDASHA ROADMAP -->
 <section class="page">
-  ${headerRail("PILLAR V: 2026-2028 ANTARDASHA RADAR")}
+  ${headerRail("PILLAR V: ANTARDASHA ROADMAP")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">2026–2028 Chara Antardasha Precision Roadmap</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Chara Antardasha Precision Roadmap</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Quarter-by-quarter timeline of the sub-periods (<em>Antardashas</em>) governing your transition from Sagittarius into Capricorn.
+      Quarter-by-quarter timeline of the sub-periods (<em>Antardashas</em>) governing your active soul progression and upcoming transition.
     </p>
 
     <!-- Radar Table -->
@@ -1523,40 +1517,34 @@ body {
       </thead>
       <tbody>
         <tr>
-          <td><strong>Q1 2026 &ndash; Q2 2026</strong></td>
-          <td><strong>Sagittarius &ndash; Gemini</strong></td>
-          <td>MK Sun, GK Venus in 10th</td>
-          <td>Launch public enterprise marketing, establish international client contracts, refine brand aesthetics</td>
+          <td><strong>Current Phase (Foundational)</strong></td>
+          <td><strong>${activeDasha.sign} &ndash; ${SIGN_NAMES[(SIGN_NAMES.indexOf(activeDasha.sign) + 1) % 12]}</strong></td>
+          <td>Second Rashi Axis</td>
+          <td>Consolidate core assets, focus on skill deepening, and streamline financial allocation.</td>
         </tr>
         <tr>
-          <td><strong>Q3 2026 &ndash; Q4 2026</strong></td>
-          <td><strong>Sagittarius &ndash; Taurus</strong></td>
-          <td>AmK Mercury in 9th House, A5</td>
-          <td>Peak IP monetization, publish high-ticket shastra dossiers, secure enterprise software retainers</td>
+          <td><strong>Intermediate Phase (Expansion)</strong></td>
+          <td><strong>${activeDasha.sign} &ndash; ${SIGN_NAMES[(SIGN_NAMES.indexOf(activeDasha.sign) + 4) % 12]}</strong></td>
+          <td>Fifth Rashi Axis (Purva Punya)</td>
+          <td>Strategic expansion, publishing intellectual output, and executing high-conviction creative initiatives.</td>
         </tr>
         <tr>
-          <td><strong>Q1 2027 &ndash; Q2 2027</strong></td>
-          <td><strong>Sagittarius &ndash; Aries</strong></td>
-          <td>UL Upapada, A10 Rajya Pada, Ketu</td>
-          <td>Deep code refactoring, implement automated safeguards, finalize platform architecture</td>
+          <td><strong>Pivotal Alignment (Synergy)</strong></td>
+          <td><strong>${activeDasha.sign} &ndash; ${SIGN_NAMES[(SIGN_NAMES.indexOf(activeDasha.sign) + 6) % 12]}</strong></td>
+          <td>Seventh Rashi Axis (Dvanda)</td>
+          <td>Refining partnership boundaries, renegotiating major commitments, and cementing alliances.</td>
         </tr>
         <tr style="background:rgba(16,185,129,0.12);border-left:3px solid var(--emerald-bright);">
-          <td><strong style="color:var(--emerald-bright);">JULY 2027</strong></td>
-          <td><strong style="color:var(--emerald-bright);">CAPRICORN ENTRANCE</strong></td>
-          <td><strong>Arudha Lagna &amp; Indu Lagna</strong></td>
-          <td><strong>THE GRAND SHIFT:</strong> Transition from architectural building to compounding institutional wealth management</td>
+          <td><strong style="color:var(--emerald-bright);">${nextDashaStartYear} MILESTONE</strong></td>
+          <td><strong style="color:var(--emerald-bright);">${nextDasha.sign.toUpperCase()} ENTRANCE</strong></td>
+          <td><strong>Next Sovereign Dasha</strong></td>
+          <td><strong>THE GRAND SHIFT:</strong> Transitioning from building and preparation into compounding long-term worldly value.</td>
         </tr>
         <tr>
-          <td><strong>Q3 2027 &ndash; Q4 2027</strong></td>
-          <td><strong>Capricorn &ndash; Sagittarius</strong></td>
-          <td>AL and KL resonance</td>
-          <td>Consolidate market leadership, roll out enterprise licensing, celebrate corporate milestone</td>
-        </tr>
-        <tr>
-          <td><strong>2028 FULL YEAR</strong></td>
-          <td><strong>Capricorn &ndash; Scorpio</strong></td>
-          <td>Jupiter PK &amp; Ishta Devata in D9</td>
-          <td>Spiritual pilgrimage, institutional mentoring, establishment of sovereign family trust</td>
+          <td><strong>Subsequent Window (Consolidation)</strong></td>
+          <td><strong>${nextDasha.sign} &ndash; ${SIGN_NAMES[(SIGN_NAMES.indexOf(nextDasha.sign) + 1) % 12]}</strong></td>
+          <td>Initial Rashi Foundation</td>
+          <td>Consolidating initial gains, establishing operational discipline, and anchoring new authority.</td>
         </tr>
       </tbody>
     </table>
@@ -1564,11 +1552,11 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--gold-bright);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ TIMING SYNCHRONICITY</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Notice that late 2026 activates <strong>Sagittarius&ndash;Taurus (Amatyakaraka Mercury)</strong> at the exact same time that transiting Jupiter exalts in Cancer (11th house of gains). This creates an extraordinary window for capital accumulation and commercial breakthroughs.
+        As your chart navigates through the ${activeDasha.sign} Mahadasha toward ${nextDasha.sign}, aligning daily initiatives with your Atmakaraka (${ak.planet}) and Amatyakaraka (${amk.planet}) ensures that every milestone translates into lasting spiritual and worldly compounding.
       </p>
     </div>
   </div>
-  ${footerRail("Pillar V: 2026-2028 Antardasha Radar", 20)}
+  ${footerRail("Pillar V: Antardasha Precision Roadmap", 20)}
 </section>
 
 <!-- PAGE 21: PILLAR V — SACRED SOUL MANTRAS -->
@@ -1580,51 +1568,51 @@ body {
       Vedic mantras are acoustic geometric keys that align the brainwave state with cosmic intelligence.
     </p>
 
-    <!-- Hanuman / Skanda Mantra -->
+    <!-- Ishta Devata Mantra -->
     <div class="luxury-card" style="margin-bottom:8px;border:1.5px solid var(--ruby);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;">
-        1. HANUMAN ISHTA DEVATA MOOLA MANTRA (12TH FROM KL IN D9)
+        1. ${ishtaInfo.deity.toUpperCase()} ISHTA DEVATA MANTRA (12TH FROM KL IN D9)
       </div>
-      <div class="mantra-devanagari">
-        ॐ हं हनुमते रुद्रात्मकाय हुं फट् नमः ॥
+      <div class="mantra-devanagari devanagari-safe" style="letter-spacing:0 !important;font-size:14px;text-align:center;color:var(--gold-bright);margin:6px 0;">
+        ${ishtaMantra.devanagari}
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
-        OM HAM HANUMATE RUDRATMAKAYA HUM PHAT NAMAH ||
+        ${ishtaMantra.latin}
       </div>
       <p style="font-size:10.5px;color:var(--ivory-dim);margin-top:4px;">
-        <strong>Protocol:</strong> Chant 108 times on Tuesday mornings facing East/North. Destroys all fear, psychic intrusion, and operational fatigue; awakens invincible courage.
+        <strong>Protocol:</strong> Chant 108 times during morning sadhana facing East or North. Strengthens spiritual sovereignty, clears subconscious obstacles, and invokes divine protection.
       </p>
     </div>
 
-    <!-- Moon AK Mantra -->
+    <!-- AK Mantra -->
     <div class="luxury-card" style="margin-bottom:8px;border:1.5px solid var(--purple);">
       <div class="card-title" style="color:var(--purple-bright);font-size:11.5px;">
-        2. ATMAKARAKA CHANDRA BEEJA MANTRA (FOR SOUL HEALING)
+        2. ATMAKARAKA ${ak.planet.toUpperCase()} BEEJA MANTRA (FOR SOUL HEALING)
       </div>
-      <div class="mantra-devanagari">
-        ॐ श्रां श्रीं श्रौं सः चन्द्रमसे नमः ॥
+      <div class="mantra-devanagari devanagari-safe" style="letter-spacing:0 !important;font-size:14px;text-align:center;color:var(--gold-bright);margin:6px 0;">
+        ${akMantra.devanagari}
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
-        OM SHRAM SHREEM SHROUM SAH CHANDRAMASE NAMAH ||
+        ${akMantra.latin}
       </div>
       <p style="font-size:10.5px;color:var(--ivory-dim);margin-top:4px;">
-        <strong>Protocol:</strong> Chant 11 times on Monday evenings near running water. Cleanses emotional burnout and strengthens Atmakaraka resilience.
+        <strong>Protocol:</strong> Chant 21 times in the quiet of dawn or dusk. Purifies emotional tension, calms the mind, and strengthens Atmakaraka resilience.
       </p>
     </div>
 
-    <!-- Mercury AmK Mantra -->
+    <!-- AmK Mantra -->
     <div class="luxury-card" style="margin-bottom:8px;border:1.5px solid var(--emerald);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-        3. AMATYAKARAKA BUDHA GAYATRI MANTRA (FOR INTELLECTUAL ACCURACY)
+        3. AMATYAKARAKA ${amk.planet.toUpperCase()} MANTRA (FOR INTELLECTUAL ACCURACY)
       </div>
-      <div class="mantra-devanagari">
-        ॐ सौम्यरूपाय विद्महे वाणेशाय धीमहि। तन्नो सौम्यः प्रचोदयात्॥
+      <div class="mantra-devanagari devanagari-safe" style="letter-spacing:0 !important;font-size:14px;text-align:center;color:var(--gold-bright);margin:6px 0;">
+        ${amkMantra.devanagari}
       </div>
       <div style="font-size:9.5px;color:var(--ivory-dim);text-align:center;font-style:italic;">
-        OM SAUMYA-ROOPAYA VIDMAHE VAANESHAYA DHIMAHI | TANNO SAUMYAH PRACHODAYAT ||
+        ${amkMantra.latin}
       </div>
       <p style="font-size:10.5px;color:var(--ivory-dim);margin-top:4px;">
-        <strong>Protocol:</strong> Chant 9 times Wednesday morning before writing code or closing deals. Sharpens mathematical discernment and intellectual focus.
+        <strong>Protocol:</strong> Chant 18 times before key professional work or strategic negotiations. Sharpens discernment, strategic focus, and financial acumen.
       </p>
     </div>
   </div>
@@ -1637,7 +1625,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Soul Alignment Rituals &amp; Karmic Neutralization</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Practical Jaimini remediation is not about expensive superstitions; it is about realigning physical actions with cosmic laws.
+      Practical Jaimini remediation is not about superstition; it is about realigning physical actions with cosmic laws.
     </p>
 
     <!-- Upaya Cards -->
@@ -1645,28 +1633,28 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--purple-bright);">
         <strong style="color:var(--purple-bright);font-size:11.5px;">1. THE 15-MINUTE BRAHMAMUHURTA SILENCE (AK ALIGNMENT):</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Because your Atmakaraka Moon sits in the 12th house, sit in complete silence for 15 minutes before touching your phone or screens upon waking. Breathe deeply and allow the mind to settle into formless presence.
+          Because your Atmakaraka is ${ak.planet} in ${ak.sign} (${akHouse}), sit in quiet reflection for 15 minutes before engaging with screens upon waking. Breathe deeply and allow the mind to establish centered stillness.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--gold-bright);">
-        <strong style="color:var(--gold-bright);font-size:11.5px;">2. SOLID SILVER DRINKING VESSEL:</strong>
+        <strong style="color:var(--gold-bright);font-size:11.5px;">2. GROUNDING &amp; CLARITY PROTOCOL:</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Drink pure water stored in a solid silver vessel. Silver cools Moon-Mars heat in Leo 12th house, stabilizes neuro-chemistry, and prevents emotional burnout.
+          Maintain clean hydration and a balanced morning routine. Cooling the internal nervous system stabilizes cognitive stamina and shields against emotional fatigue.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--ruby-bright);">
-        <strong style="color:var(--ruby-bright);font-size:11.5px;">3. TUESDAY UPAPADA CHARITY (ARIES UL HARMONIZATION):</strong>
+        <strong style="color:var(--ruby-bright);font-size:11.5px;">3. UPAPADA CHARITY (${ul.sign.toUpperCase()} UL HARMONIZATION):</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Aries Upapada Lagna is ruled by Mars. Sponsoring warm meals or donating sweet jaggery on Tuesdays directly energizes your UL and fortifies marital and partnership karma.
+          ${ul.sign} Upapada Lagna is ruled by ${SIGN_LORDS[ul.sign]}. Performing acts of kindness, donating food, or supporting harmonious relationship causes directly energizes your UL and fortifies partnership karma.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
-        <strong style="color:var(--emerald-bright);font-size:11.5px;">4. FRIDAY WHITE DANA (GNATIKARAKA NEUTRALIZATION):</strong>
+        <strong style="color:var(--emerald-bright);font-size:11.5px;">4. GNATIKARAKA NEUTRALIZATION (${gk.planet.toUpperCase()} GK UPAYA):</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Offer milk, kheer, or white flowers at a temple on Friday evenings. This satisfies GK Venus in 10th and dissolves workplace envy and contractual misunderstandings.
+          Engage in charitable donations and mindful speech aligned with ${gk.planet}. This resolves professional friction, dissolves unspoken tensions, and guards your reputation.
         </p>
       </div>
     </div>
@@ -1675,7 +1663,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ THE TIMELESS JAIMINI CODE</div>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        <em>"He who knows his Atmakaraka conquers grief; he who honors his Ishta Devata crosses the ocean of samsara."</em> Live in harmony with your Sagittarius Karakamsha, and every door opens naturally.
+        <em>"He who knows his Atmakaraka conquers grief; he who honors his Ishta Devata crosses the ocean of samsara."</em> Live in harmony with your ${klSign} Karakamsha, and every path clears naturally.
       </p>
     </div>
   </div>
@@ -1695,36 +1683,36 @@ body {
       <!-- Card 1 -->
       <div class="luxury-card" style="border-top:2px solid var(--purple-bright);">
         <div class="kicker" style="color:var(--purple-bright);">1. ATMAKARAKA (SOUL)</div>
-        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">Moon in Leo (${akDegreeStr})</div>
+        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">${ak.planet} in ${ak.sign} (${akDegreeStr})</div>
         <p style="font-size:10.5px;color:var(--ivory-dim);line-height:1.4;">
-          12th House Moksha King. Requires solitary creative architecture, emotional boundaries, and regular nature retreats.
+          ${akHouse} Sovereign Essence. Requires focused creative autonomy, clear emotional boundaries, and regular nature retreats.
         </p>
       </div>
 
       <!-- Card 2 -->
       <div class="luxury-card" style="border-top:2px solid var(--emerald-bright);">
         <div class="kicker" style="color:var(--emerald-bright);">2. AMATYAKARAKA (CAREER)</div>
-        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">Mercury in Taurus (${amkDegreeStr})</div>
+        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">${amk.planet} in ${amk.sign} (${amkDegreeStr})</div>
         <p style="font-size:10.5px;color:var(--ivory-dim);line-height:1.4;">
-          9th House Shastric Mind. Monetizes through algorithms, code, shastra translation, and institutional IP advisory.
+          ${amkHouse} Strategic Mind. Monetizes through structured expertise, rigorous knowledge systems, and disciplined leadership.
         </p>
       </div>
 
       <!-- Card 3 -->
       <div class="luxury-card" style="border-top:2px solid var(--gold-bright);">
         <div class="kicker" style="color:var(--gold-bright);">3. ARUDHA LAGNA (WORLD IMAGE)</div>
-        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">Capricorn (5th House)</div>
+        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">${al.sign} (House ${al.house})</div>
         <p style="font-size:10.5px;color:var(--ivory-dim);line-height:1.4;">
-          Seen as a disciplined mathematical strategist, quantitative thinker, and institutional systems founder.
+          Perceived in the outer world as a disciplined, high-competence strategist capable of enduring systemic stewardship.
         </p>
       </div>
 
       <!-- Card 4 -->
       <div class="luxury-card" style="border-top:2px solid var(--ruby-bright);">
         <div class="kicker" style="color:var(--ruby-bright);">4. ISHTA DEVATA (12TH FROM KL IN D9)</div>
-        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">Lord Hanuman &middot; Sri Kartikeya</div>
+        <div style="font-weight:700;font-size:13px;color:var(--gold-bright);margin:2px 0;">${ishtaInfo.deity}</div>
         <p style="font-size:10.5px;color:var(--ivory-dim);line-height:1.4;">
-          Scorpio 12th house in Navamsha occupied by Mars and Venus. Invincible spiritual protection and creative mastery.
+          ${klTwelfthSign} in Navamsha ruled by ${klTwelfthLord}. Supreme spiritual shield, inner wisdom, and transcendent guidance.
         </p>
       </div>
     </div>
@@ -1735,9 +1723,9 @@ body {
         ✦ 3 GOLDEN SHASTRIC SOUL MANDATES
       </div>
       <div style="font-size:11.2px;color:var(--ivory-dim);line-height:1.5;">
-        1. <strong>Honor the Sagittarius Soul Awakening (2016&ndash;2027):</strong> Complete your core software architecture before July 2027. This is your epoch of building.<br/>
-        2. <strong>Prepare for the Capricorn Decade (2027&ndash;2037):</strong> Arudha Lagna and Indu Lagna activate in July 2027. Build automated compounding wealth moats.<br/>
-        3. <strong>Guard Atmakaraka Solitude:</strong> Protect your morning silence. When your Moon is calm, your intellectual output is invincible.
+        1. <strong>Honor the ${activeDasha.sign} Era (${activeDashaStartYear}&ndash;${activeDashaEndYear}):</strong> Focus your vital energies on building enduring structural foundations before this chapter concludes.<br/>
+        2. <strong>Prepare for the ${nextDasha.sign} Era (${nextDashaStartYear}&ndash;${nextDashaEndYear}):</strong> The upcoming dasha unlocks outer recognition and compounding growth. Consolidate your core strengths.<br/>
+        3. <strong>Guard Atmakaraka Solitude:</strong> Protect your daily contemplative peace. When your ${ak.planet} Atmakaraka is clear, your life execution remains unshakeable.
       </div>
     </div>
   </div>
@@ -1745,34 +1733,34 @@ body {
 </section>
 
 <!-- PAGE 24: SHASTRA CERTIFICATION & AUTHENTICITY SEAL -->
-<section class="page page-cover">
+<section class="page">
   <div class="page-rail">
     <span class="brand">✦ AstroLife Sovereign Soul Vault</span>
     <span class="kicker">OFFICIAL IMMUTABLE SHASTRA RECORD</span>
   </div>
 
-  <div style="text-align:center;margin-top:10px;">
-    <div class="kicker" style="letter-spacing:0.25em;color:var(--purple-bright);margin-bottom:8px;">
+  <div style="text-align:center;margin-top:6px;">
+    <div class="kicker" style="letter-spacing:0.25em;color:var(--purple-bright);margin-bottom:6px;">
       ✦ CERTIFICATE OF SHASTRA AUTHENTICITY ✦
     </div>
-    <h1 class="display-xl" style="font-size:24px;margin-bottom:12px;">
+    <h1 class="display-xl" style="font-size:22px;margin-bottom:8px;">
       Certificate of Astrological Authenticity
     </h1>
-    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--ivory);max-width:540px;margin:0 auto;line-height:1.5;">
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--ivory);max-width:540px;margin:0 auto;line-height:1.45;">
       This 24-page Jaimini Soul Blueprint &amp; Karmic Mission dossier is computed deterministically under classical Maharishi Jaimini Upadesha Sutras, 7 Chara Karakas, Navamsha Karakamsha algorithms, and Swiss Ephemeris astronomical standards.
     </p>
   </div>
 
-  <div class="decorative-frame" style="max-width:550px;margin:0 auto;width:100%;">
+  <div class="decorative-frame" style="max-width:540px;margin:0 auto;width:100%;padding:18px 20px;">
     <div style="text-align:center;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.18em;color:var(--gold-bright);margin-bottom:8px;">
+      <div style="font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.18em;color:var(--gold-bright);margin-bottom:6px;">
         VERIFIED IMMUTABLE SHASTRA RECORD &middot; CERTIFICATE ID: ${certificateId}
       </div>
-      <div style="font-size:11.5px;color:var(--ivory);line-height:1.6;">
+      <div style="font-size:11px;color:var(--ivory);line-height:1.5;">
         Certified for: <strong>${subjectName}</strong> &middot; Archive Ref: <strong>${orderId}</strong> &middot; <span style="color:var(--gold);">www.astrolife.io</span>
       </div>
 
-      <div class="grid-2" style="font-size:10.5px;margin-top:14px;text-align:left;border-top:1px solid var(--border-gold);padding-top:10px;row-gap:6px;">
+      <div class="grid-2" style="font-size:10px;margin-top:10px;text-align:left;border-top:1px solid var(--border-gold);padding-top:8px;row-gap:6px;">
         <div>
           <span class="kicker">ASTRONOMICAL ENGINE</span>
           <div style="color:var(--ivory);font-weight:600;">Swiss Ephemeris DE431</div>
@@ -1791,11 +1779,11 @@ body {
         </div>
       </div>
 
-      <div style="margin-top:14px;padding:8px 12px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.25);border-radius:4px;font-size:8.5px;color:var(--ivory-mute);line-height:1.4;text-align:left;">
+      <div style="margin-top:10px;padding:6px 10px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.25);border-radius:4px;font-size:8.5px;color:var(--ivory-mute);line-height:1.35;text-align:left;">
         <strong style="color:var(--purple-bright);">SOUL BLUEPRINT SHASTRA RECORD:</strong> Computed under deterministic Rashi Dasha algorithms and exact longitudinal degree ranking. 100% Deterministic Classical Shastra preserving the sacred integrity of Maharishi Jaimini wisdom.
       </div>
 
-      <div style="margin-top:16px;font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.15em;color:var(--gold-bright);">
+      <div style="margin-top:12px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.15em;color:var(--gold-bright);">
         ✦ SACRED SHASTRA HERITAGE &middot; TIME-TESTED VEDIC WISDOM ✦
       </div>
     </div>

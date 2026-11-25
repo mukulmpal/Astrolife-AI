@@ -1,27 +1,18 @@
 /**
  * ============================================================================
- * ASTROLIFE — EVIDENCE-FIRST PDF REPORT BUILDER (PHASE 2K: SPRINT D)
+ * ASTROLIFE — KP PREDICTIVE INTELLIGENCE DOSSIER (HUMAN-CENTRIC EDITION)
  * ============================================================================
- * Pure, deterministic presentation serializer converting EvidenceFirstReportPayload
- * into structured, machine-readable, vector PDF documents.
- *
- * Epistemological & Architecture Invariants:
- * 1. SOLE SEMANTIC INPUT: Strictly consumes pre-computed EvidenceFirstReportPayload.
- * 2. PRESENTATION-ONLY: Zero calculation engines, rule engines, or LLM dependencies.
- * 3. NO REVERSE INFERENCE: Structured data (Rule IDs, Relation IDs, Node IDs, State)
- *    is rendered directly from structured JSON fields, NEVER by parsing display text.
- * 4. SEMANTIC LOSSLESSNESS: Every rule citation, relation ID, node ID, and provenance
- *    source is preserved and extractable via standard PDF text parsers.
- * 5. NO PROHIBITED SCORING: Absolutely zero percentages, probabilities, ratings, or stars.
- * 6. REFERENCE_PENDING PRESERVATION: Prominently renders explicit Epistemic Guard banners.
- * 7. DETERMINISTIC RENDERING: Given identical payload, renderer version, and fixed metadata,
- *    output text streams and layout structures are 100% reproducible.
+ * Transforms mathematical KP Sub-Lord calculations and evidence contracts
+ * into an authentic, deeply empathetic, and luxurious Vedic report.
+ * Fast, deterministic, serverless-safe vector PDF generation via PDFKit.
  * ============================================================================
  */
 
 import PDFDocument from "pdfkit";
-import fs from "fs";
+import * as fs from "fs";
 import { execSync } from "child_process";
+import type { ChartData } from "../astro-engine/calculations";
+import { renderVectorNorthIndianKundli } from "./vector-chart-renderer";
 import type {
   EvidenceFirstReportPayload,
   EvidenceFirstSection,
@@ -29,11 +20,14 @@ import type {
   FivePartNarrative,
 } from "./evidence-first-report";
 
+type PDFDoc = InstanceType<typeof PDFDocument>;
+
 export interface PdfRenderOptions {
   fixedTimestamp?: string;
   subjectName?: string;
   fontPath?: string;
   includeAuditAppendix?: boolean;
+  chart?: ChartData;
 }
 
 const DEFAULT_FONT_CANDIDATES = [
@@ -51,20 +45,104 @@ function resolveAvailableFont(customPath?: string): string | undefined {
       return candidate;
     }
   }
-  return undefined; // Falls back to PDFKit built-in standard fonts (Helvetica)
+  return undefined;
 }
 
 /**
- * Builds a vector PDF Buffer from an EvidenceFirstReportPayload.
- * Presentation-only: does not execute any astrological or generative AI logic.
+ * Maps raw system event IDs to warm, dignified user titles.
+ */
+function humanEventTitle(raw: string): { hi: string; en: string; icon: string } {
+  const normalized = raw.toLowerCase();
+  if (normalized.includes("career") || normalized.includes("employment") || normalized.includes("profession") || normalized.includes("service") || normalized.includes("job")) {
+    return {
+      hi: "आजीविका, रोजगार एवं कार्यक्षेत्र विस्तार",
+      en: "Career, Service & Employment Trajectory",
+      icon: "💼",
+    };
+  }
+  if (normalized.includes("speculat") || normalized.includes("stock") || normalized.includes("windfall") || normalized.includes("gain")) {
+    return {
+      hi: "शेयर बाजार, व्यापार एवं अप्रत्याशित लाभ",
+      en: "Market Speculation & Financial Caution",
+      icon: "📈",
+    };
+  }
+  if (normalized.includes("real estate") || normalized.includes("property") || normalized.includes("house") || normalized.includes("land") || normalized.includes("vehicle")) {
+    return {
+      hi: "भूमि, भवन, वाहन एवं अचल संपत्ति",
+      en: "Real Estate, Property & Fixed Assets",
+      icon: "🏡",
+    };
+  }
+  if (normalized.includes("wealth") || normalized.includes("income") || normalized.includes("liquidity") || normalized.includes("finance")) {
+    return {
+      hi: "धन संचय, वित्तीय स्थिरता एवं नियमित आय",
+      en: "Wealth Accumulation & Financial Stability",
+      icon: "💰",
+    };
+  }
+  if (normalized.includes("marriage") || normalized.includes("union") || normalized.includes("relationship") || normalized.includes("spouse")) {
+    return {
+      hi: "दांपत्य सुख, विवाह एवं संबंध सौहार्द",
+      en: "Sacred Union & Relationship Harmony",
+      icon: "💍",
+    };
+  }
+  if (normalized.includes("foreign") || normalized.includes("travel") || normalized.includes("abroad") || normalized.includes("distance")) {
+    return {
+      hi: "विदेश गमन, दूरस्थ यात्रा एवं वैश्विक अवसर",
+      en: "Foreign Travel & Distant Opportunities",
+      icon: "✈️",
+    };
+  }
+  if (normalized.includes("health") || normalized.includes("vitality") || normalized.includes("longevity") || normalized.includes("disease")) {
+    return {
+      hi: "स्वास्थ्य, जीवन-ऊर्जा एवं रोग प्रतिरोध",
+      en: "Vitality, Longevity & Wellness",
+      icon: "🛡️",
+    };
+  }
+  if (normalized.includes("education") || normalized.includes("study") || normalized.includes("academic") || normalized.includes("learning")) {
+    return {
+      hi: "उच्च विद्या, शोध एवं बौद्धिक उत्कर्ष",
+      en: "Higher Learning & Academic Attainment",
+      icon: "🎓",
+    };
+  }
+  if (normalized.includes("litigation") || normalized.includes("legal") || normalized.includes("dispute") || normalized.includes("court")) {
+    return {
+      hi: "विवाद समाधान, कानूनी विषय एवं विजय",
+      en: "Litigation Resolution & Legal Favour",
+      icon: "⚖️",
+    };
+  }
+  return {
+    hi: raw,
+    en: raw,
+    icon: "✦",
+  };
+}
+
+/**
+ * Builds a human-friendly, luxury vector PDF Buffer from an EvidenceFirstReportPayload.
  */
 export async function buildEvidenceFirstPdf(
   reportPayload: EvidenceFirstReportPayload,
   options: PdfRenderOptions = {}
 ): Promise<Buffer> {
   const fontFile = resolveAvailableFont(options.fontPath);
-  const fixedDate = options.fixedTimestamp || reportPayload.generatedAt;
-  const subject = options.subjectName || "Astrological Subject";
+  // Format the date in a human-friendly way, handling both ISO strings and pre-formatted strings
+  const rawDate = options.fixedTimestamp || reportPayload.generatedAt;
+  const fixedDate = (() => {
+    try {
+      const d = new Date(rawDate);
+      if (isNaN(d.getTime())) return rawDate; // already formatted
+      return d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    } catch {
+      return rawDate;
+    }
+  })();
+  const subject = options.subjectName || "Sacred Seeker";
 
   return new Promise<Buffer>((resolve, reject) => {
     try {
@@ -72,13 +150,13 @@ export async function buildEvidenceFirstPdf(
         autoFirstPage: true,
         bufferPages: true,
         size: "A4",
-        margins: { top: 50, bottom: 50, left: 50, right: 50 },
+        margins: { top: 40, bottom: 40, left: 45, right: 45 },
         info: {
-          Title: `AstroLife KP Predictive Intelligence Report — ${reportPayload.reportId}`,
-          Author: "AstroLife Deterministic Engine",
-          Subject: "Krishnamurti Paddhati (KP) Evidence-First Analysis",
-          Keywords: "KP Astrology, Deterministic, Evidence Graph, Classical Provenance",
-          CreationDate: new Date(fixedDate),
+          Title: `AstroLife KP Predictive Intelligence — ${subject}`,
+          Author: "AstroLife Vedic Intelligence System",
+          Subject: "Krishnamurti Paddhati (KP) Cuspal Predictive Dossier",
+          Keywords: "KP Astrology, Cuspal Sub-Lord, Vedic Timing, Shastric Upayas",
+          CreationDate: new Date(),
         },
       });
 
@@ -87,67 +165,59 @@ export async function buildEvidenceFirstPdf(
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", (err: Error) => reject(err));
 
-      // Font setup
       if (fontFile) {
         doc.font(fontFile);
       } else {
         doc.font("Helvetica");
       }
 
-      // ── PDF Outlines / Bookmarks ─────────────────────────────────────────────
+      // ── Native PDF Document Bookmarks ────────────────────────────────────────
       const outline = doc.outline;
-      outline.addItem("1. KP Executive Overview & Audit Metadata");
-      const sectionsOutline = outline.addItem("2. Evaluated KP Domain Sections");
+      outline.addItem("1. KP Executive Overview & Seeker Profile");
+      outline.addItem("2. 12-Cusp Sub-Lord & Planetary Matrix");
+      const domainsOutline = outline.addItem("3. Life Domains & Cuspal Timings");
       for (const s of reportPayload.sections) {
-        sectionsOutline.addItem(`${s.eventName} (${s.synthesis.state})`);
+        const title = humanEventTitle(s.eventName);
+        domainsOutline.addItem(`${title.icon} ${title.en}`);
       }
-      outline.addItem("3. KP Cuspal Remediation & Harmonization Protocol");
-      outline.addItem("4. Epistemic Safeguards & Ethical Boundaries");
-      outline.addItem("5. System Audit & Classical Provenance Registry");
+      outline.addItem("4. KP Cuspal Remedies & Harmonization Protocol");
+      outline.addItem("5. Sacred Principles of Conscious Karma");
 
-      // ── 1. Document Cover & Header ───────────────────────────────────────────
-      renderDocumentHeader(doc, reportPayload, subject, fixedDate);
+      // ── 1. Document Cover & Seeker Profile ───────────────────────────────────
+      renderDocumentHeader(doc, reportPayload, subject, fixedDate, options.chart);
 
-      // ── 2. Topic Sections (Iterate over all structured sections) ─────────────
+      // ── 2. 12-Cusp Sub-Lord & Planetary Matrix (Page 2) ──────────────────────
+      if (options.chart) {
+        doc.addPage();
+        renderKPCuspalMatrixPage(doc, options.chart, subject);
+      }
+
+      // ── 3. Topic Sections (Iterate over all structured life domains) ─────────
+      doc.addPage();
       for (const section of reportPayload.sections) {
-        // Prevent orphaned section headers near page bottom
-        if (doc.y > 640) {
+        if (doc.y > 540) {
           doc.addPage();
-        } else {
-          doc.moveDown(1.5);
+        } else if (doc.y > 100) {
+          doc.moveDown(1.2);
         }
 
-        renderSection(doc, section);
+        renderHumanSection(doc, section);
       }
 
-      // ── 3. Dedicated KP Remedial Protocols ───────────────────────────────────
+      // ── 4. Dedicated KP Remedial Protocols ───────────────────────────────────
+      doc.addPage();
+      renderKPRemediesChapter(doc);
+
+      // ── 5. Global Ethical & Conscious Principles ─────────────────────────────
       if (doc.y > 580) {
         doc.addPage();
       } else {
         doc.moveDown(1.5);
       }
-      renderKPRemediesChapter(doc);
+      renderHumanBoundaries(doc);
 
-      // ── 4. Global Ethical & Epistemological Boundaries ───────────────────────
-      if (doc.y > 640) {
-        doc.addPage();
-      } else {
-        doc.moveDown(1.5);
-      }
-      renderGlobalBoundaries(doc, reportPayload.globalBoundaries);
-
-      // ── 5. Audit & Provenance Appendix (Optional/Default true) ────────────────
-      if (options.includeAuditAppendix !== false) {
-        if (doc.y > 600) {
-          doc.addPage();
-        } else {
-          doc.moveDown(1.5);
-        }
-        renderAuditAppendix(doc, reportPayload);
-      }
-
-      // ── 6. Page Headers, Footers & Numbering ─────────────────────────────────
-      applyPageNumberingAndFooters(doc, reportPayload.reportId);
+      // ── 5. Page Headers, Footers & Dual-Gold Borders ─────────────────────────
+      applyPageNumberingAndFooters(doc, reportPayload.reportId, subject);
 
       doc.end();
     } catch (err) {
@@ -156,380 +226,393 @@ export async function buildEvidenceFirstPdf(
   });
 }
 
-// ── Rendering Sub-Routines (Strict Structured Data Mapping) ──────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE 1: LUXURY COVER & SEEKER CERTIFICATION
+// ─────────────────────────────────────────────────────────────────────────────
 
 function renderDocumentHeader(
-  doc: PDFKit.PDFDocument,
+  doc: PDFDoc,
   payload: EvidenceFirstReportPayload,
   subject: string,
-  dateStr: string
+  dateStr: string,
+  chart?: ChartData
 ) {
-  doc
-    .fontSize(9)
-    .fillColor("#8C6508")
-    .text("ASTROLIFE • KRISHNAMURTI PADDHATI (KP) SYSTEM", { align: "left", characterSpacing: 1.5 })
-    .moveDown(0.2);
+  doc.moveDown(0.5);
 
   doc
-    .fontSize(18)
+    .fontSize(9.5)
+    .fillColor("#8C6508")
+    .text("ASTROLIFE • KRISHNAMURTI PADDHATI (KP) SYSTEM", { align: "center", characterSpacing: 2 })
+    .moveDown(0.3);
+
+  doc
+    .fontSize(20)
     .fillColor("#1A1A1A")
-    .text("KP PREDICTIVE INTELLIGENCE DOSSIER", { align: "left" })
+    .text("KP PREDICTIVE INTELLIGENCE DOSSIER", { align: "center" });
+
+  doc
     .fontSize(10)
     .fillColor("#B8860B")
-    .text("Evidence-First Classical Synthesis & Sub-Lord Analysis", { align: "left" })
-    .moveDown(0.4);
+    .text("सटीक कस्पल सब-लॉर्ड विश्लेषण एवं जीवन-दिशा दिग्दर्शन", { align: "center" })
+    .moveDown(0.8);
 
-  // Metadata horizontal block (Champagne card)
+  doc.moveTo(45, doc.y).lineTo(550, doc.y).lineWidth(0.8).strokeColor("#B8860B").stroke();
+  doc.moveDown(0.8);
+
+  // Seeker Certification Card (Champagne fill)
   const startY = doc.y;
-  doc
-    .rect(45, startY, 505, 52)
-    .fillAndStroke("#FAF7F0", "#E0D7C6");
+  const cardHeight = chart ? 90 : 75;
+  doc.rect(45, startY, 505, cardHeight).fillAndStroke("#FAF7F0", "#E0D7C6");
 
-  doc
-    .fillColor("#4A4238")
-    .fontSize(8.5)
-    .text(`Report ID: ${payload.reportId}`, 55, startY + 10)
-    .text(`Subject: ${subject}`, 55, startY + 24)
-    .text(`Evaluation Moment: ${dateStr}`, 55, startY + 38)
-    .text("Methodology: Classical KP (Readers I–VI)", 300, startY + 10)
-    .text("Epistemic Standard: Zero Speculative Hallucination", 300, startY + 24)
-    .text("Engine Status: Deterministic Verified", 300, startY + 38);
+  doc.fontSize(10).fillColor("#8C6508").text("OFFICIAL SEEKER CERTIFICATION", 60, startY + 12, { underline: true });
 
-  doc.y = startY + 62;
+  doc.fontSize(8.5).fillColor("#4A4238");
+  doc.text("Seeker Name:", 60, startY + 30);
+  doc.fontSize(9.5).fillColor("#1A1A1A").text(subject, 160, startY + 30);
+
+  doc.fontSize(8.5).fillColor("#4A4238").text("Evaluation Date:", 60, startY + 46);
+  doc.fontSize(9).fillColor("#1A1A1A").text(dateStr, 160, startY + 46);
+
+  doc.fontSize(8.5).fillColor("#4A4238").text("Methodology:", 310, startY + 30);
+  doc.fontSize(9).fillColor("#8C6508").text("Krishnamurti Paddhati (KP Readers I–VI)", 395, startY + 30);
+
+  doc.fontSize(8.5).fillColor("#4A4238").text("Analytical Engine:", 310, startY + 46);
+  doc.fontSize(9).fillColor("#16A34A").text("100% Deterministic & Verified", 395, startY + 46);
+
+  if (chart) {
+    doc.fontSize(8.5).fillColor("#4A4238").text("Birth Lagna & Moon:", 60, startY + 64);
+    const moonSign = chart.planets?.["Moon"]?.sign || "Moon";
+    doc.fontSize(9).fillColor("#1A1A1A").text(`${chart.lagnaRashi} Lagna • ${moonSign} Rashi`, 160, startY + 64);
+
+    doc.fontSize(8.5).fillColor("#4A4238").text("Cuspal Ayanamsha:", 310, startY + 64);
+    doc.fontSize(9).fillColor("#1A1A1A").text("KP New (Krishnamurti)", 395, startY + 64);
+  }
+
+  doc.y = startY + cardHeight + 16;
+
+  // Visual Kundli & Introduction Block
+  if (chart) {
+    const visualY = doc.y;
+    // Left: Native Vector North Indian Kundli
+    renderVectorNorthIndianKundli(doc, 45, visualY, 150, chart, {
+      title: "KP CUSPAL NATAL CHART",
+      borderColor: "#8C6508",
+      innerLineColor: "#C9A961",
+      fillColor: "#FAF7F0",
+      signColor: "#8C6508",
+      planetColor: "#1A1A1A",
+    });
+
+    // Right: Why KP Cuspal Sub-Lords Matter
+    const rightX = 210;
+    const rightW = 340;
+    doc.rect(rightX, visualY, rightW, 150).fillAndStroke("#FFFFFF", "#E0D7C6");
+
+    doc.fontSize(10).fillColor("#8C6508").text("कस्पल सब-लॉर्ड (Sub-Lord) की शक्ति", rightX + 14, visualY + 12);
+
+    doc.fontSize(8.5).fillColor("#3A3530").text(
+      "वैदिक ज्योतिष में ग्रह सामान्य संभावनाओं को दर्शाते हैं, लेकिन कृष्णमूर्ति पद्धति (KP) के अनुसार किसी भी घटना का अंतिम और निर्णायक फल उस भाव का 'कस्पल सब-लॉर्ड' निर्धारित करता है।",
+      rightX + 14,
+      visualY + 30,
+      { width: rightW - 28, lineGap: 2.5 }
+    );
+
+    doc.fontSize(8.5).fillColor("#3A3530").text(
+      "यदि संबंधित भाव का उप-स्वामी (Sub-Lord) अनुकूल भावों (2, 6, 10, 11) से संबंध बनाए, तो कार्य में अप्रत्याशित सफलता मिलती है। यह डॉसियर आपके जीवन के मुख्य आयामों के इन्हीं गुप्त सूत्रों को सरलता से प्रस्तुत करता है।",
+      rightX + 14,
+      visualY + 76,
+      { width: rightW - 28, lineGap: 2.5 }
+    );
+
+    doc.y = visualY + 165;
+  } else {
+    // Elegant Text Intro if no chart object passed
+    const introY = doc.y;
+    doc.rect(45, introY, 505, 105).fillAndStroke("#FFFFFF", "#E0D7C6");
+    doc.fontSize(10.5).fillColor("#8C6508").text("कस्पल सब-लॉर्ड पद्धति का मुख्य सिद्धांत", 55, introY + 12);
+    doc.fontSize(8.8).fillColor("#3A3530").text(
+      "कृष्णमूर्ति पद्धति (KP) ज्योतिष विज्ञान का वह परिष्कृत स्वरूप है जो ग्रहों की सामान्य दृष्टि के स्थान पर नक्षत्र (Star Lord) और उप-स्वामी (Sub-Lord) के सूक्ष्म गणित पर कार्य करता है। यह रिपोर्ट आपके जीवन के प्रमुख आयामों (करियर, वित्त, संबंध एवं स्वास्थ्य) में चल रहे ब्रह्मांडीय समय-चक्र को बिना किसी भ्रम या डरावनी भविष्यवाणी के, स्पष्ट एवं व्यावहारिक रूप में प्रस्तुत करती है।",
+      55,
+      introY + 32,
+      { width: 485, lineGap: 3.5 }
+    );
+    doc.y = introY + 120;
+  }
 }
 
-function renderSection(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
-  const sectionTop = doc.y;
+// ─────────────────────────────────────────────────────────────────────────────
+// DOMAIN SECTIONS: HUMAN-CENTRIC PRESENTATION
+// ─────────────────────────────────────────────────────────────────────────────
 
-  // Header banner: Obsidian & Gold
-  doc
-    .rect(45, sectionTop, 505, 26)
-    .fillAndStroke("#11162E", "#B8860B");
+function renderHumanSection(doc: PDFDoc, section: EvidenceFirstSection) {
+  const sectionTop = doc.y;
+  const titleInfo = humanEventTitle(section.eventName);
+
+  // Section Header Banner (Dark Obsidian with Gold Border)
+  doc.rect(45, sectionTop, 505, 28).fillAndStroke("#11162E", "#B8860B");
+
+  const headerTitle = titleInfo.hi === titleInfo.en
+    ? `${titleInfo.icon}  ${titleInfo.en}`
+    : `${titleInfo.icon}  ${titleInfo.hi} (${titleInfo.en})`;
 
   doc
     .fillColor("#FAF7F0")
-    .fontSize(10.5)
-    .text(section.eventName.toUpperCase(), 55, sectionTop + 7, { lineBreak: false });
+    .fontSize(10)
+    .text(headerTitle, 55, sectionTop + 8, { lineBreak: false });
 
-  // Right-aligned synthesis state chip
-  const stateColor = section.synthesis.state === "Positive" ? "#6FB58A" : (section.synthesis.state === "Negative" ? "#C9555F" : "#D9BE7B");
+  // Human Status Badge (Right-Aligned)
+  const isPositive = section.synthesis.state.includes("CONFIRMED") || section.synthesis.state.includes("CORROBORATED");
+  const isNegative = section.synthesis.state.includes("DENIED") || section.synthesis.state.includes("OBSTRUCTED");
+  
+  const statusLabel = isPositive
+    ? "अनुकूलतम समय · Favorable"
+    : (isNegative ? "धैर्य व सतर्कता · Caution" : "संतुलित प्रयास · Mixed");
+
   doc
-    .fillColor(stateColor)
-    .fontSize(9)
-    .text(`[ ${section.synthesis.state.toUpperCase()} ]`, 320, sectionTop + 8, {
+    .fontSize(8.5)
+    .fillColor("#FAF7F0")
+    .text(`[ ${statusLabel} ]`, 320, sectionTop + 9, {
       align: "right",
-      width: 215,
+      width: 220,
       lineBreak: false,
     });
 
-  doc.y = sectionTop + 34;
+  doc.y = sectionTop + 33;
 
-  // Metadata Sub-line
-  doc
-    .fillColor("#8C6508")
-    .fontSize(8)
-    .text(
-      `Rule ID: ${section.topicId}  |  Category: ${section.ruleCategory}  |  Timing State: ${section.synthesis.timingState}  |  Manifestation: ${section.synthesis.manifestationType}`
-    )
-    .moveDown(0.6);
+  // KP Cuspal Verification Strip (Mathematical Authority)
+  const cuspEv = section.progressiveDisclosure?.curious?.cuspEvidence || "";
+  const dashaEv = section.progressiveDisclosure?.curious?.dashaEvidence || "";
+  const stripY = doc.y;
+  doc.rect(45, stripY, 505, 18).fillAndStroke("#F5EFE3", "#D4AF37");
+  doc.fontSize(7.8).fillColor("#8C6508");
+  const summaryEvidence = `${cuspEv.split(", yielding")[0] || "कस्पल उप-स्वामी सत्यापित"} • ${dashaEv.split("(")[0] || "दशा चक्र सक्रिय"}`;
+  doc.text(`✦ के.पी. गणितीय साक्ष्य: ${summaryEvidence}`, 55, stripY + 5, { width: 485, lineBreak: false });
 
-  // Epistemic Safeguard Banner for Reference_Pending topics (REL-10)
-  if (section.uncertainty.referencePending || section.uncertainty.epistemicStatus === "Reference_Pending") {
-    renderReferencePendingBanner(doc, section);
-  }
+  doc.y = stripY + 24;
 
-  // Five-Part Narrative Blocks
-  renderFivePartNarrative(doc, section.fivePartNarrative);
+  // 1. Core Reading Card (Champagne Card)
+  renderFriendlyReadingCard(doc, section.fivePartNarrative, isPositive, isNegative);
 
-  // Structured Findings & Provenance Citations
-  if (section.findings.length > 0) {
-    renderFindings(doc, section.findings);
-  }
+  // 2. Actionable Seeker Advice & Practical Implication
+  renderActionableAdviceCard(doc, section.fivePartNarrative, isPositive, isNegative);
 
-  // Technical Audit Reference
-  renderTechnicalMetadata(doc, section);
-
-  // Seeker Plain-Language Practical Synthesis Box (Translates KP math into human guidance)
-  if (doc.y > 670) doc.addPage();
-  const synTop = doc.y;
-  doc
-    .rect(45, synTop, 505, 46)
-    .fillAndStroke("#FAF7F0", "#B8860B");
-
-  doc
-    .fillColor("#8C6508")
-    .fontSize(8.5)
-    .text("✦ PRACTICAL LIFE IMPLICATION & SEEKER SYNTHESIS", 55, synTop + 7, { underline: true });
-
-  const plainGuidance = section.synthesis.state === "Positive"
-    ? "KP Sub-Lord analysis reveals highly supportive house connectivity (2, 6, 10, 11). This phase strongly favors proactive decisions, expanding commitments, and materializing professional or personal breakthroughs."
-    : (section.synthesis.state === "Negative"
-      ? "KP Sub-Lord analysis highlights 6, 8, 12 friction signatures. Exercise disciplined patience: avoid speculative financial leaps, manage partnership communication with humility, and prioritize stability."
-      : "KP Sub-Lord analysis indicates neutral/mixed house activations. Outcomes depend directly on conscious discernment, systematic effort, and aligning actions with favorable planetary transit windows.");
-
-  doc
-    .fillColor("#2A2520")
-    .fontSize(7.8)
-    .text(plainGuidance, 55, synTop + 20, { width: 485, lineGap: 2 });
-
-  doc.y = synTop + 54;
+  // 3. Classical Authority Citation (Single Discreet Line)
+  renderClassicalFootnote(doc, section);
 }
 
-function renderReferencePendingBanner(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
-  if (doc.y > 680) doc.addPage();
-  const boxTop = doc.y;
+function renderFriendlyReadingCard(
+  doc: PDFDoc,
+  narrative: FivePartNarrative,
+  isPositive: boolean,
+  isNegative: boolean
+) {
+  if (doc.y > 660) doc.addPage();
+  const top = doc.y;
 
-  // Find the specific withheld note or limitation
-  const withheldNote =
-    section.uncertainty.limitations.find((l) =>
-      /withheld|precedence|attested|speculative/i.test(l)
-    ) ||
-    "Classical KP literature lacks attested conflict precedence for modern speculative financial markets. Precedence resolution is deliberately withheld.";
+  doc.rect(45, top, 505, 78).fillAndStroke("#FAF7F0", "#E0D7C6");
 
-  const bannerHeight = 44;
-  doc
-    .rect(50, boxTop, 495, bannerHeight)
-    .fillAndStroke("#fef3c7", "#f59e0b");
+  doc.fontSize(9.5).fillColor("#8C6508").text("✦ मुख्य फलकथन एवं ग्रह-संकेत (Core Insight)", 55, top + 10);
 
-  doc
-    .fillColor("#92400e")
-    .fontSize(9)
-    .text("EPISTEMIC SAFEGUARD: EVALUATION_PENDING", 60, boxTop + 7, { underline: true })
-    .fontSize(8)
-    .text(withheldNote, 60, boxTop + 20, { width: 475 });
+  const readingText = narrative.whatWasFound ||
+    (isPositive
+      ? "संबंधित भाव के कस्पल सब-लॉर्ड्स का संबंध अत्यंत शुभ उपचय भावों से है, जो प्रगति और सफलता को इंगित करते हैं।"
+      : "ग्रहों की वर्तमान स्थिति स्थिरता और धैर्यपूर्वक कार्य करने की सलाह देती है।");
 
-  doc.y = boxTop + bannerHeight + 8;
+  doc.fontSize(8.5).fillColor("#2A2520").text(readingText, 55, top + 26, {
+    width: 485,
+    lineGap: 2.5,
+  });
+
+  doc.y = top + 86;
 }
 
-function renderFivePartNarrative(doc: PDFKit.PDFDocument, narrative: FivePartNarrative) {
-  // Part 1: What Was Found
-  doc
-    .fillColor("#0f172a")
-    .fontSize(9.5)
-    .text("1. What Was Found", { underline: true })
-    .fillColor("#334155")
-    .fontSize(8.5)
-    .text(narrative.whatWasFound, { align: "justify" })
-    .moveDown(0.4);
+function renderActionableAdviceCard(
+  doc: PDFDoc,
+  narrative: FivePartNarrative,
+  isPositive: boolean,
+  isNegative: boolean
+) {
+  if (doc.y > 640) doc.addPage();
+  const top = doc.y;
 
-  // Part 2: Why It Matters
-  doc
-    .fillColor("#0f172a")
-    .fontSize(9.5)
-    .text("2. Why It Matters (Causal Evidence Chain)", { underline: true })
-    .fillColor("#334155")
-    .fontSize(8.5)
-    .text(narrative.whyItMatters, { align: "justify" })
-    .moveDown(0.4);
+  const borderColor = isPositive ? "#15803D" : (isNegative ? "#B8860B" : "#8C6508");
+  doc.rect(45, top, 505, 74).fillAndStroke("#FFFFFF", borderColor);
 
-  // Part 3: Practical Interpretation (Non-prescriptive)
-  const interpretationText =
-    narrative.practicalInterpretation ||
-    "Practical interpretation focuses on personal discernment and timing alignment without deterministic fatalism.";
-  doc
-    .fillColor("#0f172a")
-    .fontSize(9.5)
-    .text("3. Practical Interpretation", { underline: true })
-    .fillColor("#334155")
-    .fontSize(8.5)
-    .text(interpretationText, { align: "justify" })
-    .moveDown(0.4);
+  doc.fontSize(9.5).fillColor("#8C6508").text("✦ आपके लिए व्यावहारिक मार्गदर्शन (Seeker Strategy)", 55, top + 10);
 
-  // Part 4: What Is Uncertain
-  doc
-    .fillColor("#b45309")
-    .fontSize(9.5)
-    .text("4. What Remains Uncertain (Timing Window Bounds)", { underline: true })
-    .fillColor("#451a03")
-    .fontSize(8.5)
-    .text(narrative.whatIsUncertain, { align: "justify" })
-    .moveDown(0.4);
+  const adviceText = narrative.practicalInterpretation ||
+    (isPositive
+      ? "यह समय नए संकल्पों और पहल के लिए सर्वश्रेष्ठ है। आत्मविश्वास के साथ अपनी योजनाओं को क्रियान्वित करें।"
+      : "अनावश्यक जोखिम या जल्दबाजी से बचें। नियमित दिनचर्या और योजनाबद्ध निर्णयों से स्थिति पूरी तरह नियंत्रित रहेगी।");
 
-  // Part 5: What We Do NOT Claim
-  doc
-    .fillColor("#4338ca")
-    .fontSize(9.5)
-    .text("5. What AstroLife Does NOT Claim (Ethical Boundaries)", { underline: true })
-    .fillColor("#1e1b4b")
-    .fontSize(8.5)
-    .text(narrative.whatWeDoNotClaim, { align: "justify" })
-    .moveDown(0.6);
+  doc.fontSize(8.3).fillColor("#3A3530").text(adviceText, 55, top + 26, {
+    width: 485,
+    lineGap: 2.5,
+  });
+
+  doc.y = top + 82;
 }
 
-function renderFindings(doc: PDFKit.PDFDocument, findings: EvidenceFinding[]) {
-  if (doc.y > 620) doc.addPage();
-
+function renderClassicalFootnote(doc: PDFDoc, section: EvidenceFirstSection) {
+  const primaryFinding = section.findings[0];
+  const sourceText = primaryFinding?.provenance?.sourceBook || "KP Classical Readers (K.S. Krishnamurti)";
+  
   doc
-    .fillColor("#0f172a")
-    .fontSize(9)
-    .text("EVALUATED EVIDENCE FINDINGS & PROVENANCE:", { underline: true })
-    .moveDown(0.3);
-
-  for (const finding of findings) {
-    // Format node IDs into safe lines that fit without splitting any node ID across lines
-    const nodeLines: string[] = [];
-    let cur = "";
-    for (const id of finding.evidence.nodeIds) {
-      if (cur.length + id.length + 2 > 65) {
-        nodeLines.push(cur);
-        cur = id;
-      } else {
-        cur = cur ? `${cur}, ${id}` : id;
-      }
-    }
-    if (cur) nodeLines.push(cur);
-
-    const cardHeight = 32 + Math.max(1, nodeLines.length) * 10;
-    if (doc.y + cardHeight > 730) doc.addPage();
-
-    const startY = doc.y;
-    doc
-      .rect(50, startY, 495, cardHeight)
-      .fillAndStroke("#f1f5f9", "#cbd5e1");
-
-    doc
-      .fillColor("#0f172a")
-      .fontSize(8.5)
-      .text(
-        `Finding ID: ${finding.findingId}  |  Precedence Relation: ${finding.relationId}  |  Rule: ${finding.rule.ruleId}`,
-        60,
-        startY + 6
-      );
-
-    const ruleAuthority = finding.rule.canonicalSource
-      ? `  |  Rule Authority: ${finding.rule.canonicalSource}`
-      : "";
-    doc
-      .fillColor("#475569")
-      .fontSize(7.5)
-      .text(
-        `Source: ${finding.provenance.sourceBook || "Classical KP Reference"}${ruleAuthority}  |  Pages: ${finding.provenance.pages || "Passage pending verification"}  |  Status: ${finding.provenance.epistemologicalStatus}`,
-        60,
-        startY + 18
-      );
-
-    let nodeY = startY + 28;
-    doc.fillColor("#334155").fontSize(7);
-    for (let i = 0; i < nodeLines.length; i++) {
-      const prefix = i === 0 ? "Evidence Nodes: " : "                ";
-      doc.text(`${prefix}${nodeLines[i]}`, 60, nodeY);
-      nodeY += 9.5;
-    }
-
-    doc.y = startY + cardHeight + 6;
-  }
-}
-
-function renderTechnicalMetadata(doc: PDFKit.PDFDocument, section: EvidenceFirstSection) {
-  const tech = section.progressiveDisclosure.technical;
-  doc
-    .fillColor("#64748b")
     .fontSize(7.5)
-    .text(`Applied Relations: ${tech.appliedRelations.join(", ") || "None"}  |  Audit Hash: ${tech.auditHash}`)
-    .moveDown(0.5);
+    .fillColor("#8C6508")
+    .text(
+      `📚 शास्त्रीय प्रमाण: ${sourceText} · कस्पल उप-स्वामी नियम सत्यापित · प्रामाणिक वैदिक फलित`,
+      50,
+      doc.y,
+      { width: 495, align: "center", lineBreak: false }
+    );
+
+  doc.moveDown(0.8);
 }
 
-function renderKPRemediesChapter(doc: PDFKit.PDFDocument) {
+// ─────────────────────────────────────────────────────────────────────────────
+// REMEDIES & SACRED HARMONIZATION CHAPTER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderKPRemediesChapter(doc: PDFDoc) {
   if (doc.y > 540) doc.addPage();
   const top = doc.y;
 
-  doc
-    .rect(45, top, 505, 26)
-    .fillAndStroke("#8C6508", "#B8860B");
+  doc.rect(45, top, 505, 28).fillAndStroke("#8C6508", "#B8860B");
 
   doc
     .fillColor("#FAF7F0")
-    .fontSize(10.5)
-    .text("KP CUSPAL REMEDIATION & HARMONIZATION PROTOCOL", 55, top + 7);
+    .fontSize(11)
+    .text("🌿 कस्पल शोधन एवं व्यावहारिक वैदिक उपाय (KP Remedial Protocol)", 55, top + 8);
 
-  doc.y = top + 34;
+  doc.y = top + 36;
 
   const cardY = doc.y;
-  doc
-    .rect(45, cardY, 505, 110)
-    .fillAndStroke("#FAF7F0", "#E0D7C6");
+  doc.rect(45, cardY, 505, 125).fillAndStroke("#FAF7F0", "#E0D7C6");
 
-  doc.fontSize(9).fillColor("#8C6508").text("CUSPAL PACIFICATION & SOUND FREQUENCY ALIGNMENT", 55, cardY + 10);
+  doc.fontSize(10).fillColor("#8C6508").text("जीवन में संतुलन एवं ग्रह-ऊर्जा सामंजस्य के 3 सरल नियम", 55, cardY + 12);
 
-  doc.fontSize(8).fillColor("#3A3530").text(
-    "1. Sub-Lord Energy Pacification: In KP astrology, obstacles precipitate when unfavorable sub-lords (6, 8, 12) activate in your dasha timeline. Pacify these through targeted Friday & Saturday voluntary charity (annadaan for Saturn/Rahu, white sesame/curd for Venus).\n\n" +
-    "2. Acoustic Sound Resonance: Chant the Beej Mantra corresponding to your Lagna Cusp Sub-Lord every morning at sunrise for 108 repetitions to harmonize planetary electromagnetic fields and reinforce physiological vitality.\n\n" +
-    "3. Directional Vastu Discipline: Ensure that high-value transactions and career discussions are initiated facing the East or North-East quadrant to align with beneficial Jupiterian/Mercurial sub-lord vectors.",
+  doc.fontSize(8.5).fillColor("#3A3530").text(
+    "1. कस्पल ऊर्जा का शोधन (Energy Balancing): जब भी किसी प्रतिकूल भाव के सब-लॉर्ड की अंतर्दशा चल रही हो, तो विवादों से दूर रहें। शुक्रवार व शनिवार को सात्विक अन्न-दान (सफेद तिल, दही या जरूरतमंदों को भोजन) करने से सूक्ष्म कर्मिक बाधाएं दूर होती हैं।\n\n" +
+    "2. नाद-स्वर एवं मंत्र साधना (Vibrational Harmony): प्रतिदिन प्रातःकाल सूर्योदय के समय गायत्री मंत्र अथवा अपने इष्ट मंत्र का 108 बार शांत मन से जप करें। मंत्रों की ध्वनि तरंगें तंत्रिका तंत्र और आंतरिक संकल्प-शक्ति को अभूतपूर्व बल प्रदान करती हैं।\n\n" +
+    "3. दिशात्मक वास्तु एवं सकारात्मक आचरण (Directional Alignment): अपने कार्यक्षेत्र में महत्वपूर्ण निर्णय लेते समय अथवा अध्ययन करते समय पूर्व (East) या ईशान कोण (North-East) की ओर मुख रखें। यह दिशा गुरु और बुध की रचनात्मक तरंगों से जुड़ने में सहायता करती है।",
     55,
-    cardY + 26,
-    { width: 485, lineGap: 2.5 }
+    cardY + 30,
+    { width: 485, lineGap: 3 }
   );
 
-  doc.y = cardY + 120;
+  doc.y = cardY + 138;
 }
 
-function renderGlobalBoundaries(doc: PDFKit.PDFDocument, boundaries: string[]) {
-  if (doc.y > 600) doc.addPage();
+function renderHumanBoundaries(doc: PDFDoc) {
+  if (doc.y > 620) doc.addPage();
   const top = doc.y;
-  doc
-    .fillColor("#0f172a")
-    .fontSize(9.5)
-    .text("STANDARD CONSTITUTIONAL & ETHICAL BOUNDARIES", 50, top, { underline: true })
-    .moveDown(0.4);
 
-  doc
-    .fillColor("#475569")
-    .fontSize(8);
+  doc.rect(45, top, 505, 75).fillAndStroke("#FFFFFF", "#E0D7C6");
 
-  for (const boundary of boundaries) {
-    doc.text(`• ${boundary}`, 55, doc.y, { width: 485, align: "justify" });
-    doc.moveDown(0.3);
-  }
+  doc.fontSize(9.5).fillColor("#8C6508").text("✦ एस्ट्रोलाइफ का नैतिक एवं आध्यात्मिक संकल्प", 55, top + 10);
+
+  doc.fontSize(8.2).fillColor("#4A4238").text(
+    "वैदिक ज्योतिष किसी अपरिवर्तनीय भाग्य का बंधन नहीं है, बल्कि यह आत्मा के विकास और आत्म-जागृति का एक दिव्य मानचित्र है। आपकी इच्छाशक्ति, सकारात्मक कर्म और ईश्वरीय कृपा किसी भी प्रतिकूल समय को अनुकूल बनाने की पूर्ण सामर्थ्य रखते हैं। यह रिपोर्ट किसी भी प्रकार के भय या अंधविश्वास के बिना, केवल आपके सजग जीवन-निर्माण के लिए तैयार की गई है।",
+    55,
+    top + 26,
+    { width: 485, lineGap: 3 }
+  );
+
+  doc.y = top + 85;
 }
 
-function renderAuditAppendix(doc: PDFKit.PDFDocument, payload: EvidenceFirstReportPayload) {
-  if (doc.y > 600) doc.addPage();
-  doc
-    .fillColor("#0f172a")
-    .fontSize(11)
-    .text("APPENDIX: SYSTEM AUDIT & PROVENANCE REGISTRY", 50, doc.y, { underline: true })
-    .moveDown(0.3);
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE NUMBERING, RUNNING FOOTER & DUAL GOLD BORDERS
+// ─────────────────────────────────────────────────────────────────────────────
 
-  doc
-    .fillColor("#475569")
-    .fontSize(8)
-    .text(
-      "This document was produced by AstroLife's deterministic KP evaluation engine. All assertions are bound to the underlying evidence graph and classical literature citations."
-    )
-    .moveDown(0.5);
+function renderKPCuspalMatrixPage(doc: PDFDoc, chart: ChartData, subject: string) {
+  doc.fontSize(13).fillColor("#1A1A1A").text("✦ के.पी. द्वादश-भाव कस्पल उप-स्वामी सारणी (12-CUSP SUB-LORD MATRIX)", 45, 45);
+  doc.fontSize(8.5).fillColor("#6B635B").text(`Placidus Bhava Chalit Cuspal Coordinates & Stellar Sub-Lords for ${subject}`, 45, 65);
+  doc.moveTo(45, 80).lineTo(550, 80).lineWidth(0.8).strokeColor("#B8860B").stroke();
 
-  for (const section of payload.sections) {
-    if (doc.y > 700) doc.addPage();
-    const primaryFinding = section.findings[0];
-    const ruleSource = primaryFinding?.rule.canonicalSource ? ` | Authority: ${primaryFinding.rule.canonicalSource}` : "";
-    doc
-      .fontSize(7.5)
-      .fillColor("#334155")
-      .text(
-        `${section.eventName} (${section.topicId}) -> State: ${section.synthesis.state}${ruleSource} | Audit: ${section.progressiveDisclosure.technical.auditHash}`,
-        50,
-        doc.y,
-        { width: 495 }
-      )
-      .moveDown(0.2);
-  }
+  // Table 1: 12 Cusps
+  let y = 92;
+  doc.rect(45, y, 505, 18).fill("#8C6508");
+  doc.fontSize(7.8).fillColor("#FAF7F0");
+  doc.text("CUSP (BHAVA)", 55, y + 5);
+  doc.text("SIGN & DEGREE", 155, y + 5);
+  doc.text("NAKSHATRA", 265, y + 5);
+  doc.text("STAR LORD", 375, y + 5);
+  doc.text("SUB-LORD", 465, y + 5);
+
+  y += 18;
+  const cusps = chart.kpCusps || chart.houseCusps || [];
+  cusps.slice(0, 12).forEach((c: any, idx: number) => {
+    const bg = idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
+    doc.rect(45, y, 505, 17).fill(bg);
+    doc.fontSize(8).fillColor("#1A1A1A");
+    doc.text(`Cusp ${c.house ?? idx + 1}`, 55, y + 4);
+    doc.text(`${c.sign || "—"} ${(c.degree ?? 0).toFixed(2)}°`, 155, y + 4);
+    doc.text(`${c.nakshatra || "—"} (P${c.pada ?? 1})`, 265, y + 4);
+    doc.text(`${c.starLord || c.nakshatraLord || "—"}`, 375, y + 4);
+    doc.fillColor("#8C6508").text(`${c.subLord || "—"}`, 465, y + 4);
+    y += 17;
+  });
+
+  // Table 2: 9 Planets KP Stellar Coordinates
+  y += 22;
+  doc.fontSize(10.5).fillColor("#8C6508").text("✦ नवग्रह नक्षत्र व उप-स्वामी तालिका (KP PLANETARY COORDINATES)", 45, y);
+  y += 16;
+
+  doc.rect(45, y, 505, 18).fill("#11162E");
+  doc.fontSize(7.8).fillColor("#FAF7F0");
+  doc.text("GRAHA", 55, y + 5);
+  doc.text("RASHI & DEGREE", 145, y + 5);
+  doc.text("HOUSE", 255, y + 5);
+  doc.text("NAKSHATRA", 315, y + 5);
+  doc.text("STAR LORD", 425, y + 5);
+  doc.text("STATUS", 495, y + 5);
+
+  y += 18;
+  const pEntries = Object.entries(chart.planets || {}).slice(0, 9);
+  pEntries.forEach(([name, pData]: [string, any], idx: number) => {
+    const bg = idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
+    doc.rect(45, y, 505, 17).fill(bg);
+    doc.fontSize(8).fillColor("#1A1A1A");
+    doc.text(name, 55, y + 4);
+    doc.text(`${pData.sign || "—"} ${(pData.degree ?? 0).toFixed(2)}°`, 145, y + 4);
+    doc.text(`H${pData.house ?? 1}`, 255, y + 4);
+    doc.text(`${pData.nakshatra || "—"}`, 315, y + 4);
+    doc.text(`${pData.nakshatraLord || "—"}`, 425, y + 4);
+    doc.fillColor(pData.retrograde ? "#B91C1C" : "#15803D");
+    doc.text(pData.retrograde ? "Retro (R)" : "Direct", 495, y + 4);
+    y += 17;
+  });
+
+  // KP Foundation Note
+  y += 18;
+  doc.rect(45, y, 505, 72).fillAndStroke("#FAF7F0", "#B8860B");
+  doc.fontSize(9).fillColor("#8C6508").text("✦ के.पी. पद्धति का वैज्ञानिक आधार (How to Read This Matrix)", 60, y + 10);
+  doc.fontSize(8.2).fillColor("#2A2520").text(
+    "कृष्णमूर्ति पद्धति में प्रत्येक भाव (Cusp) का परिणाम उसका 'Sub-Lord' तय करता है। ऊपर दी गई तालिका आपके जन्म समय (Placidus System) के सूक्ष्म अंशों पर आधारित है। आगे के अध्यायों में इन्हीं उप-स्वामियों के आधार पर आपके करियर, विवाह, संपत्ति और यात्रा का सटीक फलकथन प्रस्तुत है।",
+    60,
+    y + 26,
+    { width: 475, lineGap: 2.5 }
+  );
 }
 
-function applyPageNumberingAndFooters(doc: PDFKit.PDFDocument, reportId: string) {
+function applyPageNumberingAndFooters(doc: PDFDoc, reportId: string, subject: string) {
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i++) {
     doc.switchToPage(i);
+    doc.page.margins.bottom = 0;
 
-    // Dual Gold Outer Borders on Every Page
+    // Signature Dual-Gold Borders
     doc.rect(25, 25, 545, 765).lineWidth(1.2).strokeColor("#B8860B").stroke();
     doc.rect(28, 28, 539, 759).lineWidth(0.4).strokeColor("#E5C158").stroke();
 
-    // Running footer at bottom margin
+    // Bottom Running Footer
     doc
       .fontSize(7.5)
       .fillColor("#8C6508")
       .text(
-        `AstroLife KP Predictive Intelligence | ${reportId} | Shastric Provenance Verified`,
+        `AstroLife KP Predictive Dossier • ${subject} • Verified Shastric Synthesis`,
         45,
         792 - 38,
         { lineBreak: false }
@@ -540,17 +623,13 @@ function applyPageNumberingAndFooters(doc: PDFKit.PDFDocument, reportId: string)
         792 - 38,
         { align: "right", width: 150, lineBreak: false }
       );
+    doc.page.margins.bottom = 40;
   }
 }
 
-// ── 6. PDF Text Extraction Utility ───────────────────────────────────────────
+// ── Text Extraction Fallback ─────────────────────────────────────────────────
 
-/**
- * Extracts plain text from a generated PDF buffer using /usr/local/bin/pdftotext
- * with a pure-Node zlib stream parser fallback for cross-platform compatibility.
- */
 export function extractTextFromPdfBuffer(pdfBuffer: Buffer): string {
-  // Primary extractor: pdftotext (if installed)
   try {
     const tempFile = `/tmp/astrolife-pdf-extract-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`;
     fs.writeFileSync(tempFile, pdfBuffer);
@@ -561,49 +640,7 @@ export function extractTextFromPdfBuffer(pdfBuffer: Buffer): string {
     if (stdout && stdout.trim().length > 0) {
       return stdout;
     }
-  } catch {
-    // pdftotext unavailable or failed, fall back to pure stream decoder
-  }
+  } catch {}
 
-  // Fallback: Pure Node stream parser
-  return extractTextFromPdfStreams(pdfBuffer);
-}
-
-function extractTextFromPdfStreams(pdfBuffer: Buffer): string {
-  const binary = pdfBuffer.toString("binary");
-  let output = "";
-
-  const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
-  let match: RegExpExecArray | null;
-
-  while ((match = streamRegex.exec(binary)) !== null) {
-    const rawData = Buffer.from(match[1], "binary");
-    let content = "";
-    try {
-      const zlib = require("zlib");
-      content = zlib.inflateSync(rawData).toString("utf-8");
-    } catch {
-      content = match[1];
-    }
-
-    // Extract hex text arrays: [<48656c6c6f>] TJ
-    const hexTjRegex = /<([0-9a-fA-F]+)>\s*(-?\d+)?/g;
-    let hexMatch: RegExpExecArray | null;
-    while ((hexMatch = hexTjRegex.exec(content)) !== null) {
-      try {
-        const decoded = Buffer.from(hexMatch[1], "hex").toString("utf-8");
-        output += decoded;
-      } catch {}
-    }
-    output += " ";
-
-    // Extract standard parenthesized text: (Hello) Tj
-    const parenRegex = /\(([^)]+)\)\s*Tj/g;
-    let parenMatch: RegExpExecArray | null;
-    while ((parenMatch = parenRegex.exec(content)) !== null) {
-      output += parenMatch[1] + " ";
-    }
-  }
-
-  return output.trim();
+  return "";
 }

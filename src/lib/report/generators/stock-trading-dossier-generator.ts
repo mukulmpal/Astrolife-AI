@@ -27,6 +27,13 @@ import { calculateSarvatobhadraGrid } from "../../astro-engine/sarvatobhadra-gri
 import { evaluateTradingRisk } from "../../astro-engine/trading-risk-guardrail";
 import { calculateAshtakavarga } from "../../astro-engine/ashtakavarga";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import {
+  getSignLord,
+  houseFromLagna,
+  ordinal,
+  renderHumanImpactCardHtml,
+  signFromHouse
+} from "../../astro/human-translator";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -246,32 +253,74 @@ export function generateStockTradingDossierHTML(
   const moonNakshatra = moonP?.nakshatra || "Ashwini";
   const moonRashi = moonP?.sign || "Aries";
 
-  const activeDasha = chart.dasha?.currentMahadasha?.planet || chart.dashas?.[0]?.planet || "Jupiter";
-  const activeAntar = chart.dasha?.currentAntardasha?.planet || "Saturn";
+  const activeMdObj = (chart.dashas as any[])?.find((d) => d.active);
+  const activeAdObj = activeMdObj?.antardashas?.find((a: any) => a.active);
+  const activeDasha = activeMdObj?.planet || chart.dasha?.currentMahadasha?.planet || chart.dashas?.[0]?.planet || "Jupiter";
+  const activeAntar = activeAdObj?.planet || chart.dasha?.currentAntardasha?.planet || "Saturn";
 
   // Compute Sarvatobhadra Grid
   const sbResult = calculateSarvatobhadraGrid(chart);
 
   // Compute Ashtakavarga
-  const akv = calculateAshtakavarga(chart);
+  const akv = calculateAshtakavarga(chart.planets as any, lagnaNum);
   const savHouses = akv.houses;
+  const h2Score = savHouses[1]?.score || 28;
+  const h5Score = savHouses[4]?.score || 28;
   const h11Score = savHouses[10]?.score || 28;
   const h12Score = savHouses[11]?.score || 25;
   const netSurplus = h11Score - h12Score;
   const surplusSign = netSurplus >= 0 ? `+${netSurplus}` : `${netSurplus}`;
 
+  const lagnesh = SIGN_LORDS[lagnaRashi] || "Mars";
+  const sunP = chart.planets?.Sun;
+  const jupP = chart.planets?.Jupiter;
+  const mercP = chart.planets?.Mercury;
   const rahuP = chart.planets?.Rahu;
+  const ketuP = chart.planets?.Ketu;
   const saturnP = chart.planets?.Saturn;
   const marsP = chart.planets?.Mars;
   const venusP = chart.planets?.Venus;
+
   const fifthSignNum = (lagnaNum + 4) % 12;
   const fifthLord = SIGN_LORDS[SIGN_NAMES[fifthSignNum]];
   const fifthLordP = chart.planets?.[fifthLord];
   
   const rahuHouse = rahuP?.house || 1;
+  const ketuHouse = ketuP?.house || 7;
   const moonHouse = moonP?.house || 1;
   const saturnHouse = saturnP?.house || 1;
   const marsHouse = marsP?.house || 1;
+
+  // Real AmK (2nd highest degree among 7 grahas)
+  const sevenGrahas = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+  const sortedDeg = sevenGrahas
+    .map(p => ({ p, deg: ((chart.planets?.[p]?.longitude ?? chart.planets?.[p]?.degree ?? 0) % 30 + 30) % 30 }))
+    .sort((a, b) => b.deg - a.deg);
+  const amkPlanet = sortedDeg[1]?.p || lagnesh;
+  const amkData = chart.planets?.[amkPlanet];
+
+  const occupantsInHouse = (h: number): string[] =>
+    Object.entries(chart.planets || {})
+      .filter(([, pd]) => pd && pd.house === h)
+      .map(([name]) => name);
+
+  const tenthSign = signFromHouse(lagnaRashi, 10);
+  const tenthLord = getSignLord(tenthSign);
+  const tenthOcc = occupantsInHouse(10);
+  const cancerJupH = houseFromLagna("Cancer", lagnaRashi);
+  const leoJupH = houseFromLagna("Leo", lagnaRashi);
+  const bestSavHouseIdx = savHouses.reduce((bestIdx, hObj, i) => ((hObj?.score || 0) > (savHouses[bestIdx]?.score || 0) ? i : bestIdx), 0);
+  const bestSavSign = signFromHouse(lagnaRashi, bestSavHouseIdx + 1);
+  const bestSavScore = savHouses[bestSavHouseIdx]?.score || 30;
+  const isCancerPeak = [1, 2, 4, 5, 7, 9, 10, 11].includes(cancerJupH);
+
+  // D-1 SVG dynamic caption
+  const d1CaptionParts = [1, 2, 5, 8, 9, 10, 11].map(h => {
+    const s = signFromHouse(lagnaRashi, h);
+    const occ = occupantsInHouse(h);
+    return `${s} ${ordinal(h)} H${occ.length ? ` (${occ.join("/")})` : ""}`;
+  });
+  const d1DynamicCaption = `${lagnaRashi} Lagna &middot; ` + d1CaptionParts.slice(1).join(" &middot; ");
 
   const fifthLordAfflicted = [6, 8, 12].includes(fifthLordP?.house || 0);
   const rahuInRiskHouses = [5, 8, 12].includes(rahuHouse);
@@ -341,15 +390,91 @@ export function generateStockTradingDossierHTML(
     return `<tr><td><strong>${bp.label}</strong></td><td>${h2} Bindus</td><td>${h5} Bindus</td><td>${h9} Bindus</td><td>${h11} Bindus</td><td>${bp.role}</td></tr>`;
   }).join("");
 
+  const SB_OFFSET_LABELS = [
+    "1st (Janma)",
+    "10th (Karma)",
+    "16th (Sanghatika)",
+    "18th (Samudayika)",
+    "23rd (Vinaasha)",
+    "25th (Manasa)",
+    "26th (Jati)",
+    "27th (Desha)",
+    "28th (Abhisheka)"
+  ];
+  const SB_ENGLISH_DESC = [
+    "Core physical &amp; psychological decision clarity during market hours",
+    "Career standing, institutional credibility &amp; execution discipline",
+    "Collective liquidity, treasury inflows &amp; capital accumulation",
+    "Teamwork, market sentiment alignment &amp; sector momentum",
+    "Critical stop-loss boundary &amp; capital drawdown protection",
+    "Emotional stability, patience &amp; avoidance of impulsive trades",
+    "Strategic peer network &amp; institutional counterparties",
+    "Macroeconomic environment &amp; cross-border capital flows",
+    "Sovereign coronation, high-conviction wealth breakthroughs"
+  ];
   const sensitiveRowsHtml = (sbResult.sensitiveTargets || []).map((st, idx) => `
     <tr>
       <td><strong>${escapeHtml(st.name)}</strong></td>
       <td>${escapeHtml(st.nakshatra)}</td>
-      <td>${idx === 0 ? "1st (Janma)" : idx === 1 ? "10th (Karma)" : idx === 2 ? "16th (Sanghatika)" : idx === 3 ? "18th (Samudayika)" : idx === 4 ? "23rd (Vinaasha)" : idx === 5 ? "25th (Manasa)" : idx === 6 ? "26th (Rajya/Jati)" : "27th/28th (Abhisheka)"}</td>
-      <td>${escapeHtml(st.shastricSignificance || "Sensitive market trigger point")}</td>
+      <td>${SB_OFFSET_LABELS[idx] || `${idx + 1}th`}</td>
+      <td>${SB_ENGLISH_DESC[idx] || "Sensitive market trigger point"}</td>
     </tr>
   `).join("");
+  const janmaNak = sbResult.sensitiveTargets?.[0]?.nakshatra || moonNakshatra;
+  const karmaNak = sbResult.sensitiveTargets?.[1]?.nakshatra || "Uttara Ashadha";
+  const sanghatikaNak = sbResult.sensitiveTargets?.[2]?.nakshatra || "Swati";
   const vinaashaNak = sbResult.sensitiveTargets?.[4]?.nakshatra || "Vinaasha";
+
+  // Dual-Layer HumanImpactCards (Pages 3, 11, 13, 14, 20)
+  const specHumanCard = renderHumanImpactCardHtml({
+    tier: h5Score >= 30 ? "TIER_HIGH" : h5Score >= 26 ? "TIER_MID" : "TIER_LOW",
+    badge: h5Score >= 30 ? "Your Natural Edge" : h5Score >= 26 ? "Steady Engine (Needs Structure)" : "Your Blind Spot & Fix",
+    title: `Risk &amp; Decision Profile (${fifthSign} 5th House)`,
+    plainWords: `Your 5th house (${fifthSign}, ${h5Score} Bindus) governed by ${fifthLord} favors structured, rules-based investing over gut-feel bets. When you follow a written checklist, your decision accuracy stays consistent.`,
+    watchOutFor: `Taking impulsive intraday trades when markets move sharply.`,
+    nextMove: `Write down your entry, stop-loss, and target before placing any order tomorrow.`,
+    shastricProof: `5th House: ${fifthSign} (${h5Score} Bindus) · Lord: ${fifthLord} in ${ordinal(fifthLordP?.house || 5)}`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const savHumanCard = renderHumanImpactCardHtml({
+    tier: netSurplus > 0 ? "TIER_HIGH" : "TIER_MID",
+    badge: netSurplus > 0 ? "Your Natural Edge" : "Steady Engine (Needs Structure)",
+    title: `Cashflow Retention (${h11Score} Gains vs ${h12Score} Outflow)`,
+    plainWords: `Your 11th house of gains (${h11Score} Bindus) compared to your 12th house of expenses (${h12Score} Bindus) gives a ${surplusSign} net retention spread. ${netSurplus > 0 ? "Money that comes in tends to stick when parked in long-term assets." : "Automated savings sweeps are essential so gains do not leak into expenses."}`,
+    watchOutFor: `Leaving idle trading profits in high-risk margin accounts.`,
+    nextMove: `Set up an automatic Friday transfer of realized gains into a separate reserve account.`,
+    shastricProof: `SAV Total: ${akv.sarvaTotal} · H2: ${h2Score} · H11: ${h11Score} · H12: ${h12Score}`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const bavHumanCard = renderHumanImpactCardHtml({
+    tier: h2Score >= 30 ? "TIER_HIGH" : "TIER_MID",
+    badge: h2Score >= 30 ? "Your Natural Edge" : "Steady Engine (Needs Structure)",
+    title: `Treasury &amp; Capital Reserves (${secondSign} 2nd House)`,
+    plainWords: `Your 2nd house of accumulated wealth holds ${h2Score} Bindus in ${secondSign}. Prioritizing liquid reserves and index compounding protects your downside during volatile market quarters.`,
+    watchOutFor: `Over-concentrating capital into a single speculative theme.`,
+    nextMove: `Verify that at least 25% of your capital sits in low-volatility liquid or sovereign reserves.`,
+    shastricProof: `2nd House: ${secondSign} (${h2Score} Bindus) · Lord: ${secondLord}`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const psychHumanCard = renderHumanImpactCardHtml({
+    tier: "TIER_MID",
+    badge: "Steady Engine (Needs Structure)",
+    title: `Trading Mindset (${lagnaRashi} Lagna &middot; ${moonRashi} Moon)`,
+    plainWords: `Your ${lagnaRashi} Ascendant brings analytical structure, while your ${moonRashi} Moon (${ordinal(moonHouse)} house) drives your emotional reaction to price swings. Separating research hours from execution hours keeps emotions out of your P&amp;L.`,
+    watchOutFor: `Overtrading out of boredom during flat or choppy market sessions.`,
+    nextMove: `Step away from screens for 2 minutes before confirming any discretionary trade.`,
+    shastricProof: `Lagna: ${lagnaRashi} (${lagnesh}) · Moon: ${moonRashi} H${moonHouse} · Mars: H${marsHouse}`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
+
+  const radarHumanCard = renderHumanImpactCardHtml({
+    tier: isCancerPeak ? "TIER_HIGH" : "TIER_MID",
+    badge: isCancerPeak ? "Your Natural Edge" : "Steady Engine (Needs Structure)",
+    title: `2026–2027 Market Timing Window (Jupiter in ${ordinal(cancerJupH)})`,
+    plainWords: `Exalted Jupiter in Cancer activates your ${ordinal(cancerJupH)} house through July 2027. ${isCancerPeak ? "This supports steady wealth harvesting and high-conviction long-term positioning." : "Use this cycle for hedged accumulation, debt reduction, and disciplined risk control."}`,
+    watchOutFor: `Assuming every rally continues indefinitely without profit-taking rules.`,
+    nextMove: `Mark your calendar for ${bestSavSign} Solar transit (${bestSavScore} Bindus) as your top review window.`,
+    shastricProof: `Jupiter Cancer: H${cancerJupH} · Best SAV Sign: ${bestSavSign} (${bestSavScore} Bindus)`
+  }, { customStyle: "margin-top:8px;margin-bottom:0;padding:8px 10px;" });
 
   const headerRail = (kicker: string) => `
     <div class="page-rail">
@@ -631,19 +756,19 @@ body {
       </div>
       <div>
         <span class="kicker">5th House Speculation Lord</span>
-        <div style="color:var(--emerald-bright);font-weight:700;">Saturn in Pisces (00° 57' · Indu Lagna Lord)</div>
+        <div style="color:var(--emerald-bright);font-weight:700;">${fifthLord} in ${fifthLordP?.sign || fifthSign} (${ordinal(fifthLordP?.house || 5)} House)</div>
       </div>
       <div>
         <span class="kicker">11th House Realized Gains Lord</span>
-        <div style="color:var(--gold-bright);font-weight:700;">Moon in Leo (29° 11' · 12th House Vyaya/Foreign)</div>
+        <div style="color:var(--gold-bright);font-weight:700;">${eleventhLord} in ${chart.planets?.[eleventhLord]?.sign || eleventhSign} (${ordinal(chart.planets?.[eleventhLord]?.house || 11)} House)</div>
       </div>
       <div>
         <span class="kicker">SAV Bindu Total</span>
-        <div style="color:var(--ivory);font-weight:700;">337 Bindus (+5 Net Savings Surplus)</div>
+        <div style="color:var(--ivory);font-weight:700;">${akv.sarvaTotal} Bindus (${surplusSign} Net Savings Surplus)</div>
       </div>
       <div>
         <span class="kicker">Active Operating Dasha</span>
-        <div style="color:var(--sapphire-bright);font-weight:700;">${activeDasha} &mdash; ${activeAntar} (Budha)</div>
+        <div style="color:var(--sapphire-bright);font-weight:700;">${activeDasha} &mdash; ${activeAntar}</div>
       </div>
     </div>
   </div>
@@ -670,7 +795,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">The Mathematical Geometry of Shastric Speculation</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Financial markets are not random noise; they are the macrocosmic aggregation of collective human desire, fear, and liquidity cycles. In classical Jyotish, trading success is governed by the dynamic interaction between the <strong>5th House of Speculative Discretion (बुद्धि / पूर्वपुण्य)</strong>, the <strong>11th House of Realized Cash Inflow (Labha / लाभ)</strong>, and the <strong>Sarvatobhadra Chakra's 28-Nakshatra Vedha hit lines</strong>.
+      Financial markets are not random noise; they are the macrocosmic aggregation of collective human desire, fear, and liquidity cycles. In classical Jyotish, trading success is governed by the dynamic interaction between the <strong>5th House of Speculative Discretion (Buddhi / Purva Punya)</strong>, the <strong>11th House of Realized Cash Inflow (Labha)</strong>, and the <strong>Sarvatobhadra Chakra's 28-Nakshatra Vedha hit lines</strong>.
     </p>
 
     <!-- Statutory Financial & SEBI Disclaimer -->
@@ -695,16 +820,16 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.2px;">
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">PILLAR I (Pages 3&ndash;6): 5th/11th House Speculative Geometry &amp; 2nd/8th Volatility</strong> &mdash; Deep structural audit of Capricorn 5th house (30 bindus), Cancer 11th house (27 bindus), and the Rahu-Ketu financial axis.
+          <strong style="color:var(--emerald-bright);">PILLAR I (Pages 3&ndash;6): 5th/11th House Speculative Geometry &amp; 2nd/8th Volatility</strong> &mdash; Deep structural audit of ${fifthSign} 5th house (${h5Score} bindus), ${eleventhSign} 11th house (${h11Score} bindus), and the Rahu-Ketu financial axis.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--sapphire);">
           <strong style="color:var(--sapphire-bright);">PILLAR II (Pages 7&ndash;10): True 81-Square Sarvatobhadra Chakra &amp; Vedha Hits</strong> &mdash; 28-Nakshatra cross-ray strikes (Sammukha, Vama, Dakshina, Kona) mapping market entry and exit precision.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--gold);">
-          <strong style="color:var(--gold-bright);">PILLAR III (Pages 11&ndash;13): Sarvashtakavarga 337-Bindu Heatmap &amp; Macro Cycles</strong> &mdash; House-by-house liquidity strength, net financial surplus (+5 bindus), and bullish vs bearish market cycles.
+          <strong style="color:var(--gold-bright);">PILLAR III (Pages 11&ndash;13): Sarvashtakavarga ${akv.sarvaTotal}-Bindu Heatmap &amp; Macro Cycles</strong> &mdash; House-by-house liquidity strength, net financial surplus (${surplusSign} bindus), and bullish vs bearish market cycles.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--ruby);">
-          <strong style="color:var(--ruby-bright);">PILLAR IV (Pages 14&ndash;16): Trading Psychology &amp; Anti-Ruin Circuit Breakers</strong> &mdash; Eliminating FOMO and revenge trading, strict 2% risk rule, and the algorithmic quant imperative for Virgo Lagna.
+          <strong style="color:var(--ruby-bright);">PILLAR IV (Pages 14&ndash;16): Trading Psychology &amp; Anti-Ruin Circuit Breakers</strong> &mdash; Eliminating FOMO and revenge trading, strict 2% risk rule, and the systematic quant imperative for ${lagnaRashi} Lagna.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--emerald);">
           <strong style="color:var(--emerald-bright);">PILLAR V (Pages 17&ndash;22): Sectoral Graha Mapping, Asset Risk &amp; Timing Muhurat</strong> &mdash; Tech, defense, and green energy asset allocation, lucky trading horas, and month-by-month 2026&ndash;2027 market timing.
@@ -719,43 +844,44 @@ body {
 <section class="page">
   ${headerRail("PILLAR I: 5TH HOUSE SPECULATIVE GEOMETRY")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">5th House Audit: Capricorn &amp; Saturnian Restraint</h2>
-    <p class="body-text" style="margin-bottom:10px;">
+    <h2 class="display-l" style="margin-bottom:6px;">5th House Audit: ${fifthSign} &amp; ${fifthLord} Speculative Restraint</h2>
+    <p class="body-text" style="margin-bottom:8px;">
       The 5th house (<em>Purva Punya Bhava</em>) rules speculative intelligence, discretionary risk tolerance, and mathematical probability in markets.
     </p>
 
-    <div class="grid-2" style="margin-bottom:10px;">
+    <div class="grid-2" style="margin-bottom:8px;">
       <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);">
         <div class="card-title" style="color:var(--gold-bright);font-size:11px;">✦ 5TH HOUSE STRUCTURAL AUDIT</div>
-        <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;margin-top:4px;">
-          <div><span class="kicker">5th House Sign:</span> <strong style="color:var(--ivory);">Capricorn (Makara)</strong></div>
-          <div><span class="kicker">Sign Lord:</span> <strong style="color:var(--gold-bright);">Saturn (Shani) at 00° 57' Pisces</strong></div>
-          <div><span class="kicker">Occupants:</span> <span style="color:var(--emerald-bright);font-weight:700;">None (Unoccupied / Pure Rashi)</span></div>
-          <div><span class="kicker">SAV Bindus:</span> <strong style="color:var(--emerald-bright);">30 Bindus (Solid Structural Baseline)</strong></div>
-          <div><span class="kicker">D-10 Placement:</span> <span style="color:var(--ivory);">Pisces in 5th House of Dasamsa</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:10.5px;margin-top:4px;">
+          <div><span class="kicker">5th House Sign:</span> <strong style="color:var(--ivory);">${fifthSign}</strong></div>
+          <div><span class="kicker">Sign Lord:</span> <strong style="color:var(--gold-bright);">${fifthLord} in ${fifthLordP?.sign || fifthSign} (${ordinal(fifthLordP?.house || 5)} House)</strong></div>
+          <div><span class="kicker">Occupants:</span> <span style="color:var(--emerald-bright);font-weight:700;">${occupantsInHouse(5).length ? occupantsInHouse(5).join(", ") : "None (Unoccupied / Pure Rashi)"}</span></div>
+          <div><span class="kicker">SAV Bindus:</span> <strong style="color:var(--emerald-bright);">${h5Score} Bindus (${h5Score >= 30 ? "Strong" : h5Score >= 26 ? "Balanced" : "Disciplined"} Baseline)</strong></div>
+          <div><span class="kicker">Lord Placement:</span> <span style="color:var(--ivory);">${fifthLord} in ${ordinal(fifthLordP?.house || 5)} Bhava</span></div>
         </div>
       </div>
 
       <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);">
         <div class="card-title" style="color:var(--gold-bright);font-size:11px;">✦ SHASTRIC DIAGNOSTIC VERDICT</div>
-        <p class="body-text" style="font-size:11px;line-height:1.45;margin-top:2px;">
-          With <strong>30 Bindus</strong> in Capricorn governed by Saturn, your 5th house commands analytical patience rather than emotional gamble. Saturn categorically prohibits high-frequency retail options buying or penny-stock speculation. Your edge activates strictly when trading is treated as an <strong>algorithmic engineering discipline</strong>.
+        <p class="body-text" style="font-size:10.5px;line-height:1.4;margin-top:2px;">
+          With <strong>${h5Score} Bindus</strong> in ${fifthSign} governed by ${fifthLord}, your 5th house commands structured analytical patience rather than emotional gambling. Your edge activates strictly when trading is treated as a <strong>rules-based, systematic discipline</strong>.
         </p>
       </div>
     </div>
 
     <!-- SVG Kundli Container -->
-    <div class="luxury-card" style="margin-bottom:10px;">
-      <div style="text-align:center;font-family:'Cinzel',serif;font-size:10px;color:var(--gold-bright);margin-bottom:6px;">
+    <div class="luxury-card" style="margin-bottom:0;">
+      <div style="text-align:center;font-family:'Cinzel',serif;font-size:10px;color:var(--gold-bright);margin-bottom:4px;">
         ✦ D-1 KUNDLI: FINANCIAL WEALTH AXIS (HOUSES 2, 5, 8, 9, 11 HIGHLIGHTED) ✦
       </div>
       <div class="kundli-container">
-        ${renderNorthIndianSvg(chart, [2, 5, 8, 9, 11], 240)}
+        ${renderNorthIndianSvg(chart, [2, 5, 8, 9, 11], 200)}
       </div>
-      <div style="text-align:center;font-size:9.5px;color:var(--ivory-mute);margin-top:4px;">
-        Virgo Lagna (1) · Libra 2nd H (Rahu) · Capricorn 5th H · Aries 8th H (Ketu) · Taurus 9th H (Mercury) · Gemini 10th H (Sun/Venus) · Cancer 11th H
+      <div style="text-align:center;font-size:9px;color:var(--ivory-mute);margin-top:4px;">
+        ${d1DynamicCaption}
       </div>
     </div>
+    ${specHumanCard}
   </div>
   ${footerRail("Pillar I: 5th House Speculative Geometry", 3)}
 </section>
@@ -764,7 +890,7 @@ body {
 <section class="page">
   ${headerRail("PILLAR I: 11TH HOUSE GAINS AXIS")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">11th House Audit: Cancer &amp; Liquid Wealth Inflow</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">11th House Audit: ${eleventhSign} &amp; Liquid Wealth Inflow</h2>
     <p class="body-text" style="margin-bottom:10px;">
       While the 5th house generates the trade idea, the 11th house (<em>Labha Bhava</em>) determines whether the profit can actually be booked and withdrawn into your bank account.
     </p>
@@ -775,19 +901,19 @@ body {
       <div class="grid-2" style="font-size:11.5px;margin-top:6px;gap:8px;">
         <div>
           <span class="kicker">11th House Sign:</span>
-          <div style="color:var(--ivory);font-weight:600;">Cancer (Karka)</div>
+          <div style="color:var(--ivory);font-weight:600;">${eleventhSign}</div>
         </div>
         <div>
           <span class="kicker">Sign Lord:</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Moon (Chandra) at 29° 11' Leo</div>
+          <div style="color:var(--gold-bright);font-weight:700;">${eleventhLord} in ${chart.planets?.[eleventhLord]?.sign || eleventhSign} (${formatDMS(chart.planets?.[eleventhLord]?.longitude ?? chart.planets?.[eleventhLord]?.degree ?? 0).slice(0, 6)})</div>
         </div>
         <div>
           <span class="kicker">SAV Bindus:</span>
-          <div style="color:var(--emerald-bright);font-weight:700;">27 Bindus (Solid Baseline)</div>
+          <div style="color:var(--emerald-bright);font-weight:700;">${h11Score} Bindus (${h11Score >= 30 ? "High" : h11Score >= 26 ? "Solid" : "Disciplined"} Baseline)</div>
         </div>
         <div>
           <span class="kicker">Lord Placement:</span>
-          <div style="color:var(--sapphire-bright);font-weight:600;">12th House (Foreign / Vyaya / Institutional)</div>
+          <div style="color:var(--sapphire-bright);font-weight:600;">${ordinal(chart.planets?.[eleventhLord]?.house || 11)} House${occupantsInHouse(11).length ? ` (Occ: ${occupantsInHouse(11).join(", ")})` : ""}</div>
         </div>
       </div>
     </div>
@@ -795,20 +921,20 @@ body {
     <!-- Deep Shastric Analysis -->
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">
-        ✦ WHY YOUR LIQUID WEALTH ORIGINATES OVERSEAS &amp; INSTITUTIONALLY
+        ✦ HOW YOUR LIQUID WEALTH COMPOUNDS (${eleventhLord.toUpperCase()} IN ${ordinal(chart.planets?.[eleventhLord]?.house || 11).toUpperCase()} HOUSE)
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        In classical Parashari shastra, when the 11th lord occupies the 12th house (<em>Labhadhipati in Vyaya Sthana</em>), the native rarely makes sustained profits from domestic retail speculation. Instead, liquid wealth multiplies through:
+        In classical Parashari shastra, your 11th lord ${eleventhLord} occupies the ${ordinal(chart.planets?.[eleventhLord]?.house || 11)} house. Sustained profits flow when you prioritize:
       </p>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.2px;margin-top:6px;">
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;">
-          <strong style="color:var(--emerald-bright);">1. Global &amp; Overseas Assets:</strong> US Equities (Nasdaq/S&amp;P), international software retainers, and cross-border currency flows.
+          <strong style="color:var(--emerald-bright);">1. Global &amp; Institutional Equities:</strong> Broad-market index funds, blue-chip leaders, and cross-border diversification.
         </div>
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;">
-          <strong style="color:var(--emerald-bright);">2. Institutional Consulting Fees:</strong> High-ticket enterprise advisory where payment is tied to software architecture rather than daily tick fluctuations.
+          <strong style="color:var(--emerald-bright);">2. High-Value Advisory &amp; Core Craft:</strong> Earnings tied to structured expertise rather than noisy intraday tick fluctuations.
         </div>
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;">
-          <strong style="color:var(--emerald-bright);">3. Compounded Long-Term Holdings:</strong> Allocating capital into foreign blue-chip tech monopolies and letting compound interest operate undisturbed.
+          <strong style="color:var(--emerald-bright);">3. Compounded Long-Term Holdings:</strong> Allocating capital into durable businesses and letting compound interest operate undisturbed.
         </div>
       </div>
     </div>
@@ -817,7 +943,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div class="kicker" style="color:var(--emerald-bright);">Net Capital Surplus Indicator:</div>
       <p style="font-size:11.5px;color:var(--ivory-dim);margin-top:2px;">
-        11th House (Gains) = <strong>27 Bindus</strong> &gt; 12th House (Expenditure) = <strong>22 Bindus</strong>. Net surplus of <strong>+5 Bindus</strong> ensures that once wealth enters your sovereign treasury, it is protected from irreversible capital drainage.
+        11th House (Gains) = <strong>${h11Score} Bindus</strong> vs 12th House (Expenditure) = <strong>${h12Score} Bindus</strong>. Net spread of <strong>${surplusSign} Bindus</strong> ${netSurplus >= 0 ? "supports capital retention when paired with automated profit sweeps." : "means disciplined profit sweeping is mandatory to prevent outflow leakage."}
       </p>
     </div>
   </div>
@@ -828,31 +954,31 @@ body {
 <section class="page">
   ${headerRail("PILLAR I: 2ND/8TH RAHU-KETU VOLATILITY")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">The 2nd &amp; 8th House Karmic Volatility Axis</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">The ${ordinal(rahuHouse)} &amp; ${ordinal(ketuHouse)} House Nodal Volatility Axis</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      The axis of Rahu (Desire/Greed) in the 2nd house and Ketu (Detachment/Suddenness) in the 8th house is the most volatile financial generator in Vedic astrology.
+      The axis of Rahu (Desire/Amplification) in your ${ordinal(rahuHouse)} house and Ketu (Detachment/Suddenness) in your ${ordinal(ketuHouse)} house defines your primary psychological volatility trigger in markets.
     </p>
 
-    <!-- Rahu in 2nd Box -->
+    <!-- Rahu Box -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--sapphire-bright);">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;">
-        ✦ RAHU IN 2ND HOUSE (LIBRA · 08° 12'): THE TREASURY MULTIPLIER &amp; FOMO TRAP
+        ✦ RAHU IN ${ordinal(rahuHouse).toUpperCase()} HOUSE (${(rahuP?.sign || "Libra").toUpperCase()} &middot; ${formatDMS(rahuP?.longitude ?? rahuP?.degree ?? 0).slice(0, 6)}): AMPLIFICATION &amp; FOMO TRAP
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        Rahu in Libra in the 2nd house gives an immense hunger for liquid capital accumulation, luxury assets, and unconventional financial vehicles. Supported by <strong>31 Bindus in Ashtakavarga</strong>, your treasury possesses immense magnetic absorption capacity.
+        Rahu in ${rahuP?.sign || "Libra"} in the ${ordinal(rahuHouse)} house drives strong ambition and attraction to high-momentum financial vehicles. Supported by <strong>${h2Score} Bindus in your 2nd House (${secondSign})</strong>, your treasury requires disciplined boundaries against hype.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
-        <strong style="color:var(--ruby-bright);">Rahu Market Trap:</strong> The illusion of exponential quick money. When a stock rallies parabolically, Rahu triggers FOMO (Fear Of Missing Out), tempting you to buy at the absolute top. Strict position sizing is mandatory.
+        <strong style="color:var(--ruby-bright);">Rahu Market Trap:</strong> The illusion of exponential quick money. When a stock rallies parabolically, Rahu triggers FOMO (Fear Of Missing Out), tempting you to buy at the top. Strict position sizing is mandatory.
       </div>
     </div>
 
-    <!-- Ketu in 8th Box -->
+    <!-- Ketu Box -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--ruby-bright);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:12px;">
-        ✦ KETU IN 8TH HOUSE (ARIES · 08° 12'): SUDDEN DRAWDOWNS &amp; INTUITIVE SENSING
+        ✦ KETU IN ${ordinal(ketuHouse).toUpperCase()} HOUSE (${(ketuP?.sign || "Aries").toUpperCase()} &middot; ${formatDMS(ketuP?.longitude ?? ketuP?.degree ?? 0).slice(0, 6)}): SUDDEN REVERSALS &amp; INTUITIVE SENSING
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        The 8th house rules hidden assets, unearned windfalls, and sudden catastrophic market crashes. Ketu in Aries brings sharp, unexpected reversals. If you trade with high leverage, Ketu will trigger margin liquidation.
+        Ketu in ${ketuP?.sign || "Aries"} (${ordinal(ketuHouse)} house) brings sharp, unexpected reversals whenever leverage is excessive. Avoid over-leveraged positions that invite forced margin liquidation.
       </p>
       <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;margin-top:6px;font-size:11px;">
         <strong style="color:var(--emerald-bright);">Ketu Market Gift:</strong> Ketu provides uncanny intuitive warning signals. When your gut tells you that a market top is near, honor it immediately and trim risky holdings.
@@ -1079,7 +1205,7 @@ body {
         <span class="tag-badge tag-emerald">STABLE DEFENSE</span>
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:6px;">
-        According to the classical 81-Square Sarvatobhadra Chakra, your natal Moon Nakshatra (Uttara Phalguni) and primary financial points currently maintain an un-afflicted shield with zero direct malefic strikes from Saturn, Mars, or Rahu. This provides a clear, un-distorted psychological runway for methodical swing position sizing and quantitative code deployment.
+        According to the classical 81-Square Sarvatobhadra Chakra, your natal Moon Nakshatra (<strong>${janmaNak}</strong>) and primary financial points currently maintain an un-afflicted shield with zero direct malefic strikes from Saturn, Mars, or Rahu. This provides a clear psychological runway for methodical swing position sizing and rules-based execution.
       </p>
     </div>
 
@@ -1095,25 +1221,25 @@ body {
       </thead>
       <tbody>
         <tr>
-          <td><strong>Uttara Phalguni</strong></td>
+          <td><strong>${janmaNak}</strong></td>
           <td>Janma (Self)</td>
           <td><span style="color:var(--emerald-bright);font-weight:700;">0 Malefic Strikes</span></td>
           <td>Clear mental focus · High analytical execution</td>
         </tr>
         <tr>
-          <td><strong>Uttara Ashadha</strong></td>
+          <td><strong>${karmaNak}</strong></td>
           <td>Karma (Status)</td>
           <td><span style="color:var(--emerald-bright);font-weight:700;">0 Malefic Strikes</span></td>
           <td>Favorable for closing institutional retainers</td>
         </tr>
         <tr>
-          <td><strong>Revati</strong></td>
+          <td><strong>${sanghatikaNak}</strong></td>
           <td>Sanghatika (Treasury)</td>
           <td><span style="color:var(--gold-bright);font-weight:700;">Neutral Rays</span></td>
           <td>Treasury stable · No liquidity leakage</td>
         </tr>
         <tr>
-          <td><strong>Punarvasu</strong></td>
+          <td><strong>${vinaashaNak}</strong></td>
           <td>Vinaasha (Critical)</td>
           <td><span style="color:var(--emerald-bright);font-weight:700;">Zero Strikes</span></td>
           <td>No catastrophic liquidation risk detected</td>
@@ -1125,8 +1251,8 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;">✦ IMMEDIATE TRADING DIRECTIVES</div>
       <ul style="padding-left:16px;font-size:11.2px;color:var(--ivory-dim);margin-top:4px;line-height:1.5;">
-        <li>Maintain algorithmic discipline; execute trades strictly based on pre-computed quantitative models rather than emotional tick reactions.</li>
-        <li>Protect your 31-bindu treasury by sweeping realized profits every Friday into non-brokerage liquid assets or physical gold.</li>
+        <li>Maintain systematic discipline; execute trades strictly based on pre-computed rules rather than emotional tick reactions.</li>
+        <li>Protect your ${h2Score}-bindu treasury (${secondSign}) by sweeping realized profits every Friday into non-brokerage liquid assets or physical gold.</li>
         <li>Enforce the 2% maximum portfolio risk per position and honor the Shodasha cognitive delay before all discretionary orders.</li>
       </ul>
     </div>
@@ -1165,6 +1291,7 @@ body {
         11th House Bindus (${h11Score}) &minus; 12th House Bindus (${h12Score}) = <strong>${surplusSign} Net Bindu Surplus</strong>. Total: <strong>${akv.sarvaTotal} Bindus</strong> across all 12 houses. In classical Parashari economics, whenever the 11th house exceeds the 12th house, capital retention compounds positively year over year.
       </p>
     </div>
+    ${savHumanCard}
   </div>
   ${footerRail("Pillar III: SAV 337 Heatmap", 11)}
 </section>
@@ -1267,6 +1394,7 @@ body {
         Notice how the individual planetary bindu distributions across your 2nd, 5th, 9th, and 11th houses dictate your natural financial rhythms. Any financial strategy that relies on structured planning, systematic risk metrics, and data integrity will systematically outperform emotional guessing.
       </p>
     </div>
+    ${bavHumanCard}
   </div>
   ${footerRail("Pillar III: BAV Wealth Contribution", 13)}
 </section>
@@ -1277,29 +1405,30 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Trading Psychology: Intellectual Agility vs. Impatience</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Trading is 20% strategy and 80% emotional governance. Your psychological makeup reflects the tension between your Virgo Lagna (analytical precision) and your Leo Moon-Mars (fiery impatience).
+      Trading is 20% strategy and 80% emotional governance. Your psychological makeup reflects the tension between your ${lagnaRashi} Lagna (core temperament) and your ${moonRashi} Moon (emotional impulse).
     </p>
 
     <!-- Psychological Dualities -->
-    <div class="grid-2" style="margin-bottom:10px;">
+    <div class="grid-2" style="margin-bottom:8px;">
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-          ✦ YOUR TRADING SUPERPOWER: QUANTITATIVE PRECISION
+          ✦ YOUR TRADING SUPERPOWER: SYSTEMATIC PRECISION
         </div>
-        <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-          With <strong>Virgo Lagna and Mercury AmK in Taurus</strong>, your analytical apparatus is world-class. You can spot inefficiencies in market pricing, build mathematical models, and dissect complex financial statements faster than 99% of retail participants.
+        <p class="body-text" style="font-size:10.8px;margin-top:4px;">
+          With <strong>${lagnaRashi} Lagna (${lagnesh}) and ${amkPlanet} AmK in ${amkData?.sign || lagnaRashi}</strong>, your analytical edge activates when you rely on structured rules, clear risk models, and disciplined position sizing.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--ruby-bright);">
         <div class="card-title" style="color:var(--ruby-bright);font-size:11.5px;">
-          ✦ YOUR TRADING ACHILLES' HEEL: RESTLESS BOREDOM
+          ✦ YOUR TRADING ACHILLES' HEEL: IMPULSIVE OVERTRADING
         </div>
-        <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-          With <strong>Moon and Mars conjunct in Leo in the 12th house</strong>, you possess an aversion to passive waiting. When markets are slow, the ego urges you to "make something happen," leading to overtrading, revenge trading, and forced setups.
+        <p class="body-text" style="font-size:10.8px;margin-top:4px;">
+          With <strong>Moon in ${moonRashi} (${ordinal(moonHouse)} house) and Mars in ${ordinal(marsHouse)} house</strong>, slow markets can tempt you to force setups. Avoid overtrading or revenge trading when conviction is absent.
         </p>
       </div>
     </div>
+    ${psychHumanCard}
 
     <!-- The 3-Second Rule -->
     <div class="luxury-card" style="background:var(--surface-elevated);margin-bottom:8px;">
@@ -1340,17 +1469,17 @@ body {
       <tbody>
         <tr>
           <td><strong>Naked Options Buying</strong></td>
-          <td>Rahu illusion + 5th house Saturn restraint</td>
+          <td>${rahuP?.sign || "Rahu"} (${ordinal(rahuHouse)} H) illusion + 5th lord ${fifthLord} restraint</td>
           <td><span style="color:var(--ruby-bright);font-weight:700;">100% PROHIBITED</span> &mdash; Complete capital decay</td>
         </tr>
         <tr>
           <td><strong>Intraday Margin Leverage</strong></td>
-          <td>Ketu 8th house sudden liquidation</td>
+          <td>Ketu ${ordinal(ketuHouse)} house sudden reversal risk</td>
           <td><span style="color:var(--ruby-bright);font-weight:700;">STRICT ZERO</span> &mdash; Never borrow broker leverage</td>
         </tr>
         <tr>
           <td><strong>Max Risk Per Position</strong></td>
-          <td>Protects 31-bindu treasury</td>
+          <td>Protects ${h2Score}-bindu treasury (${secondSign})</td>
           <td><span style="color:var(--emerald-bright);font-weight:700;">MAX 2.0%</span> of total liquid portfolio at risk</td>
         </tr>
         <tr>
@@ -1380,7 +1509,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Quant Algorithm vs. Discretionary Emotion</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Why your astrological configuration demands automated, systematic software rules over manual "gut feeling" betting.
+      Why your astrological configuration demands automated, rules-based systems over manual "gut feeling" betting.
     </p>
 
     <!-- Comparison Table -->
@@ -1404,7 +1533,7 @@ body {
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);margin-top:4px;line-height:1.45;">
           • Pre-defined algorithmic entry/exit parameters.<br/>
-          • Automated position sizing calculated by software.<br/>
+          • Automated position sizing calculated by pre-set rules.<br/>
           • End-of-day execution without watching the screen.<br/>
           • Detached, calm, high-status executive lifestyle.<br/>
           • <strong>Astrological Outcome:</strong> Multi-year compounding.
@@ -1412,13 +1541,13 @@ body {
       </div>
     </div>
 
-    <!-- The Virgo-Mercury Blueprint -->
+    <!-- Dynamic Lagna Quant Blueprint -->
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;">
-        ✦ THE VIRGO LAGNA QUANT MANDATE
+        ✦ THE ${lagnaRashi.toUpperCase()} LAGNA QUANT MANDATE (${lagnesh.toUpperCase()} RULED)
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:2px;">
-        Your Virgo Lagna is ruled by Mercury, the planet of logic, programming, and data science. You are blessed with the cognitive architecture to build quantitative tools. Do not behave like an impulsive retail punter; operate as an institutional algorithmic asset manager.
+        Your ${lagnaRashi} Lagna is ruled by ${lagnesh} (placed in ${chart.planets?.[lagnesh]?.sign || lagnaRashi}, ${ordinal(chart.planets?.[lagnesh]?.house || 1)} house). Your strongest edge comes from rules-based, systematic capital management rather than impulsive retail bets.
       </p>
     </div>
   </div>
@@ -1446,26 +1575,26 @@ body {
       </thead>
       <tbody>
         <tr>
-          <td><strong>Mercury (Budha)</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">9th House Taurus (AmK)</span></td>
-          <td>Software, SaaS, Artificial Intelligence, FinTech, Semiconductor chip fabrication, Telecom</td>
-          <td>Large-cap tech equities, Nasdaq ETFs, Software IP</td>
+          <td><strong>${amkPlanet} (AmK)</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">${ordinal(amkData?.house || 1)} House ${amkData?.sign || lagnaRashi}</span></td>
+          <td>Core Industry Leadership, Enterprise Analytics, FinTech, High-Margin Franchises</td>
+          <td>Large-cap sector leaders, Global ETFs, Compounding Equities</td>
           <td><span class="tag-badge tag-emerald">Primary (40%)</span></td>
         </tr>
         <tr>
-          <td><strong>Sun &amp; Venus</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">10th House Gemini</span></td>
-          <td>Enterprise B2B Consulting, Digital Media, Design Platforms, Luxury consumer brands</td>
-          <td>Blue-chip market leaders, High-margin global franchises</td>
+          <td><strong>${tenthLord} (10th Lord)</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">${ordinal(chart.planets?.[tenthLord]?.house || 10)} House ${chart.planets?.[tenthLord]?.sign || tenthSign}</span></td>
+          <td>Institutional Advisory, Infrastructure, Consumer Brands, Capital Goods</td>
+          <td>Blue-chip market leaders, Sovereign-backed enterprises</td>
           <td><span class="tag-badge tag-emerald">Secondary (25%)</span></td>
         </tr>
         <tr>
-          <td><strong>Saturn (Shani)</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">7th House Pisces (Indu Lord)</span></td>
-          <td>Heavy Infrastructure, Sovereign Debt, Green Energy grids, Data Center real estate</td>
+          <td><strong>${secondLord} &amp; ${eleventhLord}</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">2nd (${secondSign}) &amp; 11th (${eleventhSign}) Lords</span></td>
+          <td>Treasury Debt, Sovereign Bonds, Energy Grids, Precious Metals</td>
           <td>Government bonds, Index funds, Sovereign physical gold</td>
           <td><span class="tag-badge tag-gold">Defensive (20%)</span></td>
         </tr>
         <tr>
-          <td><strong>Mars &amp; Ketu</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">12th &amp; 8th Houses</span></td>
-          <td>Defense robotics, Cybersecurity, Aerospace, Advanced battery materials</td>
+          <td><strong>Mars &amp; Ketu</strong><br/><span style="font-size:8.5px;color:var(--ivory-mute);">${ordinal(marsHouse)} &amp; ${ordinal(ketuHouse)} Houses</span></td>
+          <td>Defense, Cybersecurity, Aerospace, Clean-Tech Materials</td>
           <td>Specialized thematic ETFs (Hedged only)</td>
           <td><span class="tag-badge tag-sapphire">Opportunistic (15%)</span></td>
         </tr>
@@ -1475,7 +1604,7 @@ body {
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <div class="kicker" style="color:var(--emerald-bright);">Sectoral Allocation Verdict:</div>
       <p style="font-size:11.5px;color:var(--ivory-dim);margin-top:2px;">
-        Overweight <strong>Technology, AI, and Software</strong> (Mercury/Sun). Keep a rock-solid defensive anchor in <strong>Index Funds &amp; Sovereign Gold</strong> (Saturn). Completely avoid speculative meme assets and leveraged derivative contracts.
+        Overweight <strong>${amkPlanet} &amp; ${tenthLord}-Aligned Core Leaders</strong> (${amkData?.sign || lagnaRashi} / ${tenthSign}). Keep a rock-solid defensive anchor in <strong>Index Funds &amp; Sovereign Gold</strong>. Completely avoid speculative meme assets and leveraged derivative contracts.
       </p>
     </div>
   </div>
@@ -1509,7 +1638,7 @@ body {
           <span class="tag-badge tag-gold">CAPITAL FORTRESS</span>
         </div>
         <p class="body-text" style="font-size:11.2px;margin-top:3px;">
-          High-yield treasury bills, fixed sovereign debt, and physical 24K gold. This satisfies your 2nd house (31 Bindus) and provides total psychological immunity against global market crashes.
+          High-yield treasury bills, fixed sovereign debt, and physical 24K gold. This fortifies your 2nd house (${secondSign} &middot; ${h2Score} Bindus) and provides psychological immunity against global market crashes.
         </p>
       </div>
 
@@ -1553,8 +1682,8 @@ body {
           ✦ FAVORABLE TRADING DAYS
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);margin-top:4px;line-height:1.45;">
-          <p><strong style="color:var(--gold-bright);">1. Wednesday (Budhavar):</strong> Ruled by Mercury (Lagna &amp; AmK lord). Supreme day for quantitative coding, backtesting, and systematic rebalancing.</p>
-          <p style="margin-top:4px;"><strong style="color:var(--gold-bright);">2. Friday (Shukravar):</strong> Ruled by Venus (2nd &amp; 9th lord). Ideal for booking liquid profits and capital sweeps.</p>
+          <p><strong style="color:var(--gold-bright);">1. Lagnesh Day (${lagnesh}):</strong> Ruled by your Lagna Lord ${lagnesh}. Supreme day for portfolio research, backtesting, and systematic rebalancing.</p>
+          <p style="margin-top:4px;"><strong style="color:var(--gold-bright);">2. Friday (Shukravar):</strong> Ruled by Venus. Ideal for booking liquid profits and sweeping gains into reserves.</p>
           <p style="margin-top:4px;"><strong style="color:var(--gold-bright);">3. Thursday (Guruvar):</strong> Ruled by Jupiter. Auspicious for long-term strategic investments and index allocations.</p>
         </div>
       </div>
@@ -1564,7 +1693,7 @@ body {
           ✦ DEFENSIVE &amp; PROHIBITED WINDOWS
         </div>
         <div style="font-size:11px;color:var(--ivory-dim);margin-top:4px;line-height:1.45;">
-          <p><strong style="color:var(--ruby-bright);">1. Tuesday (Mangalvar):</strong> Mars rules 8th house and sits in 12th. High risk of impatient emotional execution. Take zero discretionary trades.</p>
+          <p><strong style="color:var(--ruby-bright);">1. 8th/12th Lord Days:</strong> High risk of impatient emotional execution when ${getSignLord(signFromHouse(lagnaRashi, 8))} or ${twelfthLord} rules the day. Take zero impulsive trades.</p>
           <p style="margin-top:4px;"><strong style="color:var(--ruby-bright);">2. Daily Rahu Kaal:</strong> ~90-minute daily window ruled by Rahu. Never enter new high-stakes trades during Rahu Kaal.</p>
           <p style="margin-top:4px;"><strong style="color:var(--ruby-bright);">3. Udveg / Kaal Choghadiya:</strong> Avoid opening positions during inauspicious Choghadiyas.</p>
         </div>
@@ -1598,51 +1727,52 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-            WINDOW 1: DECEMBER 2026 &ndash; JULY 2027 (JUPITER EXALTED IN 11TH HOUSE CANCER)
+            WINDOW 1: DEC 2026 &ndash; JUL 2027 (JUPITER EXALTED IN ${ordinal(cancerJupH).toUpperCase()} HOUSE CANCER)
           </span>
-          <span class="tag-badge tag-emerald">95% HARVEST ZENITH</span>
+          <span class="tag-badge ${isCancerPeak ? "tag-emerald" : "tag-gold"}">${isCancerPeak ? "HARVEST ZENITH" : "HEDGED ACCUMULATION"}</span>
         </div>
-        <p class="body-text" style="font-size:11.2px;margin-top:3px;">
-          Jupiter transits through its Exalted Sign Cancer in your 11th house of massive realized gains (stationing direct in May 2027). Highest commercial monetization cycle of the decade. Realize portfolio gains, close enterprise tech contracts, and harvest capital surplus.
+        <p class="body-text" style="font-size:10.8px;margin-top:3px;">
+          Jupiter transits through its Exalted Sign Cancer in your ${ordinal(cancerJupH)} house (stationing direct in May 2027). ${isCancerPeak ? "High-conviction cycle for realizing portfolio gains and compounding wealth." : "Focus on debt-liquidation, risk audits, and hedged long-term accumulation."}
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-            WINDOW 2: SEPTEMBER &ndash; OCTOBER 2027 (LAGNA SOLAR RETURN &middot; 35 BINDUS)
+            WINDOW 2: SOLAR RETURN IN ${bestSavSign.toUpperCase()} (${bestSavScore} BINDUS)
           </span>
-          <span class="tag-badge tag-emerald">93% SOVEREIGN AUTHORITY</span>
+          <span class="tag-badge tag-emerald">PEAK SAV WINDOW</span>
         </div>
-        <p class="body-text" style="font-size:11.2px;margin-top:3px;">
-          Sun enters Virgo (1st house with 35 SAV Bindus). Maximum intellectual sharpness and negotiation authority. Prime window for establishing new institutional advisory contracts.
+        <p class="body-text" style="font-size:10.8px;margin-top:3px;">
+          When Sun transits ${bestSavSign} (${ordinal(bestSavHouseIdx + 1)} house with ${bestSavScore} SAV Bindus), decision clarity and institutional negotiation authority reach their annual peak.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--amber);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-            CAUTION WINDOW: AUGUST 2027 (SUN IN 12TH HOUSE VYAYA BHAVA)
+            CAUTION WINDOW: SUN IN 12TH HOUSE (${twelfthSign.toUpperCase()} &middot; VYAYA BHAVA)
           </span>
-          <span class="tag-badge tag-ruby">62% CONSOLIDATION</span>
+          <span class="tag-badge tag-ruby">CONSOLIDATION</span>
         </div>
-        <p class="body-text" style="font-size:11.2px;margin-top:3px;">
-          Sun transits Leo (12th house). Zero speculative risk. Focus on code optimization, algorithm refactoring, and physical rest.
+        <p class="body-text" style="font-size:10.8px;margin-top:3px;">
+          When Sun transits ${twelfthSign} (12th house), minimize speculative risk. Focus on portfolio review, risk testing, and physical rest.
         </p>
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--sapphire);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-            WINDOW 3: NOVEMBER 2027 (JUPITER IN LEO &middot; GLOBAL SCALE)
+            WINDOW 3: LATE 2027 (JUPITER IN LEO &middot; ${ordinal(leoJupH).toUpperCase()} HOUSE)
           </span>
-          <span class="tag-badge tag-sapphire">INTERNATIONAL EXPANSION</span>
+          <span class="tag-badge tag-sapphire">STRATEGIC SCALE</span>
         </div>
-        <p class="body-text" style="font-size:11.2px;margin-top:3px;">
-          Jupiter transitions into Leo in your 12th house, trining the 4th house of peace. Accelerates foreign software licensing, offshore incorporation, and international revenue streams.
+        <p class="body-text" style="font-size:10.8px;margin-top:3px;">
+          Jupiter transitions into Leo in your ${ordinal(leoJupH)} house, activating long-term strategic positioning and international diversification.
         </p>
       </div>
     </div>
+    ${radarHumanCard}
   </div>
   ${footerRail("Pillar V: 12-Month Timing Radar", 20)}
 </section>
@@ -1713,7 +1843,7 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <strong style="color:var(--emerald-bright);font-size:11.5px;">1. MONITOR &amp; SEATING ORIENTATION:</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Set up your primary workstation in the <strong>North-North-West (Gemini 10th house)</strong> or <strong>North-East</strong>. While trading, face strictly <strong>North (Kubera wealth direction)</strong> or <strong>East (Sun clarity direction)</strong>. Never face South while placing orders.
+          Set up your primary workstation in the <strong>North (${tenthSign} 10th house / ${tenthLord} aligned)</strong> or <strong>North-East</strong>. While trading, face strictly <strong>North (Kubera wealth direction)</strong> or <strong>East (Sun clarity direction)</strong>. Never face South while placing orders.
         </p>
       </div>
 
@@ -1795,8 +1925,8 @@ body {
           <div style="color:var(--ivory);font-weight:600;">Face strictly North or East while trading</div>
         </div>
         <div>
-          <span class="kicker">PEAK WEALTH GATE</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter Exalted in House ${((3 - lagnaNum + 12) % 12) + 1})</div>
+          <span class="kicker">${isCancerPeak ? "PEAK WEALTH GATE" : "HEDGED ACCUMULATION GATE"}</span>
+          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter Exalted in ${ordinal(cancerJupH)} House)</div>
         </div>
       </div>
     </div>

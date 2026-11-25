@@ -89,6 +89,104 @@ export const RASHI_LORDS: Record<string, string> = {
   Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter"
 };
 
+export function ordinal(n: number): string {
+  const num = Math.round(Number(n) || 1);
+  const mod100 = num % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${num}th`;
+  switch (num % 10) {
+    case 1: return `${num}st`;
+    case 2: return `${num}nd`;
+    case 3: return `${num}rd`;
+    default: return `${num}th`;
+  }
+}
+
+export function withArticle(word: string): string {
+  const w = String(word || "").trim();
+  if (!w) return "";
+  return /^[aeiou]/i.test(w) ? `an ${w}` : `a ${w}`;
+}
+
+export function houseFromLagna(targetSign: string, lagnaSign: string): number {
+  const tIdx = ALL_RASHIS.findIndex(r => r.toLowerCase() === (targetSign || "").toLowerCase());
+  const lIdx = ALL_RASHIS.findIndex(r => r.toLowerCase() === (lagnaSign || "").toLowerCase());
+  if (tIdx === -1 || lIdx === -1) return 1;
+  return ((tIdx - lIdx + 12) % 12) + 1;
+}
+
+export function signFromHouse(lagnaSign: string, houseNum: number): string {
+  const lIdx = ALL_RASHIS.findIndex(r => r.toLowerCase() === (lagnaSign || "").toLowerCase());
+  const base = lIdx === -1 ? 0 : lIdx;
+  return ALL_RASHIS[((base + (houseNum - 1)) % 12 + 12) % 12];
+}
+
+export function getSignLord(sign: string): string {
+  const key = ALL_RASHIS.find(r => r.toLowerCase() === (sign || "").toLowerCase());
+  return key ? RASHI_LORDS[key] : "Mars";
+}
+
+const EXALTED_SIGNS: Record<string, string> = {
+  Sun: "Aries", Moon: "Taurus", Mars: "Capricorn", Mercury: "Virgo",
+  Jupiter: "Cancer", Venus: "Pisces", Saturn: "Libra", Rahu: "Taurus", Ketu: "Scorpio"
+};
+const DEBILITATED_SIGNS: Record<string, string> = {
+  Sun: "Libra", Moon: "Scorpio", Mars: "Cancer", Mercury: "Pisces",
+  Jupiter: "Capricorn", Venus: "Virgo", Saturn: "Aries", Rahu: "Scorpio", Ketu: "Taurus"
+};
+const MOOLATRIKONA_SIGNS: Record<string, string> = {
+  Sun: "Leo", Moon: "Taurus", Mars: "Aries", Mercury: "Virgo",
+  Jupiter: "Sagittarius", Venus: "Libra", Saturn: "Aquarius"
+};
+const OWN_SIGNS: Record<string, string[]> = {
+  Sun: ["Leo"], Moon: ["Cancer"], Mars: ["Aries", "Scorpio"], Mercury: ["Gemini", "Virgo"],
+  Jupiter: ["Sagittarius", "Pisces"], Venus: ["Taurus", "Libra"], Saturn: ["Capricorn", "Aquarius"],
+  Rahu: ["Aquarius"], Ketu: ["Scorpio"]
+};
+const NATURAL_FRIENDS: Record<string, string[]> = {
+  Sun: ["Moon", "Mars", "Jupiter"],
+  Moon: ["Sun", "Mercury"],
+  Mars: ["Sun", "Moon", "Jupiter"],
+  Mercury: ["Sun", "Venus"],
+  Jupiter: ["Sun", "Moon", "Mars"],
+  Venus: ["Mercury", "Saturn"],
+  Saturn: ["Mercury", "Venus"],
+  Rahu: ["Mercury", "Venus", "Saturn"],
+  Ketu: ["Mars", "Jupiter", "Venus"]
+};
+const NATURAL_ENEMIES: Record<string, string[]> = {
+  Sun: ["Venus", "Saturn"],
+  Moon: [],
+  Mars: ["Mercury"],
+  Mercury: ["Moon"],
+  Jupiter: ["Mercury", "Venus"],
+  Venus: ["Sun", "Moon"],
+  Saturn: ["Sun", "Moon", "Mars"],
+  Rahu: ["Sun", "Moon", "Mars"],
+  Ketu: ["Sun", "Moon"]
+};
+
+export function getPlanetaryDignity(planet: string, sign: string): "Exalted" | "Moolatrikona" | "Own" | "Friendly" | "Neutral" | "Enemy" | "Debilitated" {
+  const p = String(planet || "").trim();
+  const s = String(sign || "").trim();
+  if (EXALTED_SIGNS[p] === s) return "Exalted";
+  if (DEBILITATED_SIGNS[p] === s) return "Debilitated";
+  if (MOOLATRIKONA_SIGNS[p] === s) return "Moolatrikona";
+  if (OWN_SIGNS[p]?.includes(s)) return "Own";
+  const signLord = getSignLord(s);
+  if (NATURAL_FRIENDS[p]?.includes(signLord)) return "Friendly";
+  if (NATURAL_ENEMIES[p]?.includes(signLord)) return "Enemy";
+  return "Neutral";
+}
+
+export function getPlanetHousesOwned(planet: string, lagnaSign: string): number[] {
+  const own = OWN_SIGNS[planet] || [];
+  const houses: number[] = [];
+  for (const s of own) {
+    houses.push(houseFromLagna(s, lagnaSign));
+  }
+  return houses.sort((a, b) => a - b);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DYNAMIC TARA BALA & ASHTAMA CHANDRA
 // ─────────────────────────────────────────────────────────────────────────────
@@ -160,7 +258,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Red Coral (Moonga)",
         uparatna: "Carnelian or Red Agate",
         metal: "Copper or Yellow Gold",
-        finger: `Ring Finger (${lat.wrist})`,
+        finger: `Ring Finger (${lat.hand})`,
         day: "Tuesday morning during Shukla Paksha",
         mantra: "Om Kram Kreem Kroum Sah Bhaumaya Namah (108 times)",
         prohibitedGems: ["Emerald (Budha / 3rd & 6th lord)", "Blue Sapphire (Shani / 10th & 11th badhaka)"],
@@ -171,7 +269,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Diamond or White Zircon",
         uparatna: "White Sapphire or Clear Quartz",
         metal: "Platinum or Silver",
-        finger: `Middle or Little Finger (${lat.wrist})`,
+        finger: `Middle or Little Finger (${lat.hand})`,
         day: "Friday morning during Shukla Paksha",
         mantra: "Om Dram Dreem Droum Sah Shukraya Namah (108 times)",
         prohibitedGems: ["Yellow Sapphire (Guru / 8th & 11th lord)", "Ruby (Surya / 4th lord - keep balanced)"],
@@ -182,7 +280,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Emerald (Panna)",
         uparatna: "Green Tourmaline (Verdelite) or Peridot",
         metal: "Panchdhatu or Yellow Gold",
-        finger: `Little Finger (${lat.wrist})`,
+        finger: `Little Finger (${lat.hand})`,
         day: "Wednesday morning during sunrise",
         mantra: "Om Bram Breem Broum Sah Budhaya Namah (108 times)",
         prohibitedGems: ["Red Coral (Mangal / 6th & 11th lord)", "Yellow Sapphire (Guru / Badhaka & Maraka lord)"],
@@ -193,7 +291,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural South Sea Pearl (Moti)",
         uparatna: "Natural Moonstone",
         metal: "Pure Silver",
-        finger: `Little Finger (${lat.wrist})`,
+        finger: `Little Finger (${lat.hand})`,
         day: "Monday morning during Shukla Paksha",
         mantra: "Om Shram Shreem Shroum Sah Chandraya Namah (108 times)",
         prohibitedGems: ["Blue Sapphire (Shani / 7th & 8th lord)", "Emerald (Budha / 3rd & 12th lord)"],
@@ -204,7 +302,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Burmese Ruby (Manikya)",
         uparatna: "Red Garnet or Spinel",
         metal: "Yellow Gold or Copper",
-        finger: `Ring Finger (${lat.wrist})`,
+        finger: `Ring Finger (${lat.hand})`,
         day: "Sunday sunrise during Shukla Paksha",
         mantra: "Om Hram Hreem Hroum Sah Suryaya Namah (108 times)",
         prohibitedGems: ["Diamond (Shukra / 3rd & 10th enemy)", "Blue Sapphire (Shani / 6th & 7th adversary)"],
@@ -215,7 +313,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Emerald (Panna)",
         uparatna: "Green Tourmaline or Peridot (6.5–7.5 Ratti)",
         metal: "Panchdhatu or Yellow Gold",
-        finger: `Little Finger (${lat.wrist})`,
+        finger: `Little Finger (${lat.hand})`,
         day: "Wednesday sunrise during Shukla Paksha",
         mantra: "Om Bram Breem Broum Sah Budhaya Namah (108 times)",
         prohibitedGems: ["Red Coral (Mangal / 3rd & 8th lord)", "Yellow Sapphire (Guru / Badhaka lord)"],
@@ -226,7 +324,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural White Sapphire or Diamond",
         uparatna: "Clear Quartz or White Zircon",
         metal: "Silver or Platinum",
-        finger: `Middle or Little Finger (${lat.wrist})`,
+        finger: `Middle or Little Finger (${lat.hand})`,
         day: "Friday morning during sunrise",
         mantra: "Om Dram Dreem Droum Sah Shukraya Namah (108 times)",
         prohibitedGems: ["Ruby (Surya / 11th badhaka)", "Yellow Sapphire (Guru / 3rd & 6th functional malefic)"],
@@ -237,7 +335,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Red Coral (Moonga)",
         uparatna: "Carnelian",
         metal: "Copper or Yellow Gold",
-        finger: `Ring Finger (${lat.wrist})`,
+        finger: `Ring Finger (${lat.hand})`,
         day: "Tuesday morning during sunrise",
         mantra: "Om Kram Kreem Kroum Sah Bhaumaya Namah (108 times)",
         prohibitedGems: ["Emerald (Budha / 8th & 11th lord)", "Diamond (Shukra / 7th & 12th lord)"],
@@ -248,7 +346,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Yellow Sapphire (Pukhraj)",
         uparatna: "Yellow Topaz or Heliodor",
         metal: "Yellow Gold or Brass",
-        finger: `Index Finger (${lat.wrist})`,
+        finger: `Index Finger (${lat.hand})`,
         day: "Thursday morning during sunrise",
         mantra: "Om Gram Greem Groum Sah Gurave Namah (108 times)",
         prohibitedGems: ["Diamond (Shukra / 6th & 11th adversary)", "Emerald (Budha / 7th & 10th kendradhipati)"],
@@ -259,7 +357,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Blue Sapphire (Neelam) or Amethyst",
         uparatna: "Iolite (Neeli) or Blue Topaz",
         metal: "Panchdhatu or Silver",
-        finger: `Middle Finger (${lat.wrist})`,
+        finger: `Middle Finger (${lat.hand})`,
         day: "Saturday twilight",
         mantra: "Om Pram Preem Proum Sah Shanaishcharaya Namah (108 times)",
         prohibitedGems: ["Ruby (Surya / 8th lord)", "Yellow Sapphire (Guru / 3rd & 12th lord)"],
@@ -270,7 +368,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Blue Sapphire or Blue Topaz",
         uparatna: "Iolite or Amethyst",
         metal: "Silver or White Gold",
-        finger: `Middle Finger (${lat.wrist})`,
+        finger: `Middle Finger (${lat.hand})`,
         day: "Saturday twilight",
         mantra: "Om Sham Shanaishcharaya Namah (108 times)",
         prohibitedGems: ["Ruby (Surya / 7th maraka)", "Red Coral (Mangal / 3rd & 10th adversary)"],
@@ -282,7 +380,7 @@ export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: stri
         primaryGem: "Natural Yellow Sapphire (Pukhraj)",
         uparatna: "Yellow Citrine or Golden Topaz",
         metal: "Yellow Gold",
-        finger: `Index Finger (${lat.wrist})`,
+        finger: `Index Finger (${lat.hand})`,
         day: "Thursday morning during sunrise",
         mantra: "Om Gram Greem Groum Sah Gurave Namah (108 times)",
         prohibitedGems: ["Diamond (Shukra / 3rd & 8th lord)", "Emerald (Budha / 4th & 7th kendradhipati)"],

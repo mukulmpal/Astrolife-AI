@@ -129,6 +129,63 @@ export const STANDARD_ETHICAL_BOUNDARIES = [
 // ── 3. Presentation View Model Adapter ──────────────────────────────────────
 
 /**
+ * Builds human-centric, personalized domain narrative based on actual KP astronomical facts.
+ * Eliminates repetitive boilerplates and speaks directly to the seeker with dignity, clarity, and precision.
+ */
+function buildPersonalizedDomainNarrative(contract: KPPredictiveEvidenceContract): {
+  whatWasFound: string;
+  whyItMatters: string;
+  practicalInterpretation: string;
+  guidance: string;
+} {
+  const cusp = contract.primaryCusp;
+  const subLord = contract.primaryCuspSubLord;
+  const sigHouses = contract.subLordSignifiedHouses.length > 0 ? contract.subLordSignifiedHouses.join(", ") : "केंद्र/त्रिकोण";
+  const md = contract.activeDashaLords.mahadasha;
+  const ad = contract.activeDashaLords.antardasha;
+  const isPositive = contract.synthesisDecision.state.includes("CONFIRMED") ||
+    contract.synthesisDecision.state.includes("CORROBORATED") ||
+    contract.cuspPromiseVerdict === "PROMISE_SUPPORTED";
+
+  let whatWasFound = "";
+  let practicalInterpretation = "";
+
+  const ruleLower = (contract.ruleId + " " + contract.ruleName).toLowerCase();
+
+  if (ruleLower.includes("career") || ruleLower.includes("profession") || cusp === 10) {
+    whatWasFound = `आपके दशम भाव (कर्म, नेतृत्व एवं पद-प्रतिष्ठा) के कस्पल उप-स्वामी (Sub-Lord) ${subLord} हैं, जो आपकी जन्म कुंडली में भाव [${sigHouses}] को सक्रिय कर रहे हैं। कृष्णमूर्ति पद्धति (KP) के अनुसार जब दशम उप-स्वामी का संबंध भाव 2 (धन आगमन), 6 (कार्य सिद्धि) या 11 (प्रमोशन व लाभ) से बनता है, तो यह कार्यक्षेत्र में प्रतिष्ठा और स्थायित्व का स्पष्ट संकेत देता है। वर्तमान में ${md} की महादशा और ${ad} की अंतर्दशा के अंतर्गत आपके पेशेवर जीवन में नए अवसर और ज़िम्मेदारियाँ आने के प्रबल योग हैं।`;
+    practicalInterpretation = isPositive
+      ? "करियर मार्गदर्शन: यह समय अपने पेशेवर कौशल को प्रदर्शित करने और नए दायित्व स्वीकार करने के लिए अत्यंत अनुकूल है। वरिष्ठ अधिकारियों के साथ संवाद में स्पष्टता रखें और आगामी लक्ष्यों पर केंद्रित रहें।"
+      : "करियर मार्गदर्शन: कार्यक्षेत्र में संयम और कूटनीति से काम लें। अनावश्यक वाद-विवाद से बचें और कोई भी बड़ा नौकरी परिवर्तन जल्दबाज़ी में करने के बजाय योजनाबद्ध तरीके से करें।";
+  } else if (ruleLower.includes("marriage") || ruleLower.includes("nuptial") || ruleLower.includes("union") || cusp === 7) {
+    whatWasFound = `आपके सप्तम भाव (विवाह, जीवनसाथी एवं साझेदारी) के कस्पल उप-स्वामी (Sub-Lord) ${subLord} हैं, जो भाव [${sigHouses}] से जुड़े हैं। KP ज्योतिष (Reader III) के अनुसार उप-स्वामी का संबंध भाव 2 (कुटुंब), 7 (दाम्पत्य) और 11 (इच्छा पूर्ति) से होना सुखद साझेदारी का आधार बनता है। वर्तमान ${md}–${ad} दशा चक्र आपके संबंधों में सामंजस्य और पारस्परिक समझ को सुदृढ़ करने के अवसर निर्मित कर रहा है।`;
+    practicalInterpretation = isPositive
+      ? "वैवाहिक मार्गदर्शन: रिश्तों में परस्पर पारदर्शिता और सम्मान को सर्वोपरि रखें। यदि नए रिश्ते की बात चल रही है, तो पारिवारिक सहमति और साझा मूल्यों के साथ आगे बढ़ना अत्यंत फलदायी रहेगा।"
+      : "वैवाहिक मार्गदर्शन: संबंधों में संवेदनशीलता और धैर्य बनाए रखें। किसी भी मतभेद को शांत संवाद से सुलझाएं और भावनात्मक निर्णय लेने में जल्दबाज़ी न करें।";
+  } else if (ruleLower.includes("property") || ruleLower.includes("real estate") || cusp === 4) {
+    whatWasFound = `आपके चतुर्थ भाव (भूमि, भवन, वाहन एवं सुख-साधन) के कस्पल उप-स्वामी (Sub-Lord) ${subLord} हैं, जिनका संबंध भाव [${sigHouses}] से है। KP सिद्धांतों के अनुसार भाव 4 और 11 का संयोग अचल संपत्ति के अर्जन और पारिवारिक स्थिरता के लिए मंगलकारी माना जाता है। वर्तमान ${md}–${ad} दशा अवधि स्थिर संपत्तियों में बुद्धिमत्तापूर्ण निवेश का संकेत देती है।`;
+    practicalInterpretation = isPositive
+      ? "संपत्ति मार्गदर्शन: संपत्ति या वाहन क्रय के लिए यह सकारात्मक समय है। क्रय करते समय कानूनी दस्तावेजों और टाइटल डीड की समुचित पुष्टि करें।"
+      : "संपत्ति मार्गदर्शन: किसी भी बड़े वित्तीय अनुबंध या ऋण (Loan) से पूर्व बजट का गहन आकलन करें और जल्दबाज़ी में कोई अनुबंध हस्ताक्षर न करें।";
+  } else if (ruleLower.includes("foreign") || ruleLower.includes("travel") || cusp === 12 || cusp === 9) {
+    whatWasFound = `आपके द्वादश भाव (विदेश यात्रा, दूरस्थ संबंध एवं नए क्षितिज) के कस्पल उप-स्वामी (Sub-Lord) ${subLord} हैं, जो भाव [${sigHouses}] को दर्शा रहे हैं। KP सिद्धांतों के अनुसार भाव 3 (प्रस्थान), 9 (दीर्घ यात्रा) और 12 (अंतरराष्ट्रीय भूमि) का सक्रिय होना अंतरराष्ट्रीय अवसरों और नए अनुभवों का मार्ग प्रशस्त करता है।`;
+    practicalInterpretation = isPositive
+      ? "यात्रा मार्गदर्शन: अंतरराष्ट्रीय संपर्कों, वीज़ा आवेदन और वैश्विक अवसरों के लिए सक्रिय प्रयास करें। अपने दस्तावेज़ पूर्व-व्यवस्थित रखें।"
+      : "यात्रा मार्गदर्शन: दूरगामी योजनाओं में सभी औपचारिकताएं समय पूर्व पूर्ण करें और नए वातावरण में समायोजन के लिए व्यावहारिक दृष्टिकोण अपनाएं।";
+  } else {
+    whatWasFound = `आपके ${cusp}वें भाव के कस्पल उप-स्वामी (Sub-Lord) ${subLord} हैं, जो कुंडली में भाव [${sigHouses}] को सक्रिय कर रहे हैं। वर्तमान समय में ${md} महादशा और ${ad} अंतर्दशा के प्रभाव से यह जीवन क्षेत्र महत्वपूर्ण परिवर्तन और विकास के दौर में है।`;
+    practicalInterpretation = isPositive
+      ? "व्यावहारिक मार्गदर्शन: वर्तमान ग्रह योग आपके संकल्पों का समर्थन कर रहे हैं। योजनाबद्ध तरीके से अपने प्रयासों को गति दें।"
+      : "व्यावहारिक मार्गदर्शन: वर्तमान समय धैर्य और आंतरिक संतुलन का है। किसी भी निर्णय से पूर्व अनुभवी व्यक्तियों का परामर्श अवश्य लें।";
+  }
+
+  const whyItMatters = `इस विषय का मुख्य भाव कस्प ${cusp} है, जिसके निर्णायक उप-स्वामी ${subLord} (भाव: ${sigHouses}) हैं। वर्तमान समय का नियंत्रण महादशा स्वामी ${md} एवं अंतर्दशा स्वामी ${ad} के अधीन है।`;
+  const guidance = practicalInterpretation;
+
+  return { whatWasFound, whyItMatters, practicalInterpretation, guidance };
+}
+
+/**
  * Transforms an immutable KPPredictiveEvidenceContract into a structured EvidenceFirstSection.
  * Pure presentation adapter: zero recalculation of astrology.
  */
@@ -165,34 +222,11 @@ export function buildEvidenceFirstSection(
     },
   }));
 
-  // Part 1: What AstroLife Found
-  let whatWasFound = "";
-  switch (contract.synthesisDecision.state) {
-    case "EVENT_DENIED_BY_NATAL_PROMISE":
-      whatWasFound = `Under the evaluated ${contract.primaryCusp}th-cusp promise, ${contract.ruleName} is not promised in this chart. The cuspal sub-lord (${contract.primaryCuspSubLord}) connects to detrimental houses without requisite supporting houses.`;
-      break;
-    case "TIMING_OBSTRUCTED":
-      whatWasFound = `The natal promise for ${contract.ruleName} is supported, but the active Dasha period is currently obstructed. Period lords signify barrier houses, preventing immediate event manifestation.`;
-      break;
-    case "MULTIPLE_MANIFESTATION":
-      whatWasFound = `Dual significations are active for ${contract.ruleName}. Under classical principles, concurrent gain and expenditure manifest in their respective sub-periods rather than cancelling out.`;
-      break;
-    case "TIMING_MIXED_WINDOW":
-      whatWasFound = `The current window for ${contract.ruleName} carries conjoined supportive and contrary significations, indicating mixed or qualified progress.`;
-      break;
-    case "TIMING_NEUTRAL":
-      whatWasFound = `The matter of ${contract.ruleName} is not actively stimulated during the current period hierarchy. Active period lords do not connect to requisite event cusps.`;
-      break;
-    case "EVALUATION_PENDING":
-      whatWasFound = `Evaluation for ${contract.ruleName} is strictly pending. Multi-layer conflict precedence for this modern topic lacks attested classical literature and cannot be authoritatively synthesized.`;
-      break;
-    default:
-      whatWasFound = contract.synthesisDecision.summaryVerdict;
-      break;
-  }
-
-  // Part 2: Why It Matters
-  const whyItMatters = `The primary house of matter is Cusp ${contract.primaryCusp}, governed by Sub-Lord ${contract.primaryCuspSubLord}. Sub-lord significations (${contract.subLordSignifiedHouses.join(", ") || "None"}) determine the foundational promise (${contract.cuspPromiseVerdict}). Downstream timing is gated by Mahadasha Lord ${contract.activeDashaLords.mahadasha} and Antardasha Lord ${contract.activeDashaLords.antardasha} (${contract.dashaTimingState}), confirmed by Transits (${contract.transitState}), and corroborated by Ruling Planets (${contract.rulingPlanetsState}).`;
+  // Build Personalized, Human Domain Narrative
+  const domainNarrative = buildPersonalizedDomainNarrative(contract);
+  const whatWasFound = domainNarrative.whatWasFound;
+  const whyItMatters = domainNarrative.whyItMatters;
+  const practicalInterpretation = domainNarrative.practicalInterpretation;
 
   // Part 3: Which Rule Produced It
   const whichRuleProducedIt = isReferencePending
@@ -218,10 +252,6 @@ export function buildEvidenceFirstSection(
   ];
   const whatWeDoNotClaim = "AstroLife does not guarantee events or fate. Astrological factors represent conditional tendencies, timing windows, and psychological rhythms. Personal discernment and ethical effort remain paramount.";
 
-  const practicalInterpretation = isReferencePending
-    ? "Approach this matter with practical prudence and personal discernment; astrological certainty cannot be claimed due to lack of classical literature for intraday speculation."
-    : contract.synthesisDecision.summaryVerdict;
-
   const fivePartNarrative: FivePartNarrative = {
     whatWasFound,
     whyItMatters,
@@ -236,12 +266,8 @@ export function buildEvidenceFirstSection(
     casual: {
       title: contract.ruleName,
       summary: whatWasFound,
-      practicalInterpretation: isReferencePending
-        ? "Approach this matter with practical prudence and personal discernment; astrological certainty cannot be claimed due to lack of classical literature for intraday speculation."
-        : contract.synthesisDecision.summaryVerdict,
-      guidance: isReferencePending
-        ? "Approach this matter with practical prudence and personal discernment; astrological certainty cannot be claimed due to lack of classical literature for intraday speculation."
-        : contract.synthesisDecision.summaryVerdict,
+      practicalInterpretation,
+      guidance: domainNarrative.guidance,
     },
     curious: {
       cuspEvidence: `Cusp ${contract.primaryCusp} Sub-Lord ${contract.primaryCuspSubLord} signifies houses [${contract.subLordSignifiedHouses.join(", ")}], yielding verdict ${contract.cuspPromiseVerdict}.`,

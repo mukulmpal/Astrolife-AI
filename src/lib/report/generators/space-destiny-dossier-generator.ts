@@ -32,6 +32,11 @@ import {
   ALL_NAKSHATRAS,
   RASHI_LORDS,
   getGenderLateralization,
+  getPlanetaryDignity,
+  getSignLord,
+  ordinal,
+  signFromHouse,
+  withArticle,
   renderHumanImpactCardHtml
 } from "../../astro/human-translator";
 
@@ -161,6 +166,14 @@ function renderNorthIndianSvg(
 </svg>`;
 }
 
+function formatDMS(lon: number): string {
+  const degInSign = Math.abs(lon % 30);
+  const d = Math.floor(degInSign);
+  const m = Math.floor((degInSign - d) * 60);
+  const s = Math.floor(((degInSign - d) * 60 - m) * 60);
+  return `${d}° ${String(m).padStart(2, "0")}' ${String(s).padStart(2, "0")}"`;
+}
+
 export function generateSpaceDestinyDossierHTML(
   chart: ChartData,
   options: PackageDossierOptions
@@ -192,27 +205,43 @@ export function generateSpaceDestinyDossierHTML(
   const elapsedFromSunrise = Math.max(1, birthMinutes >= approxSunriseMinutes ? birthMinutes - approxSunriseMinutes : birthMinutes + (1440 - approxSunriseMinutes));
   const cycleCount = Math.floor(elapsedFromSunrise / 90) + 1;
   const remMin = elapsedFromSunrise % 90;
-  let activeTattva = "Prithvi (Earth · 6m)";
-  let tattvaNature = "grounded endurance, physical stamina, and material compounding";
-  if (remMin < 6) {
-    activeTattva = "Prithvi (Earth · 6m)";
-    tattvaNature = "grounded endurance, physical stamina, and material compounding";
-  } else if (remMin < 18) {
-    activeTattva = "Jala (Water · 12m)";
-    tattvaNature = "emotional intuition, fluid adaptation, and relational receptivity";
-  } else if (remMin < 36) {
-    activeTattva = "Tejas (Fire · 18m)";
-    tattvaNature = "decisive vitality, leadership ambition, and metabolic courage";
-  } else if (remMin < 60) {
-    activeTattva = "Vayu (Air · 24m)";
-    tattvaNature = "intellectual velocity, strategic communication, and abstract modeling";
-  } else {
-    activeTattva = "Akasha (Ether · 30m)";
-    tattvaNature = "expansive vision, spatial harmony, and institutional sovereignty";
-  }
-
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const birthDayName = dayNames[new Date(chart.dob || "1995-07-04").getDay()] || "Tuesday";
+  const birthDayIdx = new Date(chart.dob || "1995-07-04").getDay();
+  const birthDayName = dayNames[birthDayIdx] || "Tuesday";
+
+  // Dr. P.S. Sastri weekday-anchored Tattva sequence (Prithvi 6m, Jala 12m, Tejas 18m, Vayu 24m, Akasha 30m)
+  const TATTVA_DEFS: Record<string, { label: string; dur: number; nature: string }> = {
+    Prithvi: { label: "Prithvi (Earth · 6m)", dur: 6, nature: "grounded endurance, physical stamina, and material compounding" },
+    Jala: { label: "Jala (Water · 12m)", dur: 12, nature: "emotional intuition, fluid adaptation, and relational receptivity" },
+    Tejas: { label: "Tejas (Fire · 18m)", dur: 18, nature: "decisive vitality, leadership ambition, and metabolic courage" },
+    Vayu: { label: "Vayu (Air · 24m)", dur: 24, nature: "intellectual velocity, strategic communication, and abstract modeling" },
+    Akasha: { label: "Akasha (Ether · 30m)", dur: 30, nature: "expansive vision, spatial harmony, and institutional sovereignty" },
+  };
+  const WEEKDAY_START_TATTVA: Record<number, string[]> = {
+    0: ["Tejas", "Vayu", "Akasha", "Prithvi", "Jala"],   // Sun
+    1: ["Jala", "Tejas", "Vayu", "Akasha", "Prithvi"],   // Mon
+    2: ["Tejas", "Vayu", "Akasha", "Prithvi", "Jala"],   // Tue
+    3: ["Prithvi", "Jala", "Tejas", "Vayu", "Akasha"],   // Wed
+    4: ["Akasha", "Prithvi", "Jala", "Tejas", "Vayu"],   // Thu
+    5: ["Jala", "Tejas", "Vayu", "Akasha", "Prithvi"],   // Fri
+    6: ["Vayu", "Akasha", "Prithvi", "Jala", "Tejas"],   // Sat
+  };
+  const seq = WEEKDAY_START_TATTVA[birthDayIdx] || WEEKDAY_START_TATTVA[3];
+  let acc = 0;
+  let activeTattvaKey = seq[0];
+  for (const tk of seq) {
+    acc += TATTVA_DEFS[tk].dur;
+    if (remMin < acc) {
+      activeTattvaKey = tk;
+      break;
+    }
+  }
+  const activeTattva = TATTVA_DEFS[activeTattvaKey].label;
+  const tattvaNature = TATTVA_DEFS[activeTattvaKey].nature;
+
+  const dobYear = parseInt(String(birthDate).slice(0, 4), 10) || 1995;
+  const nativeAge = 2027 - dobYear;
+  const isMatureNative = nativeAge >= 38;
 
   // Engine Calculations
   let vastuDossier: ReturnType<typeof runAstroVastuHitEngine>;
@@ -246,8 +275,99 @@ export function generateSpaceDestinyDossierHTML(
   const rahuAquariusHouse = ((10 - lagnaNum + 12) % 12) + 1;
   const ketuLeoHouse = ((4 - lagnaNum + 12) % 12) + 1;
 
-  const activeDasha = chart.dashas?.find((d) => d.active)?.planet || "Rahu";
-  const activeAntar = chart.antardasha?.planet || "Jupiter";
+  const activeMdObj = (chart.dashas as any[])?.find((d) => d.active);
+  const activeAdObj = activeMdObj?.antardashas?.find((a: any) => a.active);
+  const activeDasha = activeMdObj?.planet || "Rahu";
+  const activeAntar = activeAdObj?.planet || chart.antardasha?.planet || "Jupiter";
+
+  // Dynamic Kunda trinal check
+  const kundaIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === (kundaData.kundaNakshatra || "").toLowerCase());
+  const moonNakIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === (moonNakshatra || "").toLowerCase());
+  const kundaTrineMatch = kundaIdx >= 0 && moonNakIdx >= 0 && ((kundaIdx - moonNakIdx + 27) % 9 === 0 || kundaData.kundaLord === moonPlanet?.lord);
+  const kundaDegreeDelta = Math.abs((((kundaData.kundaLon || 0) - (moonPlanet?.longitude || 0) + 540) % 360) - 180).toFixed(1);
+
+  // Dynamic 16-Zone House Mapping & Power Clusters
+  const occupantsInHouse = (h: number) =>
+    Object.entries(chart.planets || {})
+      .filter(([, pd]) => pd && pd.house === h)
+      .map(([name, pd]) => ({
+        name,
+        deg: formatDMS(pd!.longitude ?? pd!.degree ?? 0).slice(0, 7),
+      }));
+
+  const ZONE_SPEC = [
+    { zone: "North (N)", deg: "348.75° &ndash; 11.25°", house: 11, role: "Realized Gains &amp; Liquid Cashflow" },
+    { zone: "North-North-West (NNW)", deg: "326.25° &ndash; 348.75°", house: 10, role: "PRIME CAREER &amp; GOVERNANCE AXIS" },
+    { zone: "North-East (NE / Ishanya)", deg: "33.75° &ndash; 56.25°", house: 7, role: "Partnerships &amp; Spiritual Wisdom" },
+    { zone: "East-North-East (ENE)", deg: "56.25° &ndash; 78.75°", house: 12, role: "Subconscious R&amp;D &amp; Foreign Reach" },
+    { zone: "East (E)", deg: "78.75° &ndash; 101.25°", house: 8, role: "Deep Research &amp; Transformation" },
+    { zone: "South-East (SE / Agneya)", deg: "123.75° &ndash; 146.25°", house: 4, role: "Domestic Foundation &amp; Assets" },
+    { zone: "South (S)", deg: "168.75° &ndash; 191.25°", house: 1, role: "Physical Vitality &amp; Self-Agency" },
+    { zone: "West (W)", deg: "258.75° &ndash; 281.25°", house: 2, role: "Accumulated Treasury &amp; Voice" },
+  ];
+  const zoneRowsHtml = ZONE_SPEC.map(z => {
+    const sign = signFromHouse(lagnaRashi, z.house);
+    const lord = getSignLord(sign);
+    const occ = occupantsInHouse(z.house);
+    const occText = occ.length ? `<strong>${occ.map(o => `${o.name} (${o.deg})`).join(" &amp; ")}</strong>` : `Vacant (${lord} Lord)`;
+    return `<tr>
+      <td><strong>${z.zone}</strong></td>
+      <td>${z.deg}</td>
+      <td>${sign}</td>
+      <td>${ordinal(z.house)}</td>
+      <td>${occText}</td>
+      <td>${z.house === 10 ? `<strong>${z.role}</strong>` : z.role}</td>
+    </tr>`;
+  }).join("\n");
+
+  const tenthSign = signFromHouse(lagnaRashi, 10);
+  const tenthOcc = occupantsInHouse(10);
+  const seventhSign = signFromHouse(lagnaRashi, 7);
+  const seventhOcc = occupantsInHouse(7);
+  const rahuP = chart.planets?.["Rahu"];
+  const ketuP = chart.planets?.["Ketu"];
+  const rahuHouse = rahuP?.house || 1;
+  const ketuHouse = ketuP?.house || 7;
+
+  // Top 2 Power Clusters (houses with most planets)
+  const houseClusters = Array.from({ length: 12 }, (_, i) => ({
+    house: i + 1,
+    sign: signFromHouse(lagnaRashi, i + 1),
+    occ: occupantsInHouse(i + 1),
+  })).sort((a, b) => b.occ.length - a.occ.length);
+  const cluster1 = houseClusters[0];
+  const cluster2 = houseClusters[1];
+
+  const YANTRA_MAP: Record<string, string> = {
+    Sun: "Surya Yantra", Moon: "Chandra Yantra", Mars: "Mangala Yantra",
+    Mercury: "Budha Yantra", Jupiter: "Guru Yantra", Venus: "Shukra Yantra", Saturn: "Shani Yantra"
+  };
+  const lagneshYantra = YANTRA_MAP[lagnaLord] || "Sri Yantra";
+
+  // Dynamic 7 Planetary Palm Mounts rows
+  const MOUNT_META = [
+    { planet: "Jupiter", title: "Mount of Jupiter (Guru)", loc: "Base of Index Finger", trait: "Leadership, advisory authority, and ethical judgment." },
+    { planet: "Saturn", title: "Mount of Saturn (Shani)", loc: "Base of Middle Finger", trait: "Patience, structural discipline, and long-term endurance." },
+    { planet: "Sun", title: "Mount of Sun (Surya)", loc: "Base of Ring Finger", trait: "Public authority, executive presence, and institutional respect." },
+    { planet: "Mercury", title: "Mount of Mercury (Budha)", loc: "Base of Little Finger", trait: "Analytical acuity, commercial negotiation, and communication." },
+    { planet: "Venus", title: "Mount of Venus (Shukra)", loc: "Base of Thumb", trait: "Physical stamina, aesthetic refinement, and relational warmth." },
+    { planet: "Moon", title: "Mount of Moon (Chandra)", loc: "Lower Percussion Base", trait: "Intuitive foresight, emotional receptivity, and creative flow." },
+    { planet: "Mars", title: "Plain of Mars (Mangal)", loc: "Center of Palm", trait: "Moral courage, resilience, and calm under pressure." },
+  ];
+  const palmMountRowsHtml = MOUNT_META.map(m => {
+    const pd = chart.planets?.[m.planet];
+    const pSign = pd?.sign || lagnaRashi;
+    const pHouse = pd?.house || 1;
+    const dig = getPlanetaryDignity(m.planet, pSign);
+    const devLevel = dig === "Exalted" || dig === "Own" || dig === "Moolatrikona" ? "Prominent &amp; Firm" : dig === "Debilitated" ? "Subtle / Needs Grounding" : "Well-Balanced";
+    return `<tr>
+      <td><strong>${m.title}</strong></td>
+      <td>${m.loc}</td>
+      <td>${devLevel}</td>
+      <td>${m.planet} in ${pSign} (${ordinal(pHouse)} &middot; ${dig})</td>
+      <td>${m.trait}</td>
+    </tr>`;
+  }).join("\n");
 
   const totalPages = 24;
   const sampleWatermark = isSample
@@ -540,11 +660,11 @@ body {
       </div>
       <div>
         <span class="kicker">Optimal Work Zone</span>
-        <div style="color:var(--emerald-bright);font-weight:700;">North-North-West / North-East</div>
+        <div style="color:var(--emerald-bright);font-weight:700;">North-North-West (${tenthSign} 10th House)</div>
       </div>
       <div>
         <span class="kicker">BTR Kunda Nakshatra</span>
-        <div style="color:var(--gold-bright);font-weight:700;">Uttara Bhadrapada (333° 30' 26" · 100% Match)</div>
+        <div style="color:var(--gold-bright);font-weight:700;">${kundaData.kundaNakshatra} (${formatDMS(kundaData.kundaLon || 0)} &middot; ${kundaTrineMatch ? "Trinal Match" : "Verified"})</div>
       </div>
       <div>
         <span class="kicker">Primary Grounding Zone</span>
@@ -552,7 +672,7 @@ body {
       </div>
       <div>
         <span class="kicker">Active Operating Dasha</span>
-        <div style="color:var(--sapphire-bright);font-weight:700;">${activeDasha} &mdash; ${activeAntar} (Budha)</div>
+        <div style="color:var(--sapphire-bright);font-weight:700;">${activeDasha} &mdash; ${activeAntar}</div>
       </div>
     </div>
   </div>
@@ -598,7 +718,7 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px;">
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--sapphire);">
-          <strong style="color:var(--sapphire-bright);">MODULE I (Pages 3&ndash;8): 16-Zone Astro-Vastu &amp; Directional Hit Radar</strong> &mdash; 360° compass degree mapping, 180° opposition hits, power clusters in Gemini/Leo, and workstation optimization.
+          <strong style="color:var(--sapphire-bright);">MODULE I (Pages 3&ndash;8): 16-Zone Astro-Vastu &amp; Directional Hit Radar</strong> &mdash; 360° compass degree mapping, 180° opposition hits, power clusters (${cluster1.sign}/${cluster2.sign}), and workstation optimization.
         </div>
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--emerald);">
           <strong style="color:var(--emerald-bright);">MODULE II (Pages 9&ndash;11): Non-Destructive Space Harmonization</strong> &mdash; Zero demolition, 5-element color resonance, metal strips, plant alchemy, and bio-acoustic sound clearing.
@@ -641,70 +761,7 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>North (N)</strong></td>
-          <td>348.75° &ndash; 11.25°</td>
-          <td>Cancer (Karka)</td>
-          <td>11th</td>
-          <td>Vacant (Moon Lord)</td>
-          <td>Realized Gains &amp; Liquid Cashflow</td>
-        </tr>
-        <tr>
-          <td><strong>North-North-West (NNW)</strong></td>
-          <td>326.25° &ndash; 348.75°</td>
-          <td>Gemini (Mithuna)</td>
-          <td>10th</td>
-          <td><strong>Sun (18° 04') &amp; Venus (05° 00')</strong></td>
-          <td><strong>PRIME CAREER &amp; GOVERNANCE CLUSTER</strong></td>
-        </tr>
-        <tr>
-          <td><strong>North-East (NE / Ishanya)</strong></td>
-          <td>33.75° &ndash; 56.25°</td>
-          <td>Pisces (Meena)</td>
-          <td>7th</td>
-          <td><strong>Saturn (00° 57')</strong></td>
-          <td>Partnerships &amp; Spiritual Wisdom</td>
-        </tr>
-        <tr>
-          <td><strong>East-North-East (ENE)</strong></td>
-          <td>56.25° &ndash; 78.75°</td>
-          <td>Leo (Simha)</td>
-          <td>12th</td>
-          <td><strong>Moon (29° 11') &amp; Mars (26° 23')</strong></td>
-          <td>Subconscious R&amp;D &amp; Foreign Reach</td>
-        </tr>
-        <tr>
-          <td><strong>East (E)</strong></td>
-          <td>78.75° &ndash; 101.25°</td>
-          <td>Aries (Mesha)</td>
-          <td>8th</td>
-          <td><strong>Ketu (08° 12')</strong></td>
-          <td>Occult Intuition &amp; Research Depth</td>
-        </tr>
-        <tr>
-          <td><strong>South-East (SE / Agneya)</strong></td>
-          <td>123.75° &ndash; 146.25°</td>
-          <td>Sagittarius (Dhanu)</td>
-          <td>4th</td>
-          <td>Vacant (Jupiter Lord)</td>
-          <td>Domestic Foundation &amp; Vehicles</td>
-        </tr>
-        <tr>
-          <td><strong>South (S)</strong></td>
-          <td>168.75° &ndash; 191.25°</td>
-          <td>Virgo (Kanya)</td>
-          <td>1st</td>
-          <td><strong>Lagna Anchor (Mercury)</strong></td>
-          <td>Physical Vitality &amp; Self-Agency</td>
-        </tr>
-        <tr>
-          <td><strong>West (W)</strong></td>
-          <td>258.75° &ndash; 281.25°</td>
-          <td>Libra (Tula)</td>
-          <td>2nd</td>
-          <td><strong>Rahu (08° 12')</strong></td>
-          <td>Accumulated Treasury &amp; Digital Scale</td>
-        </tr>
+        ${zoneRowsHtml}
       </tbody>
     </table>
   </div>
@@ -777,18 +834,18 @@ body {
     <!-- 180 Opposition Box -->
     <div class="luxury-card" style="border:1.5px solid var(--ruby);margin-bottom:10px;">
       <div class="card-title" style="color:var(--ruby-bright);font-size:12px;font-family:'Cinzel',serif;">
-        1. THE 180-DEGREE OPPOSITION: SATURN (NE) VS. LAGNA (SOUTH)
+        1. THE 180-DEGREE OPPOSITION: 7TH HOUSE (${seventhSign.toUpperCase()}) VS. LAGNA (${lagnaRashi.toUpperCase()})
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        <strong>Planetary Dynamic:</strong> Saturn in Pisces at 00° 57' in the 7th house (North-East) casts a direct 180-degree opposition aspect onto your 1st house Lagna (South / Virgo).
+        <strong>Planetary Dynamic:</strong> Your 7th house (${seventhSign}, North-East)${seventhOcc.length ? ` occupied by ${seventhOcc.map(o => `${o.name} (${o.deg})`).join(" & ")}` : ` ruled by ${getSignLord(seventhSign)}`} casts a direct 180-degree opposition onto your 1st house Lagna (${lagnaRashi}, South).
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Physical Manifestation:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          If the North-East zone of your home or workspace has rusted iron, heavy steel cabinets, or dark blue/black paint, this 180-degree aspect triggers physical fatigue, mental rigidity, and delay in client decisions.
+          If the North-East zone of your home or workspace has rusted iron, heavy cabinets, or clutter, this 180-degree axis triggers physical fatigue and delays in partnership decisions.
         </p>
         <p style="color:var(--emerald-bright);margin-top:4px;font-weight:600;">
-          Resolution: Remove heavy iron objects from the North-East; replace with clean clear water or pure white chandan.
+          Resolution: Keep the North-East open, clean, and light with clear water or pure white accents.
         </p>
       </div>
     </div>
@@ -796,10 +853,10 @@ body {
     <!-- 180 Nodal Axis Box -->
     <div class="luxury-card" style="border:1.5px solid var(--sapphire);margin-bottom:10px;">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;font-family:'Cinzel',serif;">
-        2. THE 180-DEGREE NODAL AXIS: RAHU (WEST) VS. KETU (EAST)
+        2. THE 180-DEGREE NODAL AXIS: RAHU (${ordinal(rahuHouse).toUpperCase()} H) VS. KETU (${ordinal(ketuHouse).toUpperCase()} H)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        <strong>Planetary Dynamic:</strong> Rahu in Libra (West · 2nd House) directly opposes Ketu in Aries (East · 8th House) at 08° 12'.
+        <strong>Planetary Dynamic:</strong> Rahu in ${rahuP?.sign || "Libra"} (${ordinal(rahuHouse)} House) directly opposes Ketu in ${ketuP?.sign || "Aries"} (${ordinal(ketuHouse)} House) at ${formatDMS(rahuP?.longitude ?? rahuP?.degree ?? 0).slice(0, 7)}.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Physical Manifestation:</strong>
@@ -819,36 +876,36 @@ body {
 <section class="page">
   ${headerRail("MODULE I: POWER CENTERS & CLUSTERS")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Planetary Power Centers: Gemini &amp; Leo</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Planetary Power Centers: ${cluster1.sign} &amp; ${cluster2.sign}</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      A "Cluster" occurs when multiple major planets concentrate their energetic mass within a single zodiac sign and compass direction, creating a massive focal point in your spatial reality.
+      A "Cluster" occurs when multiple major planets concentrate their energetic mass within a single zodiac sign and house, creating a primary focal point in your spatial reality.
     </p>
 
-    <!-- Cluster 1: Gemini -->
+    <!-- Cluster 1 -->
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ CLUSTER 1: THE GEMINI EXECUTIVE AXIS (NORTH-NORTH-WEST · 10TH HOUSE)
+        ✦ CLUSTER 1: ${cluster1.sign.toUpperCase()} POWER AXIS (${ordinal(cluster1.house).toUpperCase()} HOUSE)
       </div>
-      <div class="kicker" style="margin-top:2px;">OCCUPANTS: SUN (18° 04') &amp; VENUS (05° 00') · DIRECTION: NNW</div>
+      <div class="kicker" style="margin-top:2px;">OCCUPANTS: ${cluster1.occ.map(o => `${o.name.toUpperCase()} (${o.deg})`).join(" &amp; ") || getSignLord(cluster1.sign).toUpperCase()}</div>
       <p class="body-text" style="font-size:11.8px;margin-top:6px;">
-        This is your supreme career and public authority power center. Sun holds peak <em>Digbala</em> (directional power) here, while Venus provides executive charm and high-net-worth commercial contracts.
+        This is your primary planetary concentration in the ${ordinal(cluster1.house)} house (${cluster1.sign}), channeling focused momentum into ${cluster1.house === 10 ? "executive leadership, public authority, and career growth" : cluster1.house === 11 ? "network gains and income expansion" : "core life execution and strategic clarity"}.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Spatial Activation Protocol:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          Locate your primary executive desk, laptop workstation, and corporate certificates in the <strong>North-North-West zone</strong>. Paint walls in soft cream or mint green. Add a polished brass artifact to amplify Sun's Digbala authority.
+          Keep your primary workstation aligned with the North-North-West (${tenthSign} 10th house) and maintain clean lighting and uncluttered surfaces to amplify this cluster's focus.
         </p>
       </div>
     </div>
 
-    <!-- Cluster 2: Leo -->
+    <!-- Cluster 2 -->
     <div class="luxury-card" style="border:1.5px solid var(--gold);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ CLUSTER 2: THE LEO INTELLECTUAL SANCTUARY (EAST-NORTH-EAST · 12TH HOUSE)
+        ✦ CLUSTER 2: ${cluster2.sign.toUpperCase()} SECONDARY AXIS (${ordinal(cluster2.house).toUpperCase()} HOUSE)
       </div>
-      <div class="kicker" style="margin-top:2px;">OCCUPANTS: MOON (29° 11') &amp; MARS (26° 23') · DIRECTION: ENE</div>
+      <div class="kicker" style="margin-top:2px;">OCCUPANTS: ${cluster2.occ.map(o => `${o.name.toUpperCase()} (${o.deg})`).join(" &amp; ") || getSignLord(cluster2.sign).toUpperCase()}</div>
       <p class="body-text" style="font-size:11.8px;margin-top:6px;">
-        Governs the subconscious mind, deep technical R&amp;D, foreign client expansion, and nocturnal rejuvenation. Mars brings drive, while Moon brings imaginative vision.
+        Anchors your ${ordinal(cluster2.house)} house (${cluster2.sign}), balancing external drive with internal clarity, strategic reflection, and restorative recovery.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Spatial Calming Protocol:</strong>
@@ -878,7 +935,7 @@ body {
       <div class="grid-2" style="font-size:11.5px;margin-top:8px;row-gap:6px;">
         <div>
           <span class="kicker">Desk Seating Zone:</span>
-          <div style="color:var(--gold-bright);font-weight:700;">North-North-West (Gemini 10th House)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">North-North-West (${tenthSign} 10th House)</div>
         </div>
         <div>
           <span class="kicker">Facing Direction:</span>
@@ -894,7 +951,7 @@ body {
         </div>
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:6px;">
-        Facing North aligns your frontal brain lobes with the Earth's geomagnetic lines of force, dramatically accelerating software coding speed, analytical decision-making, and client negotiation clarity.
+        Facing North aligns your frontal brain lobes with the Earth's geomagnetic lines of force, sharpening executive focus, analytical decision-making, and client negotiation clarity.
       </p>
     </div>
 
@@ -1023,7 +1080,7 @@ body {
     <!-- Plant Alchemy -->
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:10px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ BOTANICAL PRESCRIPTIONS FOR VIRGO LAGNA
+        ✦ BOTANICAL PRESCRIPTIONS FOR ${lagnaRashi.toUpperCase()} LAGNA
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;margin-top:4px;">
         <div>
@@ -1044,7 +1101,7 @@ body {
         ✦ SACRED GEOMETRICAL COPPER YANTRAS
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Place an authenticated <strong>Sri Yantra (श्री यंत्र)</strong> or <strong>Budha Yantra</strong> etched on a pure copper plate on your North-facing work altar. Its interlocking 9 triangles generate a coherent scalar vortex that shields sensitive software IP and elevates focus.
+        Place an authenticated <strong>Sri Yantra (श्री यंत्र)</strong> or <strong>${lagneshYantra}</strong> etched on a pure copper plate on your North-facing work altar. Its interlocking 9 triangles generate a coherent scalar vortex that shields your focus and intellectual initiatives.
       </p>
     </div>
   </div>
@@ -1170,7 +1227,7 @@ body {
     <div class="luxury-card" style="margin-bottom:8px;border-left:3px solid var(--gold-bright);">
       <strong style="color:var(--gold-bright);font-size:11.5px;">2. HEAD LINE (मातृ रेखा / MERCURY INTELLECT AXIS):</strong>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Long, deep, starting cleanly separate from the life line and gently sloping across the plain of Mars towards the upper Moon Mount. Confirms independence of thought, acute mathematical/coding memory, and the "Writer/Architect Fork" (bifurcation at the end) allowing creative and logical thought to operate simultaneously.
+        Long, deep, starting cleanly separate from the life line and gently sloping across the plain of Mars towards the upper Moon Mount. Confirms independence of thought, acute analytical memory, and the "Architect Fork" allowing creative and logical thought to operate simultaneously.
       </p>
     </div>
 
@@ -1186,7 +1243,7 @@ body {
     <div class="luxury-card" style="border-left:3px solid var(--sapphire-bright);">
       <strong style="color:var(--sapphire-bright);font-size:11.5px;">4. FATE LINE (भाग्य रेखा / SATURN CAREER HIGHWAY):</strong>
       <p class="body-text" style="font-size:11.2px;margin-top:2px;">
-        Ascends straight and steady from the wrist up into the Mount of Saturn. Shows self-made career expansion, solidifying significantly after age 28&ndash;30 as Saturn (your Indu Lagna lord) and Mercury (Amatyakaraka) awaken your sovereign enterprise.
+        Ascends straight and steady from the wrist up into the Mount of Saturn. Shows self-made career expansion, ${isMatureNative ? "maturing across your peak mid-career decades" : "solidifying significantly after age 28&ndash;30"} as your Lagna Lord (${lagnaLord}) and Saturnian discipline compound your enterprise.
       </p>
     </div>
   </div>
@@ -1213,55 +1270,7 @@ body {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><strong>Mount of Jupiter (Guru)</strong></td>
-          <td>Base of Index Finger</td>
-          <td>Well-developed &amp; Firm</td>
-          <td>Jupiter in Scorpio (House 3)</td>
-          <td>Natural leadership, pedagogical authority, and executive counseling.</td>
-        </tr>
-        <tr>
-          <td><strong>Mount of Saturn (Shani)</strong></td>
-          <td>Base of Middle Finger</td>
-          <td>Flat, Disciplined</td>
-          <td>Saturn in Pisces (House 7 · Indu Lord)</td>
-          <td>Patience, analytical depth, aversion to reckless speculative gambling.</td>
-        </tr>
-        <tr>
-          <td><strong>Mount of Sun (Surya)</strong></td>
-          <td>Base of Ring Finger</td>
-          <td>Prominent &amp; Radiant</td>
-          <td>Sun in Gemini (House 10 Digbali)</td>
-          <td>Public authority, executive presence, and institutional respect.</td>
-        </tr>
-        <tr>
-          <td><strong>Mount of Mercury (Budha)</strong></td>
-          <td>Base of Little Finger</td>
-          <td>High Elevation &amp; Fine Lines</td>
-          <td>Mercury in Taurus (House 9 AmK)</td>
-          <td>Software syntax acumen, rapid commercial negotiation, and humor.</td>
-        </tr>
-        <tr>
-          <td><strong>Mount of Venus (Shukra)</strong></td>
-          <td>Base of Thumb</td>
-          <td>Firm &amp; Broad</td>
-          <td>Venus in Gemini (House 10)</td>
-          <td>High physical stamina, appreciation of refined architecture and aesthetics.</td>
-        </tr>
-        <tr>
-          <td><strong>Mount of Moon (Chandra)</strong></td>
-          <td>Lower Percussion Base</td>
-          <td>Clear &amp; Uncross-hatched</td>
-          <td>Moon in Leo (House 12)</td>
-          <td>Intuitive foresight, philosophical writing, foreign business interest.</td>
-        </tr>
-        <tr>
-          <td><strong>Plain of Mars (Mangal)</strong></td>
-          <td>Center of Palm</td>
-          <td>Firm &amp; Unyielding</td>
-          <td>Mars in Leo (House 12)</td>
-          <td>High moral resilience, calm under acute professional pressure.</td>
-        </tr>
+        ${palmMountRowsHtml}
       </tbody>
     </table>
   </div>
@@ -1398,16 +1407,18 @@ body {
         </tr>
         <tr>
           <td><strong>Mathematical Concurrence</strong></td>
-          <td><span style="color:var(--emerald-bright);font-weight:700;">100% SHASTRIC MATCH</span></td>
-          <td>Parashari trinal harmonic validated for ${birthTime} IST</td>
+          <td><span style="color:${kundaTrineMatch ? "var(--emerald-bright)" : "var(--gold-bright)"};font-weight:700;">${kundaTrineMatch ? "100% SHASTRIC TRINAL MATCH" : `DELTA ${kundaDegreeDelta}° FROM MOON`}</span></td>
+          <td>${kundaTrineMatch ? `Parashari trinal harmonic validated for ${birthTime} IST` : `Kunda (${kundaData.kundaNakshatra}) vs Moon (${moonNakshatra}): ±2–4 min sensitivity check recommended`}</td>
         </tr>
       </tbody>
     </table>
 
-    <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
-      <div class="kicker" style="color:var(--emerald-bright);">BTR Scientific Conclusion:</div>
+    <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid ${kundaTrineMatch ? "var(--emerald-bright)" : "var(--gold-bright)"};">
+      <div class="kicker" style="color:${kundaTrineMatch ? "var(--emerald-bright)" : "var(--gold-bright)"};">BTR Scientific Conclusion:</div>
       <p style="font-size:11.5px;color:var(--ivory-dim);margin-top:2px;">
-        Your recorded birth time of <strong>${birthTime} IST</strong> satisfies classical Kunda Shastra with absolute mathematical precision. All harmonic divisional vargas stand authenticated.
+        ${kundaTrineMatch
+          ? `Your recorded birth time of <strong>${birthTime} IST</strong> satisfies classical Kunda Shastra trinal alignment with precision. All harmonic divisional vargas stand authenticated.`
+          : `At <strong>${birthTime} IST</strong>, Kunda falls in <strong>${kundaData.kundaNakshatra}</strong> (${kundaDegreeDelta}° offset from natal Moon). Minor ±2–4 minute birth-time refinement can be tested if D-60 / Sub-Lord events require tighter tuning.`}
       </p>
     </div>
   </div>
@@ -1429,7 +1440,7 @@ body {
         1. TATTVA SIDDHANT GENDER HARMONIC (DR. P.S. SASTRI 90-MIN CYCLE)
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-        Under Dr. P.S. Sastri's classical BTR canon, each diurnal Tattva epoch spans <strong>90 minutes (3.75 Ghatikas)</strong> partitioned proportionally across the 5 elements: <em>Prithvi (6m) &rarr; Jala (12m) &rarr; Tejas (18m) &rarr; Vayu (24m) &rarr; Akasha (30m) = 90 mins</em>. On ${birthDayName}, solar diurnal progression commenced at local sunrise.
+        Under Dr. P.S. Sastri's classical BTR canon, each diurnal Tattva epoch spans <strong>90 minutes (3.75 Ghatikas)</strong> starting from ${birthDayName}'s planetary Tattva (<em>${seq.map(k => TATTVA_DEFS[k].label).join(" &rarr; ")}</em>), with Panchikarana half-division applied for gender polarity.
       </p>
       <div class="grid-2" style="font-size:11.2px;margin-top:6px;gap:8px;">
         <div style="background:var(--surface-elevated);padding:6px 8px;border-radius:4px;">
@@ -1482,15 +1493,15 @@ body {
     <!-- Jupiter Gochar -->
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ JUPITER TRANSIT (GURU GOCHAR): EXALTED ${jupCancerHouse}TH HOUSE OF REALIZED GAINS
+        ✦ JUPITER TRANSIT (GURU GOCHAR): EXALTED ${ordinal(jupCancerHouse).toUpperCase()} HOUSE OF ${[6, 8, 12].includes(jupCancerHouse) ? "COMPETITIVE VICTORY & SERVICE" : "REALIZED GAINS"}
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Transit Jupiter enters its <strong>Exalted Sign Cancer (${jupCancerHouse}th House from Lagna)</strong> from December 2026 through October 2027 (stationing direct in May 2027), before transitioning into Leo (${((jupCancerHouse % 12) + 1)}th House) in November 2027.
+        Transit Jupiter enters its <strong>Exalted Sign Cancer (${ordinal(jupCancerHouse)} House from Lagna)</strong> from December 2026 through October 2027 (stationing direct in May 2027), before transitioning into Leo (${ordinal((jupCancerHouse % 12) + 1)} House) in November 2027.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Strategic Harvest Opportunity:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          This Exalted ${jupCancerHouse}th House progression marks a key commercial expansion era. Major partnerships solidify, advisory fees compound, and realized liquid surplus peaks.
+          This Exalted ${ordinal(jupCancerHouse)} House progression marks a key ${[6, 8, 12].includes(jupCancerHouse) ? "debt-clearance, audit, and disciplined scaling" : "commercial expansion"} era.
         </p>
       </div>
     </div>
@@ -1498,15 +1509,15 @@ body {
     <!-- Saturn Gochar -->
     <div class="luxury-card" style="border:1.5px solid var(--sapphire);">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ SATURN TRANSIT (SHANI GOCHAR): ${satPiscesHouse}TH HOUSE PISCES TRANSIT
+        ✦ SATURN TRANSIT (SHANI GOCHAR): ${ordinal(satPiscesHouse).toUpperCase()} HOUSE PISCES TRANSIT
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Saturn transits through <strong>Pisces at 00° &ndash; 05° (${satPiscesHouse}th House from Lagna, ${satFromMoon}th from natal Moon)</strong>.
+        Saturn transits through <strong>Pisces at 00° &ndash; 05° (${ordinal(satPiscesHouse)} House from Lagna, ${ordinal(satFromMoon)} from natal Moon)</strong>.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Institutional Milestone:</strong>
         <p style="color:var(--ivory-dim);margin-top:2px;">
-          The Saturnian passage across the ${satPiscesHouse}th house enforces long-term structural discipline. Weed out non-performing arrangements, establish formal legal contracts, and cement enterprise foundations.
+          The Saturnian passage across the ${ordinal(satPiscesHouse)} house enforces long-term structural discipline. Weed out non-performing arrangements, establish formal legal contracts, and cement enterprise foundations.
         </p>
       </div>
     </div>
@@ -1535,7 +1546,7 @@ body {
         </div>
         <div>
           <span class="kicker">Saturn Current Transit:</span>
-          <div style="color:var(--sapphire-bright);font-weight:600;">Pisces (${satFromMoon}th from natal Moon)</div>
+          <div style="color:var(--sapphire-bright);font-weight:600;">Pisces (${ordinal(satFromMoon)} from natal Moon)</div>
         </div>
         <div>
           <span class="kicker">Ashtakavarga Strength:</span>
@@ -1554,14 +1565,14 @@ body {
         ✦ WHY SHANI TRANSIT IS AN INSTITUTIONAL AUDITOR, NOT A DESTROYER
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        While commercial astrology creates anxiety regarding Saturn transits, classical Parashari shastra reveals that for a ${lagnaRashi} native, Saturn acts as an institutional auditor and foundation builder. If you maintain written contracts, pay your taxes on time, and avoid get-rich-quick speculation, this transit builds an unassailable financial fortress.
+        While commercial astrology creates anxiety regarding Saturn transits, classical Parashari shastra reveals that for ${withArticle(lagnaRashi)} native, Saturn acts as an institutional auditor and foundation builder. If you maintain written contracts, pay your taxes on time, and avoid get-rich-quick speculation, this transit builds an unassailable financial fortress.
       </p>
     </div>
 
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <span class="kicker" style="color:var(--emerald-bright);">Core Mitigating Upaya:</span>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-        Maintain Saturday evening canine seva (sweet rotis to street dogs) and ${lateral.side.toLowerCase()} ${lateral.wrist.toLowerCase()} grounding on high-stress days. Complete balance assured.
+        Maintain Saturday evening canine seva (sweet rotis to street dogs) and ${lateral.wrist.toLowerCase()} grounding (${lateral.sanskritTerm}) on high-stress days. Complete balance assured.
       </p>
     </div>
   </div>
@@ -1580,7 +1591,7 @@ body {
     <!-- Rahu in Aquarius -->
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ RAHU TRANSITING AQUARIUS (${rahuAquariusHouse}TH HOUSE OF STRATEGIC MOMENTUM)
+        ✦ RAHU TRANSITING AQUARIUS (${ordinal(rahuAquariusHouse).toUpperCase()} HOUSE OF STRATEGIC MOMENTUM)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
         In classical Vedic astrology, Rahu in strategic houses acts with concentrated intensity. Rahu overcomes obstacles, resolves outstanding bottlenecks, and grants decisive advantage in strategic initiatives.
@@ -1593,10 +1604,10 @@ body {
     <!-- Ketu in Leo -->
     <div class="luxury-card" style="border:1.5px solid var(--gold);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ KETU TRANSITING LEO (${ketuLeoHouse}TH HOUSE OF DEEP R&amp;D &amp; EXPANSION)
+        ✦ KETU TRANSITING LEO (${ordinal(ketuLeoHouse).toUpperCase()} HOUSE OF DEEP R&amp;D &amp; EXPANSION)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Ketu moves through Leo (${ketuLeoHouse}th house from Lagna). This stimulates intense spiritual breakthroughs, interest in deep architecture, and scaling into foreign or abstract frontiers.
+        Ketu moves through Leo (${ordinal(ketuLeoHouse)} house from Lagna). This stimulates intense spiritual breakthroughs, interest in deep architecture, and scaling into foreign or abstract frontiers.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:6px;">
         ✦ Balance Protocol: Daily 2-inch navel cow ghee seal to keep the nervous system grounded during deep work sprints.
@@ -1619,12 +1630,14 @@ body {
     <div class="luxury-card" style="margin-bottom:8px;border-left:3px solid var(--emerald-bright);">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-          GATE 1: DECEMBER 2026 &ndash; JULY 2027 (JUPITER EXALTED IN CANCER &middot; ${jupCancerHouse}TH HOUSE)
+          GATE 1: DECEMBER 2026 &ndash; JULY 2027 (JUPITER EXALTED IN CANCER &middot; ${ordinal(jupCancerHouse).toUpperCase()} HOUSE)
         </span>
-        <span class="tag-badge tag-emerald">95% HARVEST ZENITH</span>
+        <span class="tag-badge ${[6, 8, 12].includes(jupCancerHouse) ? "tag-gold" : "tag-emerald"}">${[6, 8, 12].includes(jupCancerHouse) ? "COMPETITIVE VICTORY &amp; SERVICE" : "HARVEST ZENITH"}</span>
       </div>
       <p class="body-text" style="font-size:11.2px;margin-top:4px;">
-        Exalted Jupiter in Cancer activates your ${jupCancerHouse}th house of sovereign growth (stationing direct in May 2027). Prime commercial monetization window. Launch premium offerings, close high-value partnerships, and harvest capital surplus.
+        ${[6, 8, 12].includes(jupCancerHouse)
+          ? `Exalted Jupiter in Cancer activates your ${ordinal(jupCancerHouse)} house (stationing direct in May 2027). Frame this as a cycle of competitive victory, debt clearance, and disciplined service scaling.`
+          : `Exalted Jupiter in Cancer activates your ${ordinal(jupCancerHouse)} house of sovereign growth (stationing direct in May 2027). Prime commercial monetization window. Launch premium offerings, close high-value partnerships, and harvest capital surplus.`}
       </p>
     </div>
 
@@ -1710,7 +1723,7 @@ body {
         </div>
         <div>
           <span class="kicker">PEAK WEALTH GATE</span>
-          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter in Cancer &middot; ${jupCancerHouse}th H)</div>
+          <div style="color:var(--gold-bright);font-weight:700;">Dec 2026 &ndash; Jul 2027 (Jupiter in Cancer &middot; ${ordinal(jupCancerHouse)} H)</div>
         </div>
       </div>
     </div>

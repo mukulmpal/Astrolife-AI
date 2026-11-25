@@ -36,7 +36,12 @@ import {
   RASHI_LORDS,
   getGenderLateralization,
   getDynamicGemstonePrescription,
-  renderHumanImpactCardHtml
+  getSignLord,
+  houseFromLagna,
+  ordinal,
+  renderHumanImpactCardHtml,
+  signFromHouse,
+  withArticle
 } from "../../astro/human-translator";
 
 const SIGN_NAMES = [
@@ -410,9 +415,42 @@ export function generateRajaYogaWealthDossierHTML(
   const savH8 = savHouses[8];   // 30 (Aries)
   const savH9 = savHouses[9];   // 25 (Taurus - Bhagya Bhava)
   const savH10 = savHouses[10]; // 34 (Gemini - Karma Bhava)
-  const savH11 = savHouses[11]; // 27 (Cancer - Labha Bhava)
-  const savH12 = savHouses[12]; // 22 (Leo - Vyaya Bhava)
-  const netWealthRetention = savH11 - savH12; // 27 - 22 = +5 Net Surplus
+  const savH11 = savHouses[11];
+  const savH12 = savHouses[12];
+  const netWealthRetention = savH11 - savH12;
+  const retentionLabel = netWealthRetention >= 0 ? `+${netWealthRetention}` : `${netWealthRetention}`;
+
+  const hSigns: Record<number, string> = {};
+  const hLords: Record<number, string> = {};
+  for (let h = 1; h <= 12; h++) {
+    hSigns[h] = signFromHouse(lagnaRashi, h);
+    hLords[h] = getSignLord(hSigns[h]);
+  }
+  const occInHouse = (h: number): string[] =>
+    Object.entries(chart.planets || {})
+      .filter(([, pd]) => pd && pd.house === h)
+      .map(([name]) => name);
+  const fmtDeg = (pName: string): string => {
+    const pd = chart.planets?.[pName];
+    const lon = pd?.longitude ?? pd?.degree ?? 0;
+    const degInSign = Math.abs(lon % 30);
+    const d = Math.floor(degInSign);
+    const m = Math.floor((degInSign - d) * 60);
+    return `${d}° ${String(m).padStart(2, "0")}'`;
+  };
+  const rahuPd = chart.planets?.["Rahu"];
+  const ketuPd = chart.planets?.["Ketu"];
+  const rahuH = rahuPd?.house || 2;
+  const ketuH = ketuPd?.house || 8;
+  const amkPd = chart.planets?.[amatyakaraka.planet];
+  const amkH = amkPd?.house || 9;
+  const sunPd = chart.planets?.["Sun"];
+  const sunH = sunPd?.house || 10;
+  const induSign = induAnalysis?.sign || hSigns[5];
+  const induH = houseFromLagna(induSign, lagnaRashi);
+  const induLord = getSignLord(induSign);
+  const induLordPd = chart.planets?.[induLord];
+  const induSav = savHouses[induH] || 28;
 
   // Shadbala calculation
   let shadbalaRes: ReturnType<typeof calculateShadbala>;
@@ -970,10 +1008,10 @@ body {
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:12px;">
       <div class="card-title" style="color:var(--gold-bright);">✦ THE IMPERIAL WEALTH THESIS</div>
       <p class="body-text" style="margin-bottom:8px;">
-        Your birth chart reveals an extraordinary convergence of intellectual leverage and capital retention. While ordinary horoscopes depend on manual labor, your natal blueprint operates as an <strong>Intellectual Capital Engine</strong>. The cornerstone of your financial destiny is the rare <strong>Maha Parivartana Yoga</strong> between the 9th lord of fortune (Venus in House 10) and the 10th lord of executive empire (Mercury in House 9), backed by the Sun holding peak Directional Strength (<em>Digbala</em>) in the 10th Bhava.
+        Your birth chart reveals how your <strong>${lagnaRashi} Lagna (${lagnaLord})</strong>, <strong>Amatyakaraka ${amatyakaraka.planet}</strong> (in ${amatyakaraka.sign}, ${ordinal(amkH)} house), and <strong>Indu Lagna in ${induSign}</strong> (${ordinal(induH)} house) channel financial momentum and long-term capital retention.
       </p>
       <p class="body-text">
-        Under canonical Parashari Sarvashtakavarga (totaling exactly 337 Bindus), your chart demonstrates exceptional structural strength: your <strong>1st House (Lagna) commands 35 Bindus</strong> and your <strong>10th House (Karma) commands 34 Bindus</strong>, both vastly exceeding the classical 28-point power threshold. Furthermore, your <strong>11th House of Gains (27 Bindus)</strong> cleanly outpaces your <strong>12th House of Expenditure (22 Bindus)</strong>, yielding a positive retention surplus that steadily compounds liquid wealth without chronic capital erosion.
+        Under canonical Parashari Sarvashtakavarga (totaling 337 Bindus), your <strong>1st House (${hSigns[1]}) holds ${savH1} Bindus</strong> and your <strong>10th House (${hSigns[10]}) holds ${savH10} Bindus</strong>. Furthermore, your <strong>11th House of Gains (${savH11} Bindus)</strong> vs <strong>12th House of Expenditure (${savH12} Bindus)</strong> yields a <strong>${retentionLabel} Bindu retention spread</strong>.
       </p>
     </div>
 
@@ -981,20 +1019,20 @@ body {
       <div class="card-title">✦ 4 CORE WEALTH ACCELERATION PILLARS</div>
       <div class="matrix-grid">
         <div class="matrix-item">
-          <span class="kicker">PILLAR 1: AMK MERCURY IN BHAGYA BHAVA</span>
-          <div class="val">Monetizing algorithmic, strategic, and advisory software architectures.</div>
+          <span class="kicker">PILLAR 1: AMK ${amatyakaraka.planet.toUpperCase()} IN ${ordinal(amkH).toUpperCase()} BHAVA</span>
+          <div class="val">Monetizing specialized expertise, strategic systems, and high-value advisory.</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">PILLAR 2: DIGBALI SUN IN 10TH BHAVA</span>
-          <div class="val">Commanding institutional respect and high-visibility executive authority.</div>
+          <span class="kicker">PILLAR 2: ${hLords[10].toUpperCase()} AS 10TH LORD (${hSigns[10].toUpperCase()})</span>
+          <div class="val">Commanding institutional respect and steady executive authority (${savH10} Bindus).</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">PILLAR 3: RAHU IN DHANA BHAVA (LIBRA · 31 BINDUS)</span>
-          <div class="val">Unconventional wealth scaling through global networks, equity, and technology.</div>
+          <span class="kicker">PILLAR 3: RAHU IN ${ordinal(rahuH).toUpperCase()} BHAVA (${rahuPd?.sign || hSigns[rahuH]} &middot; ${savHouses[rahuH]} BINDUS)</span>
+          <div class="val">Unconventional wealth scaling through global networks, equity, and modern systems.</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">PILLAR 4: INDU LAGNA IN CAPRICORN (30 BINDUS)</span>
-          <div class="val">Generational asset building anchored by disciplined, compounding structures.</div>
+          <span class="kicker">PILLAR 4: INDU LAGNA IN ${induSign.toUpperCase()} (${induSav} BINDUS)</span>
+          <div class="val">Generational asset building anchored by ${induLord} and compounding structures.</div>
         </div>
       </div>
     </div>
@@ -1011,31 +1049,31 @@ body {
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
-        <span>✦ 2022 &ndash; 2023: THE SATURNIAN KARMA PURGE (RAHU &ndash; SATURN · EARLY PHASE)</span>
+        <span>✦ 2022 &ndash; 2024: STRUCTURAL FOUNDATION &amp; RESTRUCTURING</span>
         <span class="tag-badge tag-gold">KARMIC CRUCIBLE</span>
       </div>
       <p class="body-text">
-        Operating under the early phase of Rahu &ndash; Saturn (Shani Antardasha), this period imposed heavy structural grit, immense personal responsibility, and feeling under-leveraged relative to your effort. Saturn seated in the 7th house (Purva Bhadrapada at 0° 57') as your Indu Lagna lord and Darakaraka demanded absolute patience. You were forced to eliminate unprofitable avenues, cut commercial deadweight, and endure delayed validation while laying deep systemic foundations in private.
+        During this foundational phase, Indu Lagna lord <strong>${induLord}</strong> (placed in ${induLordPd?.sign || induSign}, ${ordinal(induLordPd?.house || induH)} house) demanded disciplined patience and structural pruning. You were pushed to eliminate low-leverage commitments and build durable core systems.
       </p>
     </div>
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
-        <span>✦ 2024 &ndash; EARLY 2025: CRUCIBLE CLIMAX &amp; RESTRUCTURING (RAHU &ndash; SATURN · TERMINAL PHASE)</span>
-        <span class="tag-badge tag-emerald">DASHA CHIDRA MASTERY</span>
+        <span>✦ 2024 &ndash; EARLY 2025: STRATEGIC PIVOT &amp; CONSOLIDATION</span>
+        <span class="tag-badge tag-emerald">TRANSITION MASTERY</span>
       </div>
       <p class="body-text">
-        The concluding phase of Saturn Antardasha (*Dasha Chidra* junction) brought critical operational resets. As Jupiter transited through Taurus (9th house trine your Lagna), a profound strategic pivot occurred. You moved away from dependent structures toward independent technical sovereignty. Heavy investments were poured into specialized skills, software systems, and proprietary IP. Past karmic bottlenecks were cleared, setting up the board for uninhibited commercial scale.
+        As planetary periods shifted, a decisive strategic pivot occurred toward independent authority and specialized skill equity. Investments in core capabilities cleared prior bottlenecks for scalable growth.
       </p>
     </div>
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
-        <span>✦ APRIL 2025 &ndash; NOVEMBER 2027: AMATYAKARAKA ACCELERATION PIVOT (RAHU &ndash; MERCURY)</span>
+        <span>✦ CURRENT ERA: ${activeDasha.toUpperCase()} &ndash; ${activeAntar.toUpperCase()} ACCELERATION</span>
         <span class="tag-badge tag-emerald">ACTIVE WEALTH HARVEST</span>
       </div>
       <p class="body-text">
-        The commencement of the <strong>Rahu &ndash; Mercury (Budh) Antardasha</strong> in April 2025 unlocked your Lagna lord and your Amatyakaraka. Seated in the 9th house of fortune in mutual exchange with 10th lord Venus, Mercury marks the formal launch of your peak monetization era. The systems, algorithms, and deep architectures developed in solitude during the Saturnian grind are now converting directly into executive authority, digital leverage, and scalable enterprise revenue.
+        Operating under <strong>${activeDasha} &ndash; ${activeAntar}</strong> alongside Amatyakaraka <strong>${amatyakaraka.planet}</strong> in ${amatyakaraka.sign} (${ordinal(amkH)} house), your disciplined foundations convert into measurable commercial authority and scalable income streams.
       </p>
     </div>
   </div>
@@ -1051,44 +1089,44 @@ body {
 
     <div class="matrix-grid" style="margin-bottom:10px;">
       <div class="luxury-card" style="margin-bottom:0;">
-        <div class="card-title">HOUSE 2: DHANA BHAVA (SAVINGS · 31 BINDUS)</div>
+        <div class="card-title">HOUSE 2: DHANA BHAVA (SAVINGS · ${savH2} BINDUS)</div>
         <p class="body-text" style="font-size:11.5px;margin-bottom:6px;">
-          <strong>Sign: Libra (Ruled by Venus) · Occupant: Rahu (Swati 8° 12')</strong>
+          <strong>Sign: ${hSigns[2]} (Ruled by ${hLords[2]}) · Occupants: ${occInHouse(2).length ? occInHouse(2).join(", ") : "Unoccupied"}</strong>
         </p>
         <p class="body-text" style="font-size:11.5px;">
-          Holding 31 Bindus (comfortably exceeding the 28-point benchmark), Rahu in the 2nd house of treasury generates an insatiable drive for financial autonomy. Monetization occurs through modern digital assets, foreign client accounts, high-tier software, and automated revenue channels.
+          Holding ${savH2} Bindus in ${hSigns[2]}, your 2nd house of treasury builds reserves through ${hLords[2]}'s placement in the ${ordinal(chart.planets?.[hLords[2]]?.house || 2)} house, favoring disciplined asset accumulation and diverse revenue channels.
         </p>
       </div>
 
       <div class="luxury-card" style="margin-bottom:0;">
-        <div class="card-title">HOUSE 9: BHAGYA BHAVA (FORTUNE · 25 BINDUS)</div>
+        <div class="card-title">HOUSE 9: BHAGYA BHAVA (FORTUNE · ${savH9} BINDUS)</div>
         <p class="body-text" style="font-size:11.5px;margin-bottom:6px;">
-          <strong>Sign: Taurus (Ruled by Venus) · Occupant: Mercury (26° 54')</strong>
+          <strong>Sign: ${hSigns[9]} (Ruled by ${hLords[9]}) · Occupants: ${occInHouse(9).length ? occInHouse(9).join(", ") : "Unoccupied"}</strong>
         </p>
         <p class="body-text" style="font-size:11.5px;">
-          Mercury as Lagna lord in the 9th house creates the celebrated <em>Bhagya Raja Yoga</em>. Fortune is not a random gamble for you; it is a direct mathematical consequence of your intellectual foresight, analytical modeling, and ethical execution.
+          With ${hLords[9]} ruling your 9th house (${hSigns[9]}) from the ${ordinal(chart.planets?.[hLords[9]]?.house || 9)} house, fortune compounds through strategic foresight, mentorship, and ethical execution.
         </p>
       </div>
     </div>
 
     <div class="matrix-grid">
       <div class="luxury-card" style="margin-bottom:0;">
-        <div class="card-title">HOUSE 10: KARMA BHAVA (STATURE · 34 BINDUS)</div>
+        <div class="card-title">HOUSE 10: KARMA BHAVA (STATURE · ${savH10} BINDUS)</div>
         <p class="body-text" style="font-size:11.5px;margin-bottom:6px;">
-          <strong>Sign: Gemini (Ruled by Mercury) · Occupants: Sun (18° 04') &amp; Venus (5° 00')</strong>
+          <strong>Sign: ${hSigns[10]} (Ruled by ${hLords[10]}) · Occupants: ${occInHouse(10).length ? occInHouse(10).map(p => `${p} (${fmtDeg(p)})`).join(" &amp; ") : "Unoccupied"}</strong>
         </p>
         <p class="body-text" style="font-size:11.5px;">
-          A massive 34 Bindus in the 10th house creates an unassailable career foundation. The Sun here holds peak <em>Digbala</em> (directional power), conferring natural leadership stature, institutional authority, and public respect. Venus adds refinement to executive output.
+          With ${savH10} Bindus in the 10th house (${hSigns[10]}), your career foundation is anchored by ${hLords[10]} in the ${ordinal(chart.planets?.[hLords[10]]?.house || 10)} house, conferring steady institutional authority and public respect.
         </p>
       </div>
 
       <div class="luxury-card" style="margin-bottom:0;">
-        <div class="card-title">HOUSE 11: LABHA BHAVA (GAINS · 27 BINDUS)</div>
+        <div class="card-title">HOUSE 11: LABHA BHAVA (GAINS · ${savH11} BINDUS)</div>
         <p class="body-text" style="font-size:11.5px;margin-bottom:6px;">
-          <strong>Sign: Cancer (Ruled by Moon) · Net Retention Surplus: +5 Bindus</strong>
+          <strong>Sign: ${hSigns[11]} (Ruled by ${hLords[11]}) · Net Retention Spread: ${retentionLabel} Bindus</strong>
         </p>
         <p class="body-text" style="font-size:11.5px;">
-          Your 11th House (27 Bindus) decisively surpasses your 12th House of Expenditure (22 Bindus). Under classical Parashari theorems, this positive margin guarantees that your cash inflows consistently outpace outflows, ensuring steady long-term compounding of net worth.
+          Your 11th House (${savH11} Bindus) vs 12th House of Expenditure (${savH12} Bindus) yields a ${retentionLabel} Bindu margin, guiding how cleanly cash inflows convert into long-term net worth.
         </p>
       </div>
     </div>
@@ -1185,7 +1223,7 @@ ${d1TableRowsHtml}
     <div class="luxury-card">
       <div class="card-title">✦ THE CASHFLOW DUALITY BLUEPRINT</div>
       <p class="body-text">
-        <strong>The Golden Formula:</strong> Generate through Surya Hora (software, intellectual property, high-ticket consultancy), and store through Chandra Hora (precious metals, blue-chip assets, debt-free real estate). This dual harmony prevents the feast-or-famine cycles common to modern entrepreneurs.
+        <strong>The Golden Formula:</strong> Generate through Surya Hora (intellectual property, executive advisory, core craft), and store through Chandra Hora (precious metals, blue-chip assets, debt-free real estate). This dual harmony prevents feast-or-famine cycles.
       </p>
     </div>
   </div>
@@ -1197,15 +1235,15 @@ ${d1TableRowsHtml}
   ${headerRail("CHAPTER 6: AMATYAKARAKA ENGINE")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">The Amatyakaraka (AmK) Engine</h2>
-    <p class="body-text" style="margin-bottom:12px;">Your cosmic Chief Financial Officer: Mercury at 26.9° in Taurus (Mrigashira Nakshatra).</p>
+    <p class="body-text" style="margin-bottom:12px;">Your cosmic Chief Financial Officer: ${amatyakaraka.planet} at ${fmtDeg(amatyakaraka.planet)} in ${amatyakaraka.sign} (${ordinal(amkH)} House).</p>
 
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:12px;">
-      <div class="card-title" style="color:var(--gold-bright);">✦ MERCURY AS AMATYAKARAKA: THE ARCHITECT OF COMMERCE</div>
+      <div class="card-title" style="color:var(--gold-bright);">✦ ${amatyakaraka.planet.toUpperCase()} AS AMATYAKARAKA: THE ARCHITECT OF COMMERCE</div>
       <p class="body-text" style="margin-bottom:8px;">
-        In Jaimini Shastra, the <em>Amatyakaraka</em> (planet with the second highest degree) represents the primary vehicle of vocation, professional standing, and cashflow creation. Your AmK is <strong>Mercury (Budha)</strong>, the planet of algorithmic intellect, systems architecture, analytical writing, and trade.
+        In Jaimini Shastra, the <em>Amatyakaraka</em> (planet with the second highest degree) represents the primary vehicle of vocation, professional standing, and cashflow creation. Your AmK is <strong>${amatyakaraka.planet}</strong> in ${amatyakaraka.sign} (${ordinal(amkH)} house).
       </p>
       <p class="body-text">
-        Placed in the 9th house of fortune (Taurus) and exchanging signs with 10th lord Venus in Gemini, your commercial superpower is <strong>translating complex information into simple, high-leverage products</strong>. You are built to be an intellectual founder, chief strategist, or high-tier advisor rather than a routine corporate laborer.
+        Your commercial edge activates when you translate specialized mastery into structured, high-leverage offerings—operating as an independent strategist, founder, or trusted executive advisor.
       </p>
     </div>
 
@@ -1213,20 +1251,20 @@ ${d1TableRowsHtml}
       <div class="card-title">✦ OPTIMAL MONETIZATION VERTICALS</div>
       <div class="matrix-grid">
         <div class="matrix-item">
-          <span class="kicker">VERTICAL 1: AI &amp; SOFTWARE SYSTEMS</span>
-          <div class="val">Architecting intelligent software agents, workflows, and automated platforms.</div>
+          <span class="kicker">VERTICAL 1: DIGITAL &amp; SYSTEMS ARCHITECTURE</span>
+          <div class="val">Designing scalable platforms, workflows, and automated operational systems.</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">VERTICAL 2: QUANTITATIVE &amp; FINANCIAL TECH</span>
-          <div class="val">Fintech platforms, algorithmic analysis, prediction engines, and high-frequency data.</div>
+          <span class="kicker">VERTICAL 2: QUANTITATIVE &amp; FINANCIAL ANALYTICS</span>
+          <div class="val">Data-driven research, structured financial planning, and risk engines.</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">VERTICAL 3: EDITORIAL &amp; MEDIA EMPIRES</span>
-          <div class="val">High-ticket digital publications, educational software, and bespoke research dossiers.</div>
+          <span class="kicker">VERTICAL 3: EDITORIAL &amp; KNOWLEDGE ASSETS</span>
+          <div class="val">High-ticket digital publications, educational programs, and bespoke advisory.</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">VERTICAL 4: STRATEGIC B2B ADVISORY</span>
-          <div class="val">Consulting for founders, executive optimization, and corporate systems design.</div>
+          <div class="val">Consulting for founders, executive optimization, and corporate governance.</div>
         </div>
       </div>
     </div>
@@ -1248,24 +1286,24 @@ ${d1TableRowsHtml}
       </p>
       <div class="matrix-grid" style="margin-bottom:8px;">
         <div class="matrix-item">
-          <span class="kicker">LAGNA 9TH LORD (VENUS)</span>
-          <div class="val">12 Rays (Full Kala)</div>
+          <span class="kicker">LAGNA 9TH LORD (${(induAnalysis?.lagna9thLord || hLords[9]).toUpperCase()})</span>
+          <div class="val">${induAnalysis?.lagna9thRays ?? 12} Rays</div>
         </div>
         <div class="matrix-item">
-          <span class="kicker">MOON 9TH LORD (MARS)</span>
-          <div class="val">6 Rays (Partial Kala)</div>
+          <span class="kicker">MOON 9TH LORD (${(induAnalysis?.moon9thLord || "Mars").toUpperCase()})</span>
+          <div class="val">${induAnalysis?.moon9thRays ?? 6} Rays</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">TOTAL RAYS &amp; MODULO</span>
-          <div class="val">18 Rays &divide; 12 = Remainder 6</div>
+          <div class="val">${induAnalysis?.totalRays ?? 18} Rays &divide; 12 = Remainder ${induAnalysis?.remainder ?? 6}</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">RESULTING INDU LAGNA</span>
-          <div class="val" style="color:var(--emerald-bright);">Capricorn (House 5 from Lagna)</div>
+          <div class="val" style="color:var(--emerald-bright);">${induSign} (${ordinal(induH)} House from Lagna)</div>
         </div>
       </div>
       <p class="body-text" style="font-size:11.5px;">
-        Counting 6 signs from your natal Moon sign (Leo) establishes <strong>Capricorn (Makara)</strong> as your Indu Lagna. Seated in your 5th house of intellect (commanding an excellent <strong>30 Bindus in SAV</strong>) and governed by Saturn, your wealth builds steadily through structural compounding, intellectual properties, and patience.
+        Counting ${induAnalysis?.remainder ?? 6} signs from your natal Moon sign (${moonRashi}) establishes <strong>${induSign}</strong> as your Indu Lagna (${ordinal(induH)} house, holding <strong>${induSav} Bindus in SAV</strong>) governed by ${induLord}.
       </p>
     </div>
 
@@ -1274,19 +1312,19 @@ ${d1TableRowsHtml}
       <div class="matrix-grid">
         <div class="matrix-item">
           <span class="kicker">SHREE LAGNA (PROSPERITY)</span>
-          <div class="val">Taurus (House 9) · Fortified by Mercury</div>
+          <div class="val">${hSigns[9]} (House 9) &middot; ${hLords[9]} Governed</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">HORA LAGNA (FINANCIAL VELOCITY)</span>
-          <div class="val">Gemini (House 10) · Powered by Sun &amp; Venus</div>
+          <div class="val">${hSigns[10]} (House 10) &middot; ${hLords[10]} Governed</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">GHATI LAGNA (POWER &amp; PRESTIGE)</span>
-          <div class="val">Virgo (House 1) · Direct Personality Stature</div>
+          <div class="val">${lagnaRashi} (House 1) &middot; Direct Personality Stature</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">INDU LAGNA LORD STATUS</span>
-          <div class="val">Saturn in Pisces (House 7) · Aspects Lagna</div>
+          <div class="val">${induLord} in ${induLordPd?.sign || induSign} (${ordinal(induLordPd?.house || induH)} House)</div>
         </div>
       </div>
     </div>
@@ -1371,17 +1409,17 @@ ${d1TableRowsHtml}
         <span class="tag-badge tag-gold">MULTI-STREAM REVENUE</span>
       </div>
       <p class="body-text">
-        All three material houses (Artha Trikona) are dynamically interconnected. Rather than relying on a single salary check, your chart is wired to develop multiple parallel income streams: SaaS revenue, high-ticket consulting, equity investments, and intellectual royalty streams.
+        All three material houses (Artha Trikona) are dynamically interconnected. Rather than relying on a single paycheck, your chart supports multiple parallel income streams: recurring digital products, high-ticket consulting, equity investments, and intellectual royalty streams.
       </p>
     </div>
 
     <div class="luxury-card" style="margin-bottom:8px;">
       <div class="card-title">
-        <span>✦ CHANDRA-MANGALA YOGA (12TH HOUSE ENTREPRENEURIAL DRIVE)</span>
+        <span>✦ ${lagnaRashi.toUpperCase()} ENTREPRENEURIAL DRIVE (${moonRashi.toUpperCase()} MOON)</span>
         <span class="tag-badge tag-gold">BOLD CAPITAL DEPLOYMENT</span>
       </div>
       <p class="body-text">
-        Moon conjunct Mars in Leo in the 12th house forms the intense Chandra-Mangala combination. This gives fierce commercial instincts, appetite for calculated risks, and foreign earnings potential. While it requires strict emotional control around impulsive trading, it guarantees you never settle for a timid, mediocre financial life.
+        With Moon in ${moonRashi} (${ordinal(chart.planets?.["Moon"]?.house || 1)} house) and Mars in ${chart.planets?.["Mars"]?.sign || lagnaRashi} (${ordinal(chart.planets?.["Mars"]?.house || 1)} house), you combine commercial drive with calculated execution when anchored by clear risk rules.
       </p>
     </div>
   </div>
@@ -1401,7 +1439,7 @@ ${d1TableRowsHtml}
         In classical Vedic astrology, when lords of adverse houses (6th, 8th, 12th) occupy other adverse houses without benefic contamination, they form <strong>Viparita Raja Yoga (Harsha, Sarala, and Vimal)</strong>.
       </p>
       <p class="body-text">
-        In your chart, Mars (ruler of the 8th house of sudden shocks) occupies the 12th house of foreign lands and isolation, accompanied by Ketu in the 8th house (Aries). This means that <strong>industry crises, market down-turns, or competitor failures consistently create golden opportunities for your ascendancy</strong>. When competitors panic, your analytical clarity allows you to capture market share.
+        In your chart, 8th lord ${hLords[8]} (placed in ${ordinal(chart.planets?.[hLords[8]]?.house || 8)} house) and 12th lord ${hLords[12]} (placed in ${ordinal(chart.planets?.[hLords[12]]?.house || 12)} house) govern turnaround resilience. During industry dislocations, disciplined liquidity buffers let you capture undervalued opportunities while others panic.
       </p>
     </div>
 
@@ -1462,10 +1500,10 @@ ${d1TableRowsHtml}
         In classical Brihat Parashara Hora Shastra, a house scoring 28 Bindus represents baseline stability; scores of 30+ indicate immense natural power:
       </p>
       <p class="body-text" style="font-size:11.8px;margin-bottom:6px;">
-        <strong>1. Executive Authority &amp; Self-Agency:</strong> Your <strong>1st House (Virgo) holds 35 Bindus</strong> and your <strong>10th House (Gemini) holds 34 Bindus</strong>. This dual concentration creates massive executive stature, high mental stamina, and an ability to command professional respect.
+        <strong>1. Executive Authority &amp; Self-Agency:</strong> Your <strong>1st House (${hSigns[1]}) holds ${savH1} Bindus</strong> and your <strong>10th House (${hSigns[10]}) holds ${savH10} Bindus</strong>. Together they define your natural leadership capacity and career traction.
       </p>
       <p class="body-text" style="font-size:11.8px;">
-        <strong>2. Positive Cashflow Retention:</strong> Your <strong>11th House of Gains (${savH11} Bindus)</strong> cleanly outscores your <strong>12th House of Outflows (${savH12} Bindus)</strong>. Under classical rules, when Labha exceeds Vyaya, wealth leaks are naturally controlled and capital compounds steadily.
+        <strong>2. Positive Cashflow Retention:</strong> Your <strong>11th House of Gains (${savH11} Bindus)</strong> vs your <strong>12th House of Outflows (${savH12} Bindus)</strong> yields a ${retentionLabel} Bindu spread. Automating profit sweeps ensures capital compounds steadily.
       </p>
     </div>
 
@@ -1473,18 +1511,7 @@ ${d1TableRowsHtml}
       <thead>
         <tr>
           <th>Bhava</th>
-          <th>1 (Virgo)</th>
-          <th>2 (Libra)</th>
-          <th>3 (Scorpio)</th>
-          <th>4 (Sag)</th>
-          <th>5 (Cap)</th>
-          <th>6 (Aqua)</th>
-          <th>7 (Pisces)</th>
-          <th>8 (Aries)</th>
-          <th>9 (Taurus)</th>
-          <th>10 (Gem)</th>
-          <th>11 (Cancer)</th>
-          <th>12 (Leo)</th>
+          ${Array.from({ length: 12 }, (_, i) => `<th>${i + 1} (${hSigns[i + 1].slice(0, 3)})</th>`).join("")}
         </tr>
       </thead>
       <tbody>
@@ -1551,19 +1578,19 @@ ${shadbalaRowsHtml}
   ${headerRail("CHAPTER 13: RAHU-KETU SPECULATION AXIS")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Rahu-Ketu Speculation &amp; Scale Axis</h2>
-    <p class="body-text" style="margin-bottom:12px;">Navigating the House 2 (Libra) &ndash; House 8 (Aries) nodal corridor of unearned wealth and modern finance.</p>
+    <p class="body-text" style="margin-bottom:12px;">Navigating your House ${rahuH} (${rahuPd?.sign || hSigns[rahuH]}) &ndash; House ${ketuH} (${ketuPd?.sign || hSigns[ketuH]}) nodal corridor of ambition and sudden shifts.</p>
 
     <div class="luxury-card" style="margin-bottom:10px;">
-      <div class="card-title" style="color:var(--gold-bright);">✦ RAHU IN HOUSE 2: THE MODERN WEALTH ACCELERATOR</div>
+      <div class="card-title" style="color:var(--gold-bright);">✦ RAHU IN HOUSE ${rahuH}: THE MODERN WEALTH ACCELERATOR</div>
       <p class="body-text">
-        Rahu placed in the 2nd house in Libra (Swati Nakshatra) breaks traditional financial conventions. You will not generate wealth through orthodox, incremental 9-to-5 methods. Rahu demands <strong>scale, leverage, and digital systems</strong>. You are built to earn in foreign currencies, through intellectual equity, software subscriptions, and international partnerships.
+        Rahu placed in the ${ordinal(rahuH)} house (${rahuPd?.sign || hSigns[rahuH]}) breaks conventional limits. Rahu rewards <strong>scale, leverage, and modern systems</strong>—favoring global networks, intellectual equity, and recurring revenue.
       </p>
     </div>
 
     <div class="luxury-card" style="margin-bottom:10px;">
-      <div class="card-title" style="color:var(--saffron);">✦ KETU IN HOUSE 8: OCCULT WINDFALLS &amp; SPECULATION TRAPS</div>
+      <div class="card-title" style="color:var(--saffron);">✦ KETU IN HOUSE ${ketuH}: SUDDEN SHIFTS &amp; SPECULATION TRAPS</div>
       <p class="body-text">
-        Ketu in the 8th house in Aries (Ashwini) brings sudden financial developments: unexpected windfalls, sudden client conversions, or equity liquidity events. However, Ketu dissolves whatever it touches if greed replaces purpose. You must avoid day trading, speculative crypto lotteries, and unregulated financial schemes.
+        Ketu in the ${ordinal(ketuH)} house (${ketuPd?.sign || hSigns[ketuH]}) brings sudden developments and intuitive breakthroughs, but dissolves impulsive bets. Avoid unhedged day trading and unregulated schemes.
       </p>
     </div>
 
@@ -1597,11 +1624,11 @@ ${shadbalaRowsHtml}
 
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);">
-        <span>✦ CURRENT ERA: RAHU &ndash; MERCURY (APR 2025 &ndash; NOV 2027)</span>
+        <span>✦ CURRENT ERA: ${activeDasha.toUpperCase()} &ndash; ${activeAntar.toUpperCase()}</span>
         <span class="tag-badge tag-emerald">THE WEALTH FOUNDATION</span>
       </div>
       <p class="body-text">
-        You are currently living inside the most critical professional turning point of your 30s. Rahu in House 2 is deploying its desire for material scale, while Mercury activates your 9th house of fortune and your Amatyakaraka. Systems built during this 30-month window become the financial anchors of the next 15 years.
+        You are currently operating under <strong>${activeDasha} Mahadasha &ndash; ${activeAntar} Antardasha</strong>. Systems, relationships, and assets built during this active window become the financial anchors of your next decade.
       </p>
     </div>
 
@@ -1643,7 +1670,7 @@ ${shadbalaRowsHtml}
   ${headerRail("CHAPTER 15: 12-MONTH RADAR (Q1)")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">12-Month Wealth Radar: Quarter 1</h2>
-    <p class="body-text" style="margin-bottom:12px;">Month-by-month predictive financial calendar mapped to natal Lagna (Virgo) and active transits.</p>
+    <p class="body-text" style="margin-bottom:12px;">Month-by-month predictive financial calendar mapped to your natal Lagna (${lagnaRashi}) and active transits.</p>
 
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title">
@@ -1666,7 +1693,7 @@ ${shadbalaRowsHtml}
       </div>
       <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN CAPRICORN (HOUSE ${((9 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The Sun illuminates the ${((9 - lagnaNum + 12) % 12) + 1}th house of foresight and intellect. Creative proposals convert into lucrative contracts. Client conversions accelerate rapidly.
+        The Sun illuminates the ${ordinal(((9 - lagnaNum + 12) % 12) + 1)} house of foresight and intellect. Creative proposals convert into lucrative contracts. Client conversions accelerate rapidly.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Jan 7, 14, 21, 28 · Peak monetization window.
@@ -1680,7 +1707,7 @@ ${shadbalaRowsHtml}
       </div>
       <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN AQUARIUS (HOUSE ${((10 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        The ${((10 - lagnaNum + 12) % 12) + 1}th house transit energizes efficiency, overhead audit, and operational streamlining. A defensive consolidation phase; avoid speculative bets.
+        The ${ordinal(((10 - lagnaNum + 12) % 12) + 1)} house transit energizes efficiency, overhead audit, and operational streamlining. A defensive consolidation phase; avoid speculative bets.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Feb 5, 12, 19, 25 · Ideal for debt clearing and renegotiation.
@@ -1732,7 +1759,7 @@ ${shadbalaRowsHtml}
       </div>
       <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN &amp; VENUS IN TAURUS (HOUSE ${((1 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun and Venus transit Taurus (${((1 - lagnaNum + 12) % 12) + 1}th house from Lagna). This is a highly auspicious commercial window for brand elevation and strategic partnerships.
+        Sun and Venus transit Taurus (${ordinal(((1 - lagnaNum + 12) % 12) + 1)} house from Lagna). This is a highly auspicious commercial window for brand elevation and strategic partnerships.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: May 5, 12, 19, 26 · Peak sovereign luck days.
@@ -1784,7 +1811,7 @@ ${shadbalaRowsHtml}
       </div>
       <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN LEO (HOUSE ${((4 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun moves through the ${((4 - lagnaNum + 12) % 12) + 1}th house. A period for capital defense, tax optimization, and building in private. Protect cash reserves.
+        Sun moves through the ${ordinal(((4 - lagnaNum + 12) % 12) + 1)} house. A period for capital defense, tax optimization, and building in private. Protect cash reserves.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Aug 4, 11, 18, 25 · Ideal for structuring.
@@ -1822,7 +1849,7 @@ ${shadbalaRowsHtml}
       </div>
       <p class="kicker" style="color:var(--emerald-bright);margin-bottom:4px;">TRANSIT: SUN IN LIBRA (HOUSE ${((6 - lagnaNum + 12) % 12) + 1}) · SUB-PERIOD: ${activeAntar.toUpperCase()}</p>
       <p class="body-text">
-        Sun moves through the ${((6 - lagnaNum + 12) % 12) + 1}th house. Time to raise advisory rates, upgrade service tiers, and enforce premium pricing.
+        Sun moves through the ${ordinal(((6 - lagnaNum + 12) % 12) + 1)} house. Time to raise advisory rates, upgrade service tiers, and enforce premium pricing.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:4px;">
         ✦ Favorable Wealth Action Dates: Oct 6, 13, 20, 27 · Rate increase and contract revision days.
@@ -1928,7 +1955,7 @@ ${shadbalaRowsHtml}
     <div class="luxury-card">
       <div class="card-title">3. FREE DANA &amp; NATURE SEVA (ZERO COST)</div>
       <p class="body-text">
-        <strong>Budha Seva (Wednesday):</strong> Offer green fodder or fresh spinach to cows. Sponsoring mathematical textbooks, coding tools, or educational courses for underprivileged students clears commercial karmic blocks faster than commercial fire rituals.
+        <strong>${lagnaLord} Seva:</strong> Offer green fodder or fresh food to cows and support educational materials for underprivileged students. Humble, consistent generosity clears commercial bottlenecks faster than expensive rituals.
       </p>
     </div>
   </div>

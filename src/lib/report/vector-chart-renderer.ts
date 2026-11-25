@@ -8,7 +8,7 @@
  */
 
 import type PDFDocument from "pdfkit";
-import type { ChartData } from "@/lib/astro-engine/calculations";
+import type { ChartData } from "../astro-engine/calculations";
 
 type PDFDoc = InstanceType<typeof PDFDocument>;
 

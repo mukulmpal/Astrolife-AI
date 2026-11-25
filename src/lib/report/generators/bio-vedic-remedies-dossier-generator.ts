@@ -32,7 +32,13 @@ import {
   RASHI_LORDS,
   getGenderLateralization,
   getDynamicGemstonePrescription,
-  renderHumanImpactCardHtml
+  getPlanetaryDignity,
+  getSignLord,
+  houseFromLagna,
+  ordinal,
+  renderHumanImpactCardHtml,
+  signFromHouse,
+  withArticle
 } from "../../astro/human-translator";
 
 const SIGN_NAMES = [
@@ -83,51 +89,23 @@ function getHouseFromLagna(signName: string, lagnaNumber: number): number {
 }
 
 function computeClassicalDignity(planet: string, sign: string, lon: number): string {
-  const deg = lon % 30;
+  const deg = Math.abs(lon % 30);
   if (planet === "Sun" && sign === "Aries" && deg <= 10) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Sun" && sign === "Aries") return "Uchcha (Exalted)";
-  if (planet === "Sun" && sign === "Libra") return "Neecha (Debilitated)";
-  if (planet === "Sun" && sign === "Leo" && deg <= 20) return "Moolatrikona";
-  if (planet === "Sun" && sign === "Leo") return "Swakshetra (Own House)";
-
   if (planet === "Moon" && sign === "Taurus" && deg <= 3) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Moon" && sign === "Taurus") return "Uchcha (Exalted)";
-  if (planet === "Moon" && sign === "Scorpio") return "Neecha (Debilitated)";
-  if (planet === "Moon" && sign === "Cancer") return "Swakshetra (Own House)";
-
   if (planet === "Mars" && sign === "Capricorn" && deg <= 28) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Mars" && sign === "Capricorn") return "Uchcha (Exalted)";
-  if (planet === "Mars" && sign === "Cancer") return "Neecha (Debilitated)";
-  if (planet === "Mars" && (sign === "Aries" || sign === "Scorpio")) return "Swakshetra (Own House)";
-
   if (planet === "Mercury" && sign === "Virgo" && deg <= 15) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Mercury" && sign === "Virgo") return "Uchcha (Exalted)";
-  if (planet === "Mercury" && sign === "Pisces") return "Neecha (Debilitated)";
-  if (planet === "Mercury" && sign === "Gemini") return "Swakshetra (Own House)";
-
   if (planet === "Jupiter" && sign === "Cancer" && deg <= 5) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Jupiter" && sign === "Cancer") return "Uchcha (Exalted)";
-  if (planet === "Jupiter" && sign === "Capricorn") return "Neecha (Debilitated)";
-  if (planet === "Jupiter" && (sign === "Sagittarius" || sign === "Pisces")) return "Swakshetra (Own House)";
-
   if (planet === "Venus" && sign === "Pisces" && deg <= 27) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Venus" && sign === "Pisces") return "Uchcha (Exalted)";
-  if (planet === "Venus" && sign === "Virgo") return "Neecha (Debilitated)";
-  if (planet === "Venus" && (sign === "Taurus" || sign === "Libra")) return "Swakshetra (Own House)";
-
   if (planet === "Saturn" && sign === "Libra" && deg <= 20) return "Param Uchcha (Deep Exalted)";
-  if (planet === "Saturn" && sign === "Libra") return "Uchcha (Exalted)";
-  if (planet === "Saturn" && sign === "Aries") return "Neecha (Debilitated)";
-  if (planet === "Saturn" && (sign === "Capricorn" || sign === "Aquarius")) return "Swakshetra (Own House)";
 
-  if (planet === "Rahu" && (sign === "Taurus" || sign === "Gemini")) return "Uchcha (Exalted)";
-  if (planet === "Rahu" && sign === "Virgo") return "Moolatrikona";
-  if (planet === "Ketu" && (sign === "Scorpio" || sign === "Sagittarius")) return "Uchcha (Exalted)";
-  if (planet === "Ketu" && sign === "Pisces") return "Moolatrikona";
-
-  const lord = SIGN_LORDS[sign];
-  if (lord === planet) return "Swakshetra (Own House)";
-  return "Mitra Rashi (Friendly Sign)";
+  const d = getPlanetaryDignity(planet, sign);
+  if (d === "Exalted") return "Uchcha (Exalted)";
+  if (d === "Debilitated") return "Neecha (Debilitated)";
+  if (d === "Moolatrikona") return "Moolatrikona";
+  if (d === "Own") return "Swakshetra (Own House)";
+  if (d === "Friendly") return "Mitra Rashi (Friendly)";
+  if (d === "Enemy") return "Shatru Rashi (Enemy)";
+  return "Sama Rashi (Neutral)";
 }
 
 function renderNorthIndianSvg(
@@ -260,24 +238,64 @@ export function generateBioVedicRemediesDossierHTML(
     transitRemedy = { activeDashaLord: "Rahu", taraName: "Vipat Tara" } as any;
   }
 
-  const activeDasha = chart.dashas?.find((d) => d.active)?.planet || "Rahu";
-  const activeAntar = chart.antardasha?.planet || lagnaLord;
+  const activeMdObj = (chart.dashas as any[])?.find((d) => d.active);
+  const activeAdObj = activeMdObj?.antardashas?.find((a: any) => a.active);
+  const activeDasha = activeMdObj?.planet || "Rahu";
+  const activeAntar = activeAdObj?.planet || chart.antardasha?.planet || lagnaLord;
 
+  // Dynamic 5th & 9th lord secondary gemstones (never repeat Lagnesh)
+  const fifthSign = signFromHouse(lagnaRashi, 5);
+  const ninthSign = signFromHouse(lagnaRashi, 9);
+  const fifthLord = getSignLord(fifthSign);
+  const ninthLord = getSignLord(ninthSign);
+  const PLANET_GEM_INFO: Record<string, { gem: string; metal: string; hora: string; mantra: string }> = {
+    Sun: { gem: "Natural Ruby (Manikya) or Red Garnet", metal: "Yellow Gold or Copper", hora: "Sunday Sunrise (Surya Hora)", mantra: "Om Hram Hreem Hroum Sah Suryaya Namah" },
+    Moon: { gem: "Natural South Sea Pearl (Moti) or Moonstone", metal: "Pure Silver", hora: "Monday Morning (Chandra Hora)", mantra: "Om Shram Shreem Shroum Sah Chandraya Namah" },
+    Mars: { gem: "Natural Red Coral (Moonga) or Carnelian", metal: "Copper or Yellow Gold", hora: "Tuesday Morning (Mangala Hora)", mantra: "Om Kram Kreem Kroum Sah Bhaumaya Namah" },
+    Mercury: { gem: "Natural Emerald (Panna) or Peridot", metal: "Panchdhatu or Yellow Gold", hora: "Wednesday Morning (Budha Hora)", mantra: "Om Bram Breem Broum Sah Budhaya Namah" },
+    Jupiter: { gem: "Natural Yellow Sapphire (Pukhraj) or Citrine", metal: "Yellow Gold or Brass", hora: "Thursday Morning (Guru Hora)", mantra: "Om Gram Greem Groum Sah Gurave Namah" },
+    Venus: { gem: "Natural Diamond or White Zircon", metal: "Platinum or Silver", hora: "Friday Morning (Shukra Hora)", mantra: "Om Shum Shukraya Namah" },
+    Saturn: { gem: "Natural Blue Sapphire (Neelam) or Amethyst", metal: "Silver or White Gold", hora: "Saturday Twilight (Shani Hora)", mantra: "Om Sham Shanaishcharaya Namah" },
+  };
+  const secLord1 = ninthLord !== lagnaLord ? ninthLord : fifthLord;
+  const secLord2 = fifthLord !== lagnaLord && fifthLord !== secLord1 ? fifthLord : (ninthLord !== secLord1 ? ninthLord : "Jupiter");
+  const secGem1 = PLANET_GEM_INFO[secLord1] || PLANET_GEM_INFO.Venus;
+  const secGem2 = PLANET_GEM_INFO[secLord2] || PLANET_GEM_INFO.Mercury;
+
+  // Dynamic Mrityu Bhaga detector (classical degrees per planet & sign)
+  const MRITYU_BHAGA_DEGS: Record<string, Record<string, number>> = {
+    Sun: { Aries: 20, Taurus: 9, Gemini: 12, Cancer: 6, Leo: 8, Virgo: 24, Libra: 16, Scorpio: 17, Sagittarius: 22, Capricorn: 2, Aquarius: 3, Pisces: 23 },
+    Moon: { Aries: 26, Taurus: 12, Gemini: 13, Cancer: 25, Leo: 24, Virgo: 11, Libra: 26, Scorpio: 14, Sagittarius: 13, Capricorn: 25, Aquarius: 5, Pisces: 12 },
+    Mars: { Aries: 19, Taurus: 28, Gemini: 25, Cancer: 23, Leo: 29, Virgo: 28, Libra: 14, Scorpio: 21, Sagittarius: 2, Capricorn: 15, Aquarius: 11, Pisces: 6 },
+    Mercury: { Aries: 15, Taurus: 14, Gemini: 13, Cancer: 12, Leo: 8, Virgo: 18, Libra: 20, Scorpio: 10, Sagittarius: 21, Capricorn: 22, Aquarius: 7, Pisces: 5 },
+    Jupiter: { Aries: 19, Taurus: 29, Gemini: 12, Cancer: 27, Leo: 6, Virgo: 4, Libra: 13, Scorpio: 10, Sagittarius: 17, Capricorn: 11, Aquarius: 15, Pisces: 28 },
+    Venus: { Aries: 28, Taurus: 15, Gemini: 11, Cancer: 17, Leo: 10, Virgo: 13, Libra: 4, Scorpio: 6, Sagittarius: 27, Capricorn: 12, Aquarius: 29, Pisces: 19 },
+    Saturn: { Aries: 10, Taurus: 4, Gemini: 7, Cancer: 9, Leo: 12, Virgo: 16, Libra: 3, Scorpio: 18, Sagittarius: 28, Capricorn: 14, Aquarius: 13, Pisces: 15 },
+    Rahu: { Aries: 14, Taurus: 13, Gemini: 12, Cancer: 11, Leo: 24, Virgo: 23, Libra: 22, Scorpio: 21, Sagittarius: 10, Capricorn: 20, Aquarius: 18, Pisces: 8 },
+    Ketu: { Aries: 8, Taurus: 18, Gemini: 20, Cancer: 10, Leo: 21, Virgo: 22, Libra: 23, Scorpio: 24, Sagittarius: 11, Capricorn: 12, Aquarius: 13, Pisces: 14 },
+  };
   const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  const mrityuAlerts: string[] = [];
   const tableRowsHtml = PLANET_ORDER.map(p => {
     const pd = chart.planets?.[p];
     const pRashi = pd?.sign || "Aries";
-    const degVal = pd?.degree !== undefined ? pd.degree : 0;
+    const rawLon = pd?.longitude !== undefined ? pd.longitude : (pd?.degree !== undefined ? pd.degree : 0);
+    const degVal = Math.abs(rawLon % 30);
     const degInt = Math.floor(degVal);
     const minInt = Math.floor((degVal - degInt) * 60);
+    const mbTarget = MRITYU_BHAGA_DEGS[p]?.[pRashi];
+    const isMb = mbTarget !== undefined && Math.abs(degVal - mbTarget) <= 1.0;
+    if (isMb) {
+      mrityuAlerts.push(`${p} at ${degInt}° ${minInt.toString().padStart(2, "0")}' ${pRashi} (Mrityu Bhaga ${mbTarget}°)`);
+    }
     const pDeg = `${pRashi} ${degInt}° ${minInt.toString().padStart(2, "0")}'`;
     const houseNum = pd?.house || 1;
-    const pHouse = `${houseNum}${getOrdinalSuffix(houseNum)}`;
+    const pHouse = ordinal(houseNum);
     const pDignity = computeClassicalDignity(p, pRashi, pd?.longitude || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
     const funcStatus = getRemedyFunctionalStatus(p, lagnaRashi, houseNum);
     const remedy = getPlanetRemedyRecommendation(p);
     return `<tr>
-      <td><strong>${p}</strong></td>
+      <td><strong>${p}${isMb ? " <span style=\"color:var(--ruby-bright);font-size:8px;\">(MB)</span>" : ""}</strong></td>
       <td>${pDeg}</td>
       <td>${pHouse}</td>
       <td>${pDignity}</td>
@@ -285,6 +303,14 @@ export function generateBioVedicRemediesDossierHTML(
       <td>${remedy}</td>
     </tr>`;
   }).join("\n");
+
+  const rahuHouse = chart.planets?.["Rahu"]?.house || 2;
+  const rahuSign = chart.planets?.["Rahu"]?.sign || "Libra";
+  const ketuHouse = chart.planets?.["Ketu"]?.house || 8;
+  const ketuSign = chart.planets?.["Ketu"]?.sign || "Aries";
+  const moonHouse = chart.planets?.["Moon"]?.house || 1;
+  const isFemale = (subjectGender || "").toLowerCase().trim() === "female";
+  const isSaturnLagna = lagnaLord === "Saturn";
 
   const totalPages = 24;
   const sampleWatermark = isSample
@@ -702,7 +728,7 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px;">
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">PILLAR I (Pages 5&ndash;8): Gemstone &amp; Rudraksha Bio-Wearables</strong> &mdash; Exact carat weight, metal, finger, trial protocols, and strict prohibition of lethal stones (Yellow Sapphire, Red Coral).
+          <strong style="color:var(--emerald-bright);">PILLAR I (Pages 5&ndash;8): Gemstone &amp; Rudraksha Bio-Wearables</strong> &mdash; Exact carat weight, metal, finger, trial protocols, and strict prohibition of incompatible stones (${(gemPrescription.prohibitedGems || []).join(", ")}).
         </div>
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--gold);">
           <strong style="color:var(--gold-bright);">PILLAR II (Pages 9&ndash;11): Somatotopic Dot Therapy (बिंदु चिकित्सा)</strong> &mdash; 12-sign bodily coordinates, the mandatory 2-inch navel desi ghee seal, and knee/forehead grounding points.
@@ -711,10 +737,10 @@ body {
           <strong style="color:var(--ruby-bright);">PILLAR III (Pages 12&ndash;13): Sacred Protective Thread (मौली)</strong> &mdash; Kalawa consecration, wrist pulse energetics, exact Abhijeet Muhurat timings, and 21-day eco-disposal.
         </div>
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--sapphire);">
-          <strong style="color:var(--sapphire-bright);">PILLAR IV (Pages 14&ndash;15): Astro-Tattoo &amp; Talismanic Geometry</strong> &mdash; KP house negation (activating 2-6-10-11), male right-lateralization, and herbal skin ink.
+          <strong style="color:var(--sapphire-bright);">PILLAR IV (Pages 14&ndash;15): Astro-Tattoo &amp; Talismanic Geometry</strong> &mdash; KP house negation (activating 2-6-10-11), ${latGender.side.toLowerCase()} lateralization (${latGender.sanskritTerm}), and herbal skin ink.
         </div>
         <div style="background:var(--surface-elevated);padding:6px 10px;border-radius:4px;border-left:3px solid var(--saffron);">
-          <strong style="color:var(--saffron);">PILLAR V (Pages 16&ndash;19): Lal Kitab Rin Siddhant &amp; Shivling Abhisheka</strong> &mdash; Ancestral debt clearing, never-donate warnings, and active Rahu-Mercury Tak Yog neutralization.
+          <strong style="color:var(--saffron);">PILLAR V (Pages 16&ndash;19): Lal Kitab Rin Siddhant &amp; Shivling Abhisheka</strong> &mdash; Ancestral debt clearing, never-donate warnings, and active ${activeDasha}-${activeAntar} transit neutralization.
         </div>
       </div>
     </div>
@@ -728,7 +754,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Planetary Stress &amp; Vulnerability Audit</h2>
     <p class="body-text" style="margin-bottom:12px;">
-      For a <strong>${lagnaRashi} Ascendant</strong>, classical Jyotish designates specific planets as functional benefics and others as functional malefics. Knowing your personal vulnerability zones prevents spiritual missteps and ineffective remedies.
+      For ${withArticle(lagnaRashi)} <strong>${lagnaRashi} Ascendant</strong>, classical Jyotish designates specific planets as functional benefics and others as functional malefics. Knowing your personal vulnerability zones prevents spiritual missteps and ineffective remedies.
     </p>
 
     <div class="grid-2" style="margin-bottom:12px;">
@@ -811,12 +837,12 @@ ${tableRowsHtml}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Primary Life Gemstone: ${gemPrescription.primaryGem}</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      For a ${lagnaRashi} Ascendant, <strong>${lagnaLord}</strong> is the supreme ruler of your physical body, life force, and status. ${gemPrescription.rationale}
+      For ${withArticle(lagnaRashi)} Ascendant, <strong>${lagnaLord}</strong> is the supreme ruler of your physical body, life force, and status. ${gemPrescription.rationale}
     </p>
 
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:10px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-        ✦ NATURAL UNTREATED ${gemPrescription.primaryGem.toUpperCase()}
+        ✦ NATURAL UNTREATED ${gemPrescription.primaryGem.replace(/^Natural\s+/i, "").toUpperCase()}
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
         Functions as a bio-resonant optical catalyst that concentrates beneficial planetary frequencies into your nervous system. Accelerates decision precision, commercial discernment, and somatic equilibrium.
@@ -879,56 +905,37 @@ ${tableRowsHtml}
 <section class="page">
   ${headerRail("PILLAR I: SECONDARY GEMSTONE ALCHEMY")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">Secondary Shield: Blue Sapphire &amp; Diamond</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">Secondary Shield: ${secGem1.gem.split("(")[0].trim()} &amp; ${secGem2.gem.split("(")[0].trim()}</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Balancing intellectual speed with structural endurance: Activating Saturn (5th Lord of Intellect) and Venus (9th Lord of Fortune).
+      Balancing personal vitality with trinal fortune: Activating ${secLord1} (9th Lord of Fortune) and ${secLord2} (5th Lord of Intellect) for ${lagnaRashi} Ascendant.
     </p>
 
-    <!-- Blue Sapphire Box -->
+    <!-- Secondary Gem 1 -->
     <div class="luxury-card" style="border:1.5px solid var(--sapphire);margin-bottom:10px;">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;font-family:'Cinzel',serif;">
-        1. SECONDARY TREASURY &amp; KARMA SHIELD: NATURAL BLUE SAPPHIRE (नीलम)
+        1. ${secLord1.toUpperCase()} CATALYST (${ninthSign.toUpperCase()} 9TH LORD): ${secGem1.gem.toUpperCase()}
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Saturn is your 5th lord of intellect and Indu Lagna lord (Capricorn). Seated in the 7th house, Saturn enforces executive discipline, seals commercial leakages, and grounds restless mental energy.
+        For ${withArticle(lagnaRashi)} Ascendant, <strong>${secLord1}</strong> rules your 9th house of fortune (${ninthSign}) and resides in the ${ordinal(chart.planets?.[secLord1]?.house || 9)} house. Wearing <strong>${secGem1.gem}</strong> mounted in ${secGem1.metal} strengthens dharma, mentorship, and long-term luck.
       </p>
-      <div class="grid-4" style="margin-top:8px;font-size:10.5px;">
-        <div>
-          <span class="kicker">Weight:</span>
-          <div style="color:var(--ivory);font-weight:600;">4.50 &ndash; 5.50 Ratti</div>
-        </div>
-        <div>
-          <span class="kicker">Metal:</span>
-          <div style="color:var(--ivory);font-weight:600;">Silver / White Gold</div>
-        </div>
-        <div>
-          <span class="kicker">Finger:</span>
-          <div style="color:var(--ivory);font-weight:600;">Middle (Madhyama)</div>
-        </div>
-        <div>
-          <span class="kicker">Timing:</span>
-          <div style="color:var(--ivory);font-weight:600;">Saturday Twilight</div>
-        </div>
-      </div>
-
       <div class="prohibition-box" style="margin-top:8px;background:rgba(59,130,246,0.08);border-color:rgba(59,130,246,0.35);">
         <strong style="color:var(--sapphire-bright);font-size:11px;">MANDATORY 3-DAY TRIAL PROTOCOL (अनिवार्य परीक्षण विधान):</strong>
         <p style="font-size:11px;color:var(--ivory-dim);margin-top:2px;">
-          Blue Sapphire is intensely catalytic. Before setting it into metal, wrap the raw gemstone in blue silk cloth and keep it under your pillow for 3 consecutive nights (starting Saturday). If you experience peaceful sleep, clarity, or positive dreams, proceed with mounting. If you experience nightmares, sudden headaches, or restlessness, discard immediately and switch to Amethyst (Jamuniya).
+          Before setting into metal, wrap the raw stone in clean silk cloth and keep it under your pillow for 3 consecutive nights. Proceed only if sleep remains peaceful and clear. Activation: ${secGem1.hora} &middot; <em>${secGem1.mantra}</em>.
         </p>
       </div>
     </div>
 
-    <!-- Diamond / White Zircon Box -->
+    <!-- Secondary Gem 2 -->
     <div class="luxury-card" style="border:1.5px solid var(--gold);margin-bottom:8px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        2. FORTUNE &amp; REFINED AURA CATALYST: NATURAL DIAMOND / WHITE ZIRCON
+        2. ${secLord2.toUpperCase()} CATALYST (${fifthSign.toUpperCase()} 5TH LORD): ${secGem2.gem.toUpperCase()}
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Venus is your 9th lord of fortune (Bhagyadhipati) and 2nd lord of liquid treasury. Seated in the 10th house, Venus forms the Maha Parivartana Yoga with Mercury. A natural Diamond (0.75&ndash;1.00 Carat) or Natural Untreated White Zircon (4.25&ndash;5.25 Ratti) mounted in Platinum or Silver enhances charisma, luxury client conversions, and executive presence.
+        <strong>${secLord2}</strong> governs your 5th house of intellect (${fifthSign}) and sits in the ${ordinal(chart.planets?.[secLord2]?.house || 5)} house. A ${secGem2.gem} mounted in ${secGem2.metal} sharpens strategic discernment, emotional equilibrium, and executive presence.
       </p>
       <div style="font-size:11px;color:var(--gold);margin-top:6px;">
-        ✦ Activation: Friday Morning during Shukra Hora · Mantra: <em>Om Shum Shukraya Namah</em> (108&times;).
+        ✦ Activation: ${secGem2.hora} &middot; Mantra: <em>${secGem2.mantra}</em> (108&times;).
       </div>
     </div>
   </div>
@@ -978,32 +985,101 @@ ${tableRowsHtml}
       Unlike gemstones which act as optical amplifiers, sacred Rudraksha beads (seeds of <em>Elaeocarpus ganitrus</em>) act as natural capacitors and dielectric stabilizers. They regulate bio-electric heart rate, normalize blood pressure, and seal psychic vulnerabilities without any negative side-effects.
     </p>
 
+    ${(() => {
+      const RUDRAKSHA_BY_PLANET: Record<string, { mukhi: string; deity: string; chakra: string; desc: string; mantra: string; day: string; trait: string }> = {
+        Sun: {
+          mukhi: "12-Mukhi",
+          deity: "Lord Surya",
+          chakra: "MANIPURA (SOLAR PLEXUS)",
+          desc: "Governed by Lord Surya. Its twelve natural facets radiate executive authority, dissolve self-doubt, restore vitality, and command effortless institutional respect.",
+          mantra: "<em>Om Kraum Kshraum Raum Namah</em> (108&times; Sunday)",
+          day: "Sunday",
+          trait: "Sovereign Radiance",
+        },
+        Moon: {
+          mukhi: "2-Mukhi",
+          deity: "Ardhanarishwara &amp; Chandra",
+          chakra: "SWADHISHTHANA &amp; AJNA",
+          desc: "Governed by Ardhanarishwara and Chandra. Harmonizes emotional tides, stabilizes autonomic nervous rhythm, and deepens intuitive relational equilibrium.",
+          mantra: "<em>Om Namah</em> (108&times; Monday)",
+          day: "Monday",
+          trait: "Emotional Equilibrium",
+        },
+        Mars: {
+          mukhi: "3-Mukhi",
+          deity: "Lord Agni &amp; Mangala",
+          chakra: "MANIPURA",
+          desc: "Governed by Agni and Mangala. Burns stagnant karmic inertia, sharpens decisive courage, and protects blood and metabolic vitality under high pressure.",
+          mantra: "<em>Om Kleem Namah</em> (108&times; Tuesday)",
+          day: "Tuesday",
+          trait: "Executive Courage",
+        },
+        Mercury: {
+          mukhi: "4-Mukhi",
+          deity: "Lord Brahma &amp; Budha",
+          chakra: "ANAHATA &amp; VISHUDDHA",
+          desc: "Governed by creator Brahma and planetary lord Mercury. Its four natural clefts balance the four lobes of the brain, enhancing memory retention, analytical clarity, and oratory.",
+          mantra: "<em>Om Hreem Namah</em> (108&times; Wednesday)",
+          day: "Wednesday",
+          trait: "Analytical Intellect",
+        },
+        Jupiter: {
+          mukhi: "5-Mukhi",
+          deity: "Lord Brihaspati &amp; Kalagni",
+          chakra: "VISHUDDHA &amp; AJNA",
+          desc: "Governed by Brihaspati and Kalagni Rudra. Stabilizes blood pressure, expands dharmic wisdom, and anchors long-term prosperity without side effects.",
+          mantra: "<em>Om Hreem Namah</em> (108&times; Thursday)",
+          day: "Thursday",
+          trait: "Dharmic Wisdom",
+        },
+        Venus: {
+          mukhi: "6-Mukhi",
+          deity: "Lord Kartikeya &amp; Shukra",
+          chakra: "ANAHATA &amp; SWADHISHTHANA",
+          desc: "Governed by Lord Kartikeya and Shukra. Cultivates magnetic poise, refines creative discernment, and protects against emotional burnout.",
+          mantra: "<em>Om Hreem Hoom Namah</em> (108&times; Friday)",
+          day: "Friday",
+          trait: "Creative Magnetism",
+        },
+        Saturn: {
+          mukhi: "7-Mukhi",
+          deity: "Mahalakshmi &amp; Shani",
+          chakra: "MANIPURA &amp; MULADHARA",
+          desc: "Blessed by Goddess Mahalakshmi and the seven sages. Dissolves sudden financial blockages, unlocks stagnant cashflows, and harmonizes Shani&rsquo;s karmic discipline.",
+          mantra: "<em>Om Hoom Namah</em> (108&times; Saturday)",
+          day: "Saturday",
+          trait: "Karmic Treasury",
+        },
+      };
+      const rud1 = RUDRAKSHA_BY_PLANET[lagnaLord] || RUDRAKSHA_BY_PLANET.Jupiter;
+      const rud2 = RUDRAKSHA_BY_PLANET[secLord1] || RUDRAKSHA_BY_PLANET.Sun;
+      return `
     <div class="grid-2" style="margin-bottom:10px;">
-      <!-- 4-Mukhi Rudraksha -->
+      <!-- Primary Lagnesh Rudraksha -->
       <div class="luxury-card" style="border:1.5px solid var(--emerald);">
         <div class="card-title" style="color:var(--emerald-bright);font-size:12px;font-family:'Cinzel',serif;">
-          ✦ 4-MUKHI RUDRAKSHA (LORD BRAHMA &amp; BUDHA)
+          ✦ ${rud1.mukhi.toUpperCase()} RUDRAKSHA (${rud1.deity.toUpperCase()})
         </div>
-        <div class="kicker" style="margin-top:2px;">GOVERNING PLANET: MERCURY · ANAHATA &amp; VISHUDDHA</div>
+        <div class="kicker" style="margin-top:2px;">LAGNESH: ${lagnaLord.toUpperCase()} · ${rud1.chakra}</div>
         <p class="body-text" style="font-size:11.5px;margin-top:6px;">
-          Governed by the creator Brahma and planetary lord Mercury. Its four natural clefts balance the four lobes of the brain, dramatically enhancing memory retention, analytical clarity, public oratory, and deep intellectual endurance.
+          ${rud1.desc}
         </p>
         <div style="font-size:11px;color:var(--gold);margin-top:6px;">
-          ✦ <strong>Mantra:</strong> <em>Om Hreem Namah</em> (108&times; Wednesday)
+          ✦ <strong>Mantra:</strong> ${rud1.mantra}
         </div>
       </div>
 
-      <!-- 7-Mukhi Rudraksha -->
+      <!-- Secondary 9th/5th Benefic Rudraksha -->
       <div class="luxury-card" style="border:1.5px solid var(--gold);">
         <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-          ✦ 7-MUKHI RUDRAKSHA (MAHALAKSHMI &amp; SHUKRA)
+          ✦ ${rud2.mukhi.toUpperCase()} RUDRAKSHA (${rud2.deity.toUpperCase()})
         </div>
-        <div class="kicker" style="margin-top:2px;">GOVERNING PLANET: VENUS / SATURN · MANIPURA</div>
+        <div class="kicker" style="margin-top:2px;">TRIKONA BENEFIC: ${secLord1.toUpperCase()} · ${rud2.chakra}</div>
         <p class="body-text" style="font-size:11.5px;margin-top:6px;">
-          Blessed by Goddess Mahalakshmi and the seven holy sages (Saptarishis). It dissolves sudden financial blockages, unlocks stagnant cashflows, and neutralizes the malefic sting of Shani and Rahu.
+          ${rud2.desc}
         </p>
         <div style="font-size:11px;color:var(--gold);margin-top:6px;">
-          ✦ <strong>Mantra:</strong> <em>Om Hoom Namah</em> (108&times; Friday)
+          ✦ <strong>Mantra:</strong> ${rud2.mantra}
         </div>
       </div>
     </div>
@@ -1011,10 +1087,10 @@ ${tableRowsHtml}
     <!-- Sacred Combination Protocol -->
     <div class="luxury-card" style="border:1.5px solid var(--border-gold-strong);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:11.5px;font-family:'Cinzel',serif;">
-        ✦ THE SOVEREIGN INTELLECT &amp; TREASURY COMBINATION (4-MUKHI + 7-MUKHI)
+        ✦ THE ${rud1.trait.toUpperCase()} &amp; ${rud2.trait.toUpperCase()} COMBINATION (${rud1.mukhi.toUpperCase()} + ${rud2.mukhi.toUpperCase()})
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        String one collector-grade 4-Mukhi bead and one collector-grade 7-Mukhi bead together on an un-dyed pure raw red or green silk thread. Cap both ends in pure silver or 22k gold.
+        String one collector-grade ${rud1.mukhi} bead and one collector-grade ${rud2.mukhi} bead together on an un-dyed pure raw red or natural silk thread. Cap both ends in pure silver or 22k gold.
       </p>
       <div class="grid-3" style="margin-top:8px;font-size:11px;">
         <div>
@@ -1023,19 +1099,20 @@ ${tableRowsHtml}
         </div>
         <div>
           <span class="kicker">Prana Pratishtha:</span>
-          <div style="color:var(--ivory);font-weight:600;">Wednesday or Friday at sunrise</div>
+          <div style="color:var(--ivory);font-weight:600;">${rud1.day} or ${rud2.day} at sunrise</div>
         </div>
         <div>
           <span class="kicker">Maintenance:</span>
           <div style="color:var(--ivory);font-weight:600;">Condition with pure almond oil monthly</div>
         </div>
       </div>
-    </div>
+    </div>`;
+    })()}
 
     <div class="luxury-card" style="background:var(--surface-elevated);">
-      <span class="kicker" style="color:var(--sapphire-bright);">Optional Shield Addition: 8-Mukhi (Lord Ganesha &amp; Rahu):</span>
+      <span class="kicker" style="color:var(--sapphire-bright);">Active Dasha Shield (${activeDasha} Mahadasha &middot; ${lagnaLord} Lagnesh):</span>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-        If facing heavy corporate politics or regulatory hurdles during the current Rahu Mahadasha, add an 8-Mukhi Rudraksha to the pendant to eliminate obstacles and anchor Rahu's 2nd-house volatility.
+        Paired for your ${lagnaRashi} Ascendant (${lagnaLord}) and active ${activeDasha} Mahadasha: wear an 8-Mukhi (Lord Ganesha) or 7-Mukhi Rudraksha to dissolve bottlenecks and stabilize your ${ordinal(rahuHouse)}-house nodal axis.
       </p>
     </div>
   </div>
@@ -1075,7 +1152,7 @@ ${tableRowsHtml}
           <td><strong>1. Aries (Mesha)</strong></td>
           <td>Cranial Vault, Head &amp; Brain</td>
           <td>Mars</td>
-          <td>Cooling Chandan (Never Sindoor for Virgo)</td>
+          <td>Cooling Chandan (Gentle Sattvic Tilak)</td>
         </tr>
         <tr>
           <td><strong>2. Taurus (Vrishabha)</strong></td>
@@ -1129,7 +1206,7 @@ ${tableRowsHtml}
           <td><strong>10. Capricorn (Makara)</strong></td>
           <td>Knee Joints &amp; Skeletal System</td>
           <td>Saturn</td>
-          <td>Micro Kajal Dot on Right Knee</td>
+          <td>Micro Kajal Dot on ${latGender.side} Knee</td>
         </tr>
         <tr>
           <td><strong>11. Aquarius (Kumbha)</strong></td>
@@ -1194,7 +1271,7 @@ ${tableRowsHtml}
           <strong style="color:var(--gold);">3. Application Timings:</strong> Twice daily &mdash; once immediately after morning bath, and once at night 15 minutes before sleep.
         </div>
         <div>
-          <strong style="color:var(--gold);">4. Bio-Vedic Benefits:</strong> Instantly cools the vagus nerve, reduces overthinking, pacifies 12th-house Mars heat, prevents dry skin and digestive disorders, and creates an impenetrable energetic boundary against external environmental stress.
+          <strong style="color:var(--gold);">4. Bio-Vedic Benefits:</strong> Instantly cools the vagus nerve, reduces overthinking, pacifies internal metabolic heat, prevents dry skin and digestive disorders, and creates a calming energetic boundary against daily stress.
         </div>
       </div>
     </div>
@@ -1202,7 +1279,7 @@ ${tableRowsHtml}
     <div class="luxury-card" style="background:var(--surface-elevated);border-left:3px solid var(--emerald-bright);">
       <span class="kicker" style="color:var(--emerald-bright);">Clinical Astrological Observation:</span>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-        Within 7 days of continuous application, seekers with Virgo Lagna report a 40% reduction in sleep latency (falling asleep faster) and elimination of midday mental fatigue.
+        Within 7 days of continuous application, ${lagnaRashi} Lagna natives commonly report smoother sleep onset and a noticeable reduction in midday mental fatigue.
       </p>
     </div>
   </div>
@@ -1243,7 +1320,7 @@ ${tableRowsHtml}
         2. AJNA CHAKRA WHITE SANDALWOOD DOT (चंद्र व मन शांति बिंदु)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Your natal Moon sits in <strong>${moonRashi} (${moonPlanet?.house || 1}th house)</strong> in ${moonNakshatra}. This placement generates high intellectual ambition combined with periodic sensory overload.
+        Your natal Moon sits in <strong>${moonRashi} (${ordinal(moonPlanet?.house || 1)} house)</strong> in ${moonNakshatra}. This placement generates high intellectual ambition combined with periodic sensory overload.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:8px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Execution Method:</strong>
@@ -1285,7 +1362,9 @@ ${tableRowsHtml}
     <div class="prohibition-box" style="margin-bottom:12px;">
       <strong style="color:var(--ruby-bright);font-size:11.5px;">✦ AVOID THE BLIND "BLACK THREAD" TRAP (काला धागा निषेध)</strong>
       <p class="body-text" style="font-size:11.5px;margin-top:3px;">
-        Many people blindly tie thick black threads around their wrists or ankles assuming it wards off evil. For a ${lagnaRashi} Lagna native, wearing black thread on the active pulse draws heavy Saturnian lethargy and dampens somatic vitality. <strong>Do not wear black thread on your wrist.</strong>
+        ${isSaturnLagna
+          ? `For ${withArticle(lagnaRashi)} Lagna native ruled by Saturn, a thick black wrist thread is unnecessary and can over-concentrate heavy Tamasic inertia on the pulse. Use the consecrated Red &amp; Yellow Mauli instead.`
+          : `Many people blindly tie thick black threads around their wrists or ankles assuming it wards off evil. For ${withArticle(lagnaRashi)} Lagna native, wearing black thread on the active pulse draws heavy Saturnian lethargy and dampens somatic vitality. <strong>Do not wear black thread on your wrist.</strong>`}
       </p>
     </div>
 
@@ -1410,7 +1489,7 @@ ${tableRowsHtml}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;margin-top:4px;">
         <div>
-          <strong style="color:var(--gold);">Rule 1 (Male Right Lateralization):</strong> For male natives, planetary sigils must be inscribed exclusively on the <strong>Right Side of the Body</strong> (right arm, right shoulder, right calf). The right side channels masculine Solar/Pingala energy.
+          <strong style="color:var(--gold);">Rule 1 (${isFemale ? "Female Left Lateralization" : "Male Right Lateralization"}):</strong> For ${isFemale ? "female" : "male"} natives, planetary sigils must be inscribed exclusively on the <strong>${latGender.side} of the Body</strong> (${latGender.side.toLowerCase()} arm, ${latGender.side.toLowerCase()} shoulder, ${latGender.side.toLowerCase()} calf). This channels ${latGender.channel}.
         </div>
         <div>
           <strong style="color:var(--gold);">Rule 2 (No Sacred Deities Below Waist):</strong> Never inscribe images of Gods, Om, or sacred Devanagari mantras below the navel or on the feet. Geometric yantras and planetary glyphs are strictly upper-body only.
@@ -1516,13 +1595,13 @@ ${tableRowsHtml}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;margin-top:6px;">
         <div>
-          <strong style="color:var(--gold);">1. Rahu in ${chart.planets?.["Rahu"]?.house || 2}th House (Kudrati / Ancestral Lineage Factor):</strong> Rahu's placement indicates an area requiring strict ethical speech, conscious budgeting, and clear commitments to prevent expenditure leaks.
+          <strong style="color:var(--gold);">1. Rahu in ${ordinal(chart.planets?.["Rahu"]?.house || 2)} House (Kudrati / Ancestral Lineage Factor):</strong> Rahu's placement indicates an area requiring strict ethical speech, conscious budgeting, and clear commitments to prevent expenditure leaks.
         </div>
         <div>
-          <strong style="color:var(--gold);">2. Ketu in ${chart.planets?.["Ketu"]?.house || 8}th House (Dharmik Balance):</strong> Ketu's house highlights deep intuitive reserves. Harmonized through canine seva, spiritual grounding, and regular meditation.
+          <strong style="color:var(--gold);">2. Ketu in ${ordinal(chart.planets?.["Ketu"]?.house || 8)} House (Dharmik Balance):</strong> Ketu's house highlights deep intuitive reserves. Harmonized through canine seva, spiritual grounding, and regular meditation.
         </div>
         <div>
-          <strong style="color:var(--gold);">3. Mars in ${chart.planets?.["Mars"]?.house || 12}th House (Metabolic &amp; Vital Energy):</strong> Supported by mindful hydration, avoidance of emotional impatience, and physical fitness discipline.
+          <strong style="color:var(--gold);">3. Mars in ${ordinal(chart.planets?.["Mars"]?.house || 12)} House (Metabolic &amp; Vital Energy):</strong> Supported by mindful hydration, avoidance of emotional impatience, and physical fitness discipline.
         </div>
       </div>
     </div>
@@ -1542,10 +1621,10 @@ ${tableRowsHtml}
     <!-- Upaya 1: Solid Silver Ball -->
     <div class="luxury-card" style="border:1.5px solid var(--sapphire);margin-bottom:10px;">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;font-family:'Cinzel',serif;">
-        1. RAHU IN 2ND HOUSE: THE SOLID SILVER BALL ANCHOR (ठोस चांदी की गोली)
+        1. RAHU IN ${ordinal(rahuHouse).toUpperCase()} HOUSE (${rahuSign.toUpperCase()}): THE SOLID SILVER BALL ANCHOR (ठोस चांदी की गोली)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        In Lal Kitab, the 2nd house is governed by Jupiter (Dharamsala / Temple) and Venus. Rahu here pollutes liquid speech and destabilizes bank savings.
+        In Lal Kitab, Rahu in your ${ordinal(rahuHouse)} house (${rahuSign}) amplifies sensory restlessness and unbudgeted desires.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Prescription:</strong>
@@ -1553,7 +1632,7 @@ ${tableRowsHtml}
           Procure a small <strong>Solid Pure Silver Ball (ठोस चांदी की गोली &mdash; without any hole)</strong> weighing between 4 and 10 grams. Keep this ball continuously in your primary wallet or pocket.
         </p>
         <p style="color:var(--ivory-dim);margin-top:4px;">
-          <strong>Shastric Mechanism:</strong> Silver represents the pure, pacifying energy of the Moon. Keeping solid silver in the 2nd house permanently calms Rahu's smoke, secures bank liquidity, and prevents sudden wealth erosion.
+          <strong>Shastric Mechanism:</strong> Silver represents the pure, pacifying energy of the Moon. Keeping solid silver calms Rahu's ${ordinal(rahuHouse)}-house volatility and protects steady liquidity.
         </p>
       </div>
     </div>
@@ -1561,10 +1640,10 @@ ${tableRowsHtml}
     <!-- Upaya 2: Street Dog Seva -->
     <div class="luxury-card" style="border:1.5px solid var(--gold);margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold-bright);font-size:12px;font-family:'Cinzel',serif;">
-        2. KETU IN 8TH HOUSE: STRAY DOG SWEET ROTI SEVA (श्वान सेवा)
+        2. KETU IN ${ordinal(ketuHouse).toUpperCase()} HOUSE (${ketuSign.toUpperCase()}): STRAY DOG SWEET ROTI SEVA (श्वान सेवा)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        In Lal Kitab, dogs represent <strong>Ketu</strong>. When Ketu sits in the 8th house, unexpected delays, joint stiffness, and occult obstacles arise.
+        In Lal Kitab, dogs represent <strong>Ketu</strong>. When Ketu sits in your ${ordinal(ketuHouse)} house (${ketuSign}), sudden detours or restless transitions can arise.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Prescription:</strong>
@@ -1581,7 +1660,7 @@ ${tableRowsHtml}
     <div class="luxury-card" style="background:var(--surface-elevated);">
       <strong style="color:var(--emerald-bright);font-size:11px;text-transform:uppercase;">3. Yellow Lemon Temple Offering (Zero Cost):</strong>
       <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-        On any 3 consecutive Thursdays, offer 4 fresh yellow lemons in a temple without asking for anything in return. This completely dissolves lingering 8th-house acidic toxicity.
+        On any 3 consecutive Thursdays, offer 4 fresh yellow lemons in a temple without asking for anything in return. This completely dissolves lingering stagnant energetic friction.
       </p>
     </div>
   </div>
@@ -1610,7 +1689,7 @@ ${tableRowsHtml}
           <strong style="color:var(--ruby-bright);">2. NEVER DONATE MUSTARD OIL ON YOUR DOORSTEP ON SATURDAY:</strong> Giving mustard oil to wandering beggars at your main threshold invites Saturnian debt inside. Always make Saturnian donations outside, at a Shani temple or community kitchen.
         </div>
         <div>
-          <strong style="color:var(--ruby-bright);">3. NEVER ACCEPT FREE ELECTRONICS OR AMULETS FROM STRANGERS:</strong> Accepting free unearned gadgets or talismans absorbs the giver's negative Rahu karma directly into your 2nd house.
+          <strong style="color:var(--ruby-bright);">3. NEVER ACCEPT FREE ELECTRONICS OR AMULETS FROM STRANGERS:</strong> Accepting free unearned gadgets or talismans absorbs the giver's negative Rahu karma directly into your ${ordinal(rahuHouse)} house.
         </div>
       </div>
     </div>
@@ -1622,10 +1701,10 @@ ${tableRowsHtml}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;margin-top:6px;">
         <div>
-          <strong style="color:var(--gold);">1. North-West Clutter:</strong> If electrical wiring or broken electronics accumulate in the North-West zone of your residence, Rahu's 2nd-house volatility spikes. Keep this sector immaculate.
+          <strong style="color:var(--gold);">1. North-West Clutter:</strong> If electrical wiring or broken electronics accumulate in the North-West zone of your residence, Rahu's ${ordinal(rahuHouse)}-house volatility spikes. Keep this sector immaculate.
         </div>
         <div>
-          <strong style="color:var(--gold);">2. South-West Floor Dampness:</strong> Ensure the South-West master bedroom or storage area has zero plumbing leaks. Dampness here triggers 8th-house Ketu anxiety.
+          <strong style="color:var(--gold);">2. South-West Floor Dampness:</strong> Ensure the South-West master bedroom or storage area has zero plumbing leaks. Dampness here triggers ${ordinal(ketuHouse)}-house Ketu restlessness.
         </div>
         <div>
           <strong style="color:var(--gold);">3. Kitchen Tawa Hygiene:</strong> Never leave the flat iron pan (Tawa) unwashed overnight. Once cooled, clean it immediately and store it concealed from direct view.
@@ -1642,7 +1721,7 @@ ${tableRowsHtml}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Shivling Abhisheka &amp; Tak Yog Mitigation</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Under classical Nakshatra Gochar, your active Mahadasha lord <strong>Rahu</strong> and Antardasha lord <strong>Mercury</strong> are operating across an <strong>8/6 Mutual Axis ("Tak Yog")</strong>. This subtle astrological tension can generate sudden delays, contractual friction, and mental impatience.
+      Under classical Nakshatra Gochar, your active Mahadasha lord <strong>${activeDasha}</strong> and Antardasha lord <strong>${activeAntar}</strong> govern your current remedial cycle. Targeted Shivling Abhisheka cools planetary friction and harmonizes your ${ordinal(moonHouse)}-house Moon (${moonRashi}).
     </p>
 
     <!-- Shivling Abhisheka Box -->
@@ -1651,19 +1730,19 @@ ${tableRowsHtml}
         ✦ THE SACRED SHIVLING WATER &amp; HERBAL ABHISHEKA PROTOCOL
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        Lord Shiva is the supreme master of time (<em>Mahakala</em>) and cosmic poison neutralization (<em>Neelakantha</em>). Performing targeted Abhisheka cools the heated astral rays of Rahu and Mars.
+        Lord Shiva is the supreme master of time (<em>Mahakala</em>) and cosmic poison neutralization (<em>Neelakantha</em>). Performing targeted Abhisheka cools heated astral rays.
       </p>
       <div class="grid-2" style="font-size:11.5px;margin-top:8px;gap:8px;">
         <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;">
           <strong style="color:var(--sapphire-bright);">Monday Morning Abhisheka:</strong>
           <p style="color:var(--ivory-dim);margin-top:2px;">
-            Offer cold unboiled cow milk mixed with pure holy water and a pinch of <strong>White Sesame Seeds (सफेद तिल)</strong> over the Shivling while chanting <em>Om Namah Shivaya</em> 11 times. Pacifies 12th-house Moon.
+            Offer cold unboiled cow milk mixed with pure holy water and a pinch of <strong>White Sesame Seeds (सफेद तिल)</strong> over the Shivling while chanting <em>Om Namah Shivaya</em> 11 times. Pacifies ${ordinal(moonHouse)}-house Moon (${moonRashi}).
           </p>
         </div>
         <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;">
-          <strong style="color:var(--emerald-bright);">Wednesday Morning Abhisheka:</strong>
+          <strong style="color:var(--emerald-bright);">Lagnesh (${lagnaLord}) Day Abhisheka:</strong>
           <p style="color:var(--ivory-dim);margin-top:2px;">
-            Offer pure fresh water mixed with crushed fresh <strong>Green Durva Grass (दूर्वा)</strong> over the Shivling. Awakens your Lagna lord Mercury and dissolves commercial friction.
+            Offer pure fresh water with Bilva leaves or Durva over the Shivling on ${gemPrescription.day.split(" ")[0]} morning. Awakens your Lagna lord ${lagnaLord} and dissolves commercial friction.
           </p>
         </div>
       </div>
@@ -1675,7 +1754,7 @@ ${tableRowsHtml}
         ✦ NAVTARA RESILIENCE MAPPING
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        From your natal Moon Nakshatra (Uttara Phalguni), Rahu transits in <strong>Vipat Tara</strong>. While Vipat Tara can present logistical tests, the simultaneous presence of Jupiter in <strong>Sadhana Tara</strong> (Cancer / Pushya) and Mercury as exalted Lagnesh in D-9 provides steady institutional shielding. The Shivling Abhisheka bridges this gap perfectly.
+        Anchored to your natal Moon Nakshatra (<strong>${moonNakshatra}</strong>), your active ${activeDasha} transit operates through <strong>${transitRemedy?.taraName || "Sadhana Tara"}</strong>. Pairing regular Shivling Abhisheka with your ${lagnaLord} Lagnesh discipline bridges any transit turbulence smoothly.
       </p>
     </div>
 
@@ -1706,9 +1785,9 @@ ${tableRowsHtml}
         <span class="tag-badge tag-sapphire">WINTER FOCUS</span>
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Transit Focus:</strong> Sun in Sagittarius &amp; Capricorn. Saturn in 7th house.<br/>
+        <strong>Transit Focus:</strong> Sun in Sagittarius &amp; Capricorn. Saturn in ${ordinal(houseFromLagna("Pisces", lagnaRashi))} house (Pisces).<br/>
         <strong>Biological Risk:</strong> Lower back stiffness, dry skin, sluggish morning metabolism.<br/>
-        <strong>Prescribed Action:</strong> Daily warm sesame oil massage on soles of feet before sleep; strictly maintain right knee kajal micro-dot on high-stress Saturdays; double the 2-inch navel desi ghee application.
+        <strong>Prescribed Action:</strong> Daily warm sesame oil massage on soles of feet before sleep; maintain ${latGender.side.toLowerCase()} knee kajal micro-dot on high-stress Saturdays; continue the 2-inch navel desi ghee application.
       </p>
     </div>
 
@@ -1716,14 +1795,14 @@ ${tableRowsHtml}
     <div class="luxury-card" style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-          QUARTER 2 (MAR 2027 &ndash; MAY 2027): MERCURY SOLAR RETURN &amp; ENERGY PEAK
+          QUARTER 2 (MAR 2027 &ndash; MAY 2027): SPRING SOLAR EQUINOX &amp; ENERGY PEAK
         </span>
         <span class="tag-badge tag-emerald">PEAK HARVEST</span>
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Transit Focus:</strong> Sun and Venus transit Taurus (9th House of Fortune) conjoining natal Mercury.<br/>
-        <strong>Biological Opportunity:</strong> Peak cognitive agility, rapid software architecture comprehension.<br/>
-        <strong>Prescribed Action:</strong> Re-purify your Colombian Emerald on Akshaya Tritiya; drink water stored in pure copper vessels; plant a green Tulsi sapling at home on a Wednesday.
+        <strong>Transit Focus:</strong> Sun transits exalted Aries (${ordinal(houseFromLagna("Aries", lagnaRashi))} House) and Taurus (${ordinal(houseFromLagna("Taurus", lagnaRashi))} House).<br/>
+        <strong>Biological Opportunity:</strong> Peak vitality, clear focus, and strong metabolic momentum.<br/>
+        <strong>Prescribed Action:</strong> Re-purify your primary ${gemPrescription.primaryGem.replace(/^Natural\s+/i, "")} on Akshaya Tritiya; drink water stored in pure copper vessels; keep a green Tulsi plant at home.
       </p>
     </div>
 
@@ -1731,14 +1810,14 @@ ${tableRowsHtml}
     <div class="luxury-card" style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-          QUARTER 3 (JUN 2027 &ndash; AUG 2027): MONSOON GUT HEALTH &amp; 12TH HOUSE SUN
+          QUARTER 3 (JUN 2027 &ndash; AUG 2027): MONSOON GUT HEALTH &amp; LEO TRANSIT
         </span>
-        <span class="tag-badge tag-amber">CAUTION &amp; R&amp;D</span>
+        <span class="tag-badge tag-amber">CAUTION &amp; CONSOLIDATION</span>
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Transit Focus:</strong> Sun enters Leo (12th House of Outflows and Solitude).<br/>
+        <strong>Transit Focus:</strong> Sun enters Leo (${ordinal(houseFromLagna("Leo", lagnaRashi))} House).<br/>
         <strong>Biological Risk:</strong> Acidity, digestive sluggishness, vivid nocturnal dreams.<br/>
-        <strong>Prescribed Action:</strong> Consume light Satvik meals before 8:00 PM; offer cold milk with white sesame on Shivling every Monday; strictly avoid street food and high-sodium snacks.
+        <strong>Prescribed Action:</strong> Consume light Satvik meals before 8:00 PM; offer cold milk with white sesame on Shivling every Monday; strictly avoid heavy fried food and excess sodium.
       </p>
     </div>
 
@@ -1746,14 +1825,14 @@ ${tableRowsHtml}
     <div class="luxury-card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-family:'Cinzel',serif;font-size:11.5px;font-weight:700;color:var(--gold-bright);">
-          QUARTER 4 (SEP 2027 &ndash; NOV 2027): LAGNA SOLAR RETURN &amp; WEALTH HARVEST
+          QUARTER 4 (SEP 2027 &ndash; NOV 2027): AUTUMN EQUINOX &amp; ${lagnaRashi.toUpperCase()} ALIGNMENT
         </span>
         <span class="tag-badge tag-emerald">ANNUAL ZENITH</span>
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-        <strong>Transit Focus:</strong> Sun enters Virgo (1st House Lagna Return · 35 Bindus in SAV).<br/>
-        <strong>Biological Triumph:</strong> Peak physical stamina, executive negotiation dominance.<br/>
-        <strong>Prescribed Action:</strong> Consecrate a fresh red/yellow sacred wrist thread; distribute green apples or spinach to cows during Navratri; light a pure cow ghee lamp in Ishanya (North-East).
+        <strong>Transit Focus:</strong> Sun transits Virgo (${ordinal(houseFromLagna("Virgo", lagnaRashi))} House) &amp; Libra (${ordinal(houseFromLagna("Libra", lagnaRashi))} House).<br/>
+        <strong>Biological Triumph:</strong> Steady physical stamina and executive negotiation clarity.<br/>
+        <strong>Prescribed Action:</strong> Consecrate a fresh red/yellow sacred wrist thread (${latGender.wrist}); distribute fresh fruit or green fodder during Navratri; light a pure cow ghee lamp in Ishanya (North-East).
       </p>
     </div>
   </div>
@@ -1785,7 +1864,7 @@ ${tableRowsHtml}
           <strong style="color:var(--gold);">3. Navel Desi Ghee Seal (1 Minute):</strong> Post-shower, apply 2 drops of pure A2 cow desi ghee in a 2-inch clockwise circle around the navel. Seals the gut-brain axis.
         </div>
         <div>
-          <strong style="color:var(--gold);">4. Surya Dhyana &amp; Arghya (2.5 Minutes):</strong> Face East during sunrise, offer clean water from a copper vessel, and recite the Gayatri or Budha mantra 11 times.
+          <strong style="color:var(--gold);">4. Surya Dhyana &amp; Arghya (2.5 Minutes):</strong> Face East during sunrise, offer clean water from a copper vessel, and recite the Gayatri or your Lagnesh (${lagnaLord}) mantra 11 times.
         </div>
       </div>
     </div>
@@ -1820,23 +1899,21 @@ ${tableRowsHtml}
       Vedic sound codes (Mantra Kavachas) that create an acoustic electromagnetic barrier around the physical and subtle body.
     </p>
 
-    <!-- Budha Kavacham -->
+    <!-- Lagnesh Kavacham -->
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title" style="color:var(--emerald-bright);font-size:11.5px;font-family:'Cinzel',serif;">
-        1. SRI BUDHA KAVACHAM (LORD MERCURY'S SACRED ARMOR)
+        1. ${lagnaLord.toUpperCase()} LAGNESH PROTECTION KAVACHAM (${lagnaRashi.toUpperCase()} SHIELD)
       </div>
       <div class="mantra-block">
-        <div class="mantra-devanagari">
-          बुधस्तु पुस्तकधरः कुंकुमस्य समद्युतिः ।<br/>
-          पीताम्बरधरः पातु पीतमाल्यानुलेपनः ॥
+        <div class="mantra-devanagari devanagari-safe">
+          ${gemPrescription.mantra}
         </div>
         <div class="mantra-iast">
-          Budhastu Pustakadharaḥ Kuṅkumasya Samadyutiḥ ।<br/>
-          Pītāmbaradharaḥ Pātu Pītamālyānulepanaḥ ॥
+          Recite 108 times on ${gemPrescription.day} for ${lagnaLord} Lagnesh fortification.
         </div>
       </div>
       <p class="body-text" style="font-size:11.2px;">
-        Recited on Wednesday mornings to shield logical intellect, oral eloquence, software syntax comprehension, and nervous system vitality.
+        Recited to shield logical intellect, clarity of speech, executive stamina, and nervous system vitality for your ${lagnaRashi} Lagna.
       </p>
     </div>
 
@@ -1856,7 +1933,7 @@ ${tableRowsHtml}
         </div>
       </div>
       <p class="body-text" style="font-size:11.2px;">
-        The supreme hymn revealed to King Dasharatha. Neutralizes Saturn's 7th-house gaze and completely eliminates depression and unearned setbacks.
+        The supreme hymn revealed to King Dasharatha. Harmonizes Saturn's placement in your ${ordinal(chart.planets?.["Saturn"]?.house || 7)} house and completely eliminates depression and unearned setbacks.
       </p>
     </div>
 
