@@ -1526,7 +1526,9 @@ export function generateGoldenMuhuratDossierHTML(
     <div class="luxury-card" style="border-left:3px solid var(--ruby-bright);">
       <div class="kicker" style="color:var(--ruby-bright);">STRICT PROHIBITION: NEVER TAKE VEHICLE DELIVERY ON SATURDAY TWILIGHT</div>
       <p class="body-text" style="font-size:10px;">
-        While Saturn rules steel and engines, taking retail delivery of a personal luxury vehicle on a Saturday or during Saturn's Hora exposes the chassis to heavy collision accidents or long-term rusting. Avoid Saturday delivery entirely unless it is industrial heavy excavation equipment.
+        ${lagnesh === "Saturn"
+          ? `While Saturn rules steel and engines (and is your Lagnesh), avoid taking retail delivery of a personal luxury vehicle on a Tuesday or during Mars Hora / Rahu Kaal, as Mars-ruled kinetics expose the chassis to sharp collision risks. Prefer Friday (Venus Hora) or Saturday (your Lagnesh Hora) with Abhijit alignment.`
+          : `While Saturn rules steel and engines, taking retail delivery of a personal luxury vehicle on a Saturday or during Saturn's Hora exposes the chassis to heavy collision accidents or long-term rusting. Avoid Saturday delivery entirely unless it is industrial heavy excavation equipment.`}
       </p>
     </div>
   </div>
