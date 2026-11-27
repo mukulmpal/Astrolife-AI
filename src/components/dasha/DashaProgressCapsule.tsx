@@ -11,7 +11,8 @@ export interface DashaProgressCapsuleProps {
 }
 
 export function formatRemainingTime(days: number): string {
-  if (days <= 0) return "समाप्त (Completed)";
+  if (!Number.isFinite(days) || days < 0) return "तिथि उपलब्ध नहीं (Unavailable)";
+  if (days === 0) return "समाप्त (Completed)";
   if (days < 30) return `${days} दिन शेष (${days}d left)`;
   if (days < 365) {
     const months = Math.floor(days / 30.44);
@@ -34,16 +35,18 @@ export function DashaProgressCapsule({
 
   const startDate = new Date(start);
   const endDate = new Date(end);
+  const hasValidDates =
+    Number.isFinite(startDate.getTime()) && Number.isFinite(endDate.getTime());
   const now = new Date();
 
-  const totalMs = endDate.getTime() - startDate.getTime();
-  const elapsedMs = Math.max(0, now.getTime() - startDate.getTime());
+  const totalMs = hasValidDates ? endDate.getTime() - startDate.getTime() : 0;
+  const elapsedMs = hasValidDates ? Math.max(0, now.getTime() - startDate.getTime()) : 0;
   const percent = totalMs > 0 ? Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100)) : 0;
 
-  const remainingMs = Math.max(0, endDate.getTime() - now.getTime());
-  const remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
-  const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-  const totalDays = Math.round(totalMs / (1000 * 60 * 60 * 24));
+  const remainingMs = hasValidDates ? Math.max(0, endDate.getTime() - now.getTime()) : 0;
+  const remainingDays = hasValidDates ? Math.ceil(remainingMs / (1000 * 60 * 60 * 24)) : Number.NaN;
+  const elapsedDays = hasValidDates ? Math.floor(elapsedMs / (1000 * 60 * 60 * 24)) : 0;
+  const totalDays = hasValidDates ? Math.round(totalMs / (1000 * 60 * 60 * 24)) : 0;
 
   const remainingStr = formatRemainingTime(remainingDays);
 

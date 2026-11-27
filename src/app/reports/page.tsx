@@ -5,6 +5,7 @@ import Link from "next/link";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 import { useUserChart } from "@/lib/user-chart";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
+import { getActiveDashaState, getPlanetLon } from "@/lib/report/dossier-shared-helpers";
 import { savePurchasedReport, triggerDossierDownload } from "@/lib/user-reports";
 
 interface ReportItem {
@@ -117,12 +118,19 @@ export default function ReportsStorePage() {
   const [customerDob, setCustomerDob] = useState<string>(() => chart?.dob || birth?.dob || "");
   const [customerTob, setCustomerTob] = useState<string>(() => chart?.tob || birth?.tob || "12:00");
   const [customerCity, setCustomerCity] = useState<string>(() => chart?.city || birth?.city || "");
+  const [customerGender, setCustomerGender] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [formValidationError, setFormValidationError] = useState<string | null>(null);
   const [emailSending, setEmailSending] = useState<boolean>(false);
   const [emailSentStatus, setEmailSentStatus] = useState<string | null>(null);
   const [modalInputEmail, setModalInputEmail] = useState<string>("");
+
+  const effectiveGender =
+    customerGender ||
+    (chart as (ChartData & { gender?: string }) | null)?.gender ||
+    (birth as ({ gender?: string } | null))?.gender ||
+    "";
 
   const [purchasedReport, setPurchasedReport] = useState<{
     id: string;
@@ -137,20 +145,67 @@ export default function ReportsStorePage() {
 
   // Real-time calculated natal chart using Swiss Ephemeris algorithm
   const activeNatalChart = React.useMemo(() => {
+    let baseChart = chart;
     if (customerDob && customerCity) {
       try {
-        return calculateChart(
+        baseChart = calculateChart(
           customerName || "Sacred Seeker",
           customerDob,
           customerTob || "12:00",
           customerCity
         );
       } catch {
-        return chart;
+        baseChart = chart;
       }
     }
-    return chart;
-  }, [customerName, customerDob, customerTob, customerCity, chart]);
+    if (!baseChart) return baseChart;
+    const resolvedGender =
+      effectiveGender ||
+      (baseChart as ChartData & { gender?: string }).gender ||
+      (chart as (ChartData & { gender?: string }) | null)?.gender;
+    return resolvedGender
+      ? ({ ...baseChart, gender: resolvedGender } as ChartData & { gender?: string })
+      : baseChart;
+  }, [customerName, customerDob, customerTob, customerCity, effectiveGender, chart]);
+
+  const previewMeta = React.useMemo(() => {
+    const activeDasha = activeNatalChart ? getActiveDashaState(activeNatalChart).activeDasha : "—";
+    const tzVal = typeof activeNatalChart?.tz === "number" && Number.isFinite(activeNatalChart.tz) ? activeNatalChart.tz : 5.5;
+    const tzLabel = Math.abs(tzVal - 5.5) < 0.01 ? "IST" : `UTC${tzVal >= 0 ? "+" : ""}${tzVal}`;
+    const sunP = activeNatalChart?.planets?.["Sun"];
+    const moonP = activeNatalChart?.planets?.["Moon"];
+    let tithi = "—";
+    let vara = "—";
+    let yoga = "—";
+    if (sunP && moonP) {
+      const sunLon = getPlanetLon(sunP);
+      const moonLon = getPlanetLon(moonP);
+      const diff = ((moonLon - sunLon) % 360 + 360) % 360;
+      const tIdx = Math.floor(diff / 12);
+      const tNames = [
+        "Pratipada", "Dvitiya", "Tritiya", "Chaturthi", "Panchami",
+        "Shashthi", "Saptami", "Ashtami", "Navami", "Dashami",
+        "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Purnima / Amavasya",
+      ];
+      tithi = `${tIdx < 15 ? "Shukla" : "Krishna"} ${tNames[tIdx % 15]}`;
+      const yIdx = Math.floor((((sunLon + moonLon) % 360 + 360) % 360) / (360 / 27));
+      const yNames = [
+        "Vishkumbha", "Preeti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda", "Sukarma",
+        "Dhriti", "Shoola", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana",
+        "Vajra", "Siddhi", "Vyatipata", "Variyana", "Parigha", "Shiva", "Siddha",
+        "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti",
+      ];
+      yoga = yNames[yIdx] || "Siddha";
+    }
+    const dobStr = customerDob || activeNatalChart?.dob;
+    if (dobStr) {
+      const dt = new Date(`${dobStr}T12:00:00Z`);
+      if (Number.isFinite(dt.getTime())) {
+        vara = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dt.getUTCDay()];
+      }
+    }
+    return { activeDasha, tzLabel, tithi, vara, yoga };
+  }, [activeNatalChart, customerDob]);
 
   const requireCustomerContact = (): boolean => {
     setFormValidationError(null);
@@ -200,6 +255,10 @@ export default function ReportsStorePage() {
     try {
       setEmailSending(true);
       setEmailSentStatus(null);
+      const resolvedGender =
+        effectiveGender ||
+        (activeNatalChart as (ChartData & { gender?: string }) | null)?.gender ||
+        undefined;
       const res = await fetch("/api/reports/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -212,12 +271,19 @@ export default function ReportsStorePage() {
           orderId: reportToUse.order_id,
           paymentId: reportToUse.payment_id,
           signature: reportToUse.signature,
+          gender: resolvedGender,
           chart: activeNatalChart,
           birth: {
             name: customerName,
             dob: customerDob,
             tob: customerTob,
             city: customerCity,
+            ...(resolvedGender ? { gender: resolvedGender } : {}),
+          },
+          customer: {
+            name: customerName || activeNatalChart?.name || "Sacred Seeker",
+            email: emailToUse,
+            ...(resolvedGender ? { gender: resolvedGender } : {}),
           },
         }),
       });
@@ -285,6 +351,10 @@ export default function ReportsStorePage() {
   const handleDownloadDossier = async (report: { id: string; title: string; order_id: string; payment_id: string; signature?: string }) => {
     try {
       setDownloading(true);
+      const resolvedGender =
+        effectiveGender ||
+        (activeNatalChart as (ChartData & { gender?: string }) | null)?.gender ||
+        undefined;
       const res = await fetch("/api/reports/generate-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -292,16 +362,19 @@ export default function ReportsStorePage() {
           reportId: report.id,
           reportTitle: report.title,
           chart: activeNatalChart,
+          gender: resolvedGender,
           birth: {
             name: customerName || activeNatalChart?.name || "Sacred Seeker",
             dob: customerDob || activeNatalChart?.dob || "2000-01-01",
             tob: customerTob || activeNatalChart?.tob || "12:00",
             city: customerCity || activeNatalChart?.city || "New Delhi",
+            ...(resolvedGender ? { gender: resolvedGender } : {}),
           },
           customer: {
             name: customerName || activeNatalChart?.name || "Sacred Seeker",
             email: customerEmail,
             phone: customerPhone,
+            ...(resolvedGender ? { gender: resolvedGender } : {}),
           },
           orderId: report.order_id,
           paymentId: report.payment_id,
@@ -420,7 +493,7 @@ export default function ReportsStorePage() {
         "Astro-Vastu Directional Radar: 16-Zone Birth Planet Home Mapping",
         "Samudrika Shastra Palm Mounts & Vital Line Synchronicity",
         "Mathematical Birth Time Rectification (BTR) Exact Minute Calculation",
-        "2026-2027 1-Year Transit & Shani Sade Sati Month-by-Month Forecast",
+        "1-Year Rolling Transit & Shani Sade Sati Month-by-Month Forecast",
         "Non-Destructive Space Harmonization & Spatial Energy Balancing",
       ],
     },
@@ -804,7 +877,7 @@ export default function ReportsStorePage() {
     },
     {
       id: "yearly_gochar",
-      title: "🪐 2026-2027 1-Year Transit & Sade Sati Dossier",
+      title: "🪐 1-Year Rolling Transit & Sade Sati Dossier",
       tagline: "Month-by-month predictions based on Saturn, Jupiter & Rahu movements.",
       price: "₹129",
       paise: 12900,
@@ -1204,6 +1277,21 @@ export default function ReportsStorePage() {
                 placeholder="+91 98765 43210"
                 className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] placeholder-[#9C948A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
               />
+            </div>
+            <div>
+              <label htmlFor="seeker-gender-input" className="block text-[10px] font-bold uppercase tracking-wider text-[#6B635B] mb-1">
+                Gender (Remedial Lateralization)
+              </label>
+              <select
+                id="seeker-gender-input"
+                value={effectiveGender}
+                onChange={(e) => setCustomerGender(e.target.value)}
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:border-[#c8a030] focus:bg-white transition-all"
+              >
+                <option value="">Prefer not to specify (Neutral)</option>
+                <option value="male">Male (Dakshina Anga)</option>
+                <option value="female">Female (Vama Anga)</option>
+              </select>
             </div>
           </div>
         </div>
@@ -1952,15 +2040,15 @@ export default function ReportsStorePage() {
                       </div>
                       <div>
                         <span className="text-[#6B635B] block text-[10px] font-medium">Date & Time of Birth</span>
-                        <strong className="text-[#1A1A1A] text-sm">{customerDob || activeNatalChart?.dob || "Recorded"} · {customerTob || activeNatalChart?.tob || "12:00"} IST</strong>
+                        <strong className="text-[#1A1A1A] text-sm">{customerDob || activeNatalChart?.dob || "Recorded"} · {customerTob || activeNatalChart?.tob || "12:00"} {previewMeta.tzLabel}</strong>
                       </div>
                       <div>
                         <span className="text-[#6B635B] block text-[10px] font-medium">Birth Location & Coords</span>
-                        <strong className="text-[#1A1A1A]">{customerCity || activeNatalChart?.city || "New Delhi"}</strong>
+                        <strong className="text-[#1A1A1A]">{customerCity || activeNatalChart?.city || "Recorded Location"}</strong>
                       </div>
                       <div>
                         <span className="text-[#6B635B] block text-[10px] font-medium">Lagna & Nakshatra Anchor</span>
-                        <strong className="text-[#8C6508]">{activeNatalChart?.lagnaRashi || "Ascendant"} Lagna · {activeNatalChart?.planets?.["Moon"]?.nakshatra || "Rohini"} Nakshatra</strong>
+                        <strong className="text-[#8C6508]">{activeNatalChart?.lagnaRashi || "Ascendant"} Lagna · {activeNatalChart?.planets?.["Moon"]?.nakshatra || "—"} Nakshatra</strong>
                       </div>
                     </div>
 
@@ -1986,13 +2074,13 @@ export default function ReportsStorePage() {
                       <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E0D7C6]">
                         <span className="text-[#8C6508] font-bold block text-[10px] uppercase">✦ Janma Rashi & Chandra Kundli</span>
                         <p className="text-[#4A4238] mt-1 text-[11.5px]">
-                          Moon placed in <strong>{activeNatalChart?.planets?.["Moon"]?.sign || "Taurus"}</strong> under <strong>{activeNatalChart?.planets?.["Moon"]?.nakshatra || "Rohini"}</strong> nakshatra. Dispositor of psychological immunity, memory, and instincts.
+                          Moon placed in <strong>{activeNatalChart?.planets?.["Moon"]?.sign || "—"}</strong> under <strong>{activeNatalChart?.planets?.["Moon"]?.nakshatra || "—"}</strong> nakshatra. Dispositor of psychological immunity, memory, and instincts.
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-[#FAF7F0] border border-[#E0D7C6]">
                         <span className="text-[#8C6508] font-bold block text-[10px] uppercase">✦ Ascendant (Lagna) Foundation</span>
                         <p className="text-[#4A4238] mt-1 text-[11.5px]">
-                          Ascendant in <strong>{activeNatalChart?.lagnaRashi || "Scorpio"}</strong>. Primary vector of physical constitution, worldly dharma, and instinctual reaction patterns.
+                          Ascendant in <strong>{activeNatalChart?.lagnaRashi || "—"}</strong>. Primary vector of physical constitution, worldly dharma, and instinctual reaction patterns.
                         </p>
                       </div>
                     </div>
@@ -2000,19 +2088,19 @@ export default function ReportsStorePage() {
                     <div className="grid grid-cols-4 gap-2 text-center text-xs">
                       <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
                         <span className="text-[9px] text-[#6B635B] block font-bold">TITHI</span>
-                        <strong className="text-[#1A1A1A] text-[11px]">Shukla / Krishna</strong>
+                        <strong className="text-[#1A1A1A] text-[11px]">{previewMeta.tithi}</strong>
                       </div>
                       <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
                         <span className="text-[9px] text-[#6B635B] block font-bold">VARA</span>
-                        <strong className="text-[#1A1A1A] text-[11px]">Solar Day</strong>
+                        <strong className="text-[#1A1A1A] text-[11px]">{previewMeta.vara}</strong>
                       </div>
                       <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
                         <span className="text-[9px] text-[#6B635B] block font-bold">YOGA</span>
-                        <strong className="text-[#1A1A1A] text-[11px]">Shubh Yoga</strong>
+                        <strong className="text-[#1A1A1A] text-[11px]">{previewMeta.yoga}</strong>
                       </div>
                       <div className="p-2 rounded-lg bg-white border border-[#E7DFD5]">
                         <span className="text-[9px] text-[#6B635B] block font-bold">ACTIVE DASHA</span>
-                        <strong className="text-[#c8a030] text-[11px]">{activeNatalChart?.dashas?.find((d) => d.active)?.planet || "Jupiter"} MD</strong>
+                        <strong className="text-[#c8a030] text-[11px]">{previewMeta.activeDasha} MD</strong>
                       </div>
                     </div>
                   </div>
@@ -2038,12 +2126,12 @@ export default function ReportsStorePage() {
                         </div>
                         <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
                           <span className="text-[9px] text-[#8C6508] font-bold block uppercase">Chandra Rashi</span>
-                          <strong className="text-[#1A1A1A]">{activeNatalChart?.planets?.["Moon"]?.sign || "Moon"} ({activeNatalChart?.planets?.["Moon"]?.nakshatra || "Rohini"})</strong>
+                          <strong className="text-[#1A1A1A]">{activeNatalChart?.planets?.["Moon"]?.sign || "—"} ({activeNatalChart?.planets?.["Moon"]?.nakshatra || "—"})</strong>
                           <p className="text-[10.5px] text-[#6B635B] mt-0.5">Subconscious architecture and emotional responsiveness.</p>
                         </div>
                         <div className="p-2.5 rounded-lg bg-white border border-[#E7DFD5]">
                           <span className="text-[9px] text-[#c8a030] font-bold block uppercase">Active Governing Cycle</span>
-                          <strong className="text-[#c8a030]">{activeNatalChart?.dashas?.find((d) => d.active)?.planet || "Jupiter"} Mahadasha</strong>
+                          <strong className="text-[#c8a030]">{previewMeta.activeDasha} Mahadasha</strong>
                           <p className="text-[10.5px] text-[#6B635B] mt-0.5">Primary governing energetic lifecycle at current age.</p>
                         </div>
                       </div>

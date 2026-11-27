@@ -10,26 +10,51 @@
 
 import PDFDocument from "pdfkit";
 import * as fs from "fs";
-import type { ChartData } from "../astro-engine/calculations";
+import type { ChartData, PlanetData } from "../astro-engine/calculations";
 import { RASHIS } from "../astro-engine/calculations";
+
+type ChartWithLegacyMeta = ChartData & {
+  moonSign?: string;
+  moonNakshatra?: string;
+  moonPada?: number;
+  gender?: string;
+};
+
+type PlanetLike = Partial<PlanetData> & {
+  name?: string;
+  planet?: string;
+  rashi?: string;
+  isRetrograde?: boolean;
+  longitude?: number;
+};
 import { calculateDivisional, getNavamshaAnalysis, getDashamshaAnalysis } from "../astro-engine/divisional";
 import { calculateShadbala } from "../astro-engine/shadbala";
+import { calculateAshtakavarga } from "../astro-engine/ashtakavarga";
+import { calculateKarakas } from "../astro-engine/jaimini";
+import { makeRudrakshaRecommendation } from "../astro-engine/gemstone";
 import { getPresentYogas } from "../astro-engine/yogas";
+import { getDynamicGemstonePrescription } from "../astro/human-translator";
+import type { PackageDossierOptions } from "./package-dossier-html-generator";
+import {
+  SIGN_NAMES,
+  SIGN_LORDS,
+  PLANET_WEEKDAYS,
+  getPlanetLon,
+  formatDMS,
+  getHouseFromLagna,
+  getSignFromHouse,
+  computeClassicalDignity,
+  getActiveDashaState,
+  resolveGender,
+  getGenderLateralizationSafe,
+  getAkvHouseSav,
+  isDusthanaLord,
+} from "./dossier-shared-helpers";
 import { renderVectorNorthIndianKundli } from "./vector-chart-renderer";
 
-type PDFDoc = InstanceType<typeof PDFDocument>;
+export type { PackageDossierOptions };
 
-export interface PackageDossierOptions {
-  reportId: string;
-  reportTitle: string;
-  customerName?: string;
-  customerEmail?: string;
-  customerPhone?: string;
-  orderId?: string;
-  paymentId?: string;
-  fixedTimestamp?: string;
-  isSample?: boolean;
-}
+type PDFDoc = InstanceType<typeof PDFDocument>;
 
 const DEFAULT_FONT_CANDIDATES = [
   "/System/Library/Fonts/Supplemental/Arial.ttf",
@@ -48,7 +73,7 @@ function resolveAvailableFont(): string | undefined {
  */
 export async function buildPackageDossierPdf(
   chart: ChartData,
-  options: PackageDossierOptions
+  options: PackageDossierOptions = {}
 ): Promise<Buffer> {
   const fontFile = resolveAvailableFont();
   const subjectName = options.customerName || chart.name || "Sacred Seeker";
@@ -139,7 +164,7 @@ export async function buildPackageDossierPdf(
       // PAGE 6: SPECIALIZED THEMATIC DEEP DIVE
       // ───────────────────────────────────────────────────────────────────────
       doc.addPage();
-      renderPage3ThematicAnalysis(doc, chart, options.reportId, reportTitle);
+      renderPage3ThematicAnalysis(doc, chart, options.reportId || "general", reportTitle);
 
       // ───────────────────────────────────────────────────────────────────────
       // PAGE 7: 12-HOUSE BHAVA VITALITY OVERVIEW
@@ -157,7 +182,7 @@ export async function buildPackageDossierPdf(
       // PAGE 9: SACRED VEDIC REMEDIES & HARMONIZATION MATRIX
       // ───────────────────────────────────────────────────────────────────────
       doc.addPage();
-      renderPage5RemediesAndGuidance(doc, chart, options.reportId);
+      renderPage5RemediesAndGuidance(doc, chart, options);
 
       if (options.isSample) {
         // In sample preview mode, include the official locked verification chapter
@@ -254,10 +279,11 @@ function renderPage1Cover(
   doc.fontSize(9).fillColor("#4A4238").text("Time & Location:", 60, boxTop + 72);
   doc.fontSize(9).fillColor("#1A1A1A").text(`${chart.tob || "Standard"} • ${chart.city || "Sacred Geometry"}`, 170, boxTop + 72);
 
-  const moonData = (chart.planets as any)?.Moon;
-  const moonSign = (chart as any).moonSign || moonData?.sign || "Chandra";
-  const moonNakshatra = (chart as any).moonNakshatra || moonData?.nakshatra || "Nakshatra";
-  const moonPada = (chart as any).moonPada || moonData?.pada || 1;
+  const chartMeta = chart as ChartWithLegacyMeta;
+  const moonData = chart.planets?.Moon;
+  const moonSign = chartMeta.moonSign || moonData?.sign || "Chandra";
+  const moonNakshatra = chartMeta.moonNakshatra || moonData?.nakshatra || "Nakshatra";
+  const moonPada = chartMeta.moonPada || moonData?.pada || 1;
 
   doc.fontSize(9).fillColor("#4A4238").text("Lagna / Janma Rashi:", 60, boxTop + 90);
   doc.fontSize(9).fillColor("#8C6508").text(`${chart.lagnaRashi || "Ascendant"} (${chart.lagnaNum !== undefined ? chart.lagnaNum + 1 : 1}) • ${moonSign}`, 170, boxTop + 90);
@@ -294,7 +320,7 @@ function renderPage1Cover(
   doc.rect(45, execTop, 505, 175).fillAndStroke("#FFFFFF", "#E0D7C6");
   doc.fontSize(11).fillColor("#1A1A1A").text("DOSSIER EXECUTIVE OVERVIEW", 60, execTop + 14);
   doc.fontSize(9).fillColor("#4A4238").text(
-    `Welcome to your personalized ${title}. Your natal chart reflects a unique karmic alignment configured by Lagna ${chart.lagnaRashi} and Moon Sign ${moonSign}. The following chapters provide an unbundled, surgical examination of your specific planetary indicators, current life cycle timing, and precise remedial actions to harmonize your destiny.`,
+    `Welcome to your personalized ${title}. Your natal chart reflects a unique karmic alignment configured by Lagna ${chart.lagnaRashi || "Ascendant"} and Moon Sign ${moonSign}. The following chapters provide an unbundled, surgical examination of your specific planetary indicators, current life cycle timing, and precise remedial actions to harmonize your destiny.`,
     60,
     execTop + 34,
     { width: 475, lineGap: 4 }
@@ -332,18 +358,21 @@ function renderPage2NatalPlacements(doc: PDFDoc, chart: ChartData, subject: stri
 
   let currentY = tableTop + 22;
   const rawPlanets = chart.planets || {};
-  const planetList = Array.isArray(rawPlanets)
-    ? (rawPlanets as any[]).map((p) => ({ name: p.name || p.planet || "Graha", ...p }))
-    : Object.entries(rawPlanets).map(([name, data]) => ({ name, ...(typeof data === "object" && data !== null ? data : {}) }));
+  const planetList: PlanetLike[] = Array.isArray(rawPlanets)
+    ? (rawPlanets as PlanetLike[]).map((p) => ({ name: p.name || p.planet || "Graha", ...p }))
+    : Object.entries(rawPlanets).map(([name, data]) => ({
+        name,
+        ...(typeof data === "object" && data !== null ? (data as PlanetLike) : {}),
+      }));
 
-  planetList.slice(0, 10).forEach((p: any, idx: number) => {
+  planetList.slice(0, 10).forEach((p, idx: number) => {
     const bg = idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
     doc.rect(45, currentY, 505, 20).fill(bg);
 
     doc.fontSize(8.5).fillColor("#1A1A1A");
-    doc.text(p.name, 55, currentY + 5);
+    doc.text(p.name || "Graha", 55, currentY + 5);
     doc.text(p.sign || p.rashi || "—", 135, currentY + 5);
-    doc.text(`${(p.degree ?? 0).toFixed(2)}°`, 235, currentY + 5);
+    doc.text(formatDMS(getPlanetLon(p)), 235, currentY + 5);
     doc.text(`${p.nakshatra || "—"} (${p.nakshatraLord || "—"})`, 310, currentY + 5);
     doc.text(`H${p.house ?? 1}`, 435, currentY + 5);
     doc.fillColor(p.retrograde || p.isRetrograde ? "#B91C1C" : "#16A34A");
@@ -357,11 +386,12 @@ function renderPage2NatalPlacements(doc: PDFDoc, chart: ChartData, subject: stri
   doc.rect(45, dashaBoxTop, 505, 95).fillAndStroke("#FAF7F0", "#E0D7C6");
   doc.fontSize(10.5).fillColor("#8C6508").text("CURRENT VIMSHOTTARI DASHA CYCLE", 60, dashaBoxTop + 12);
 
-  const activeDasha = chart.dashas?.[0]?.planet || "Jupiter";
-  const activeAntar = chart.antardasha?.[0]?.planet || "Saturn";
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha;
+  const activeAntar = dashaState.activeAntar;
 
   doc.fontSize(9).fillColor("#3A3530").text(
-    `You are presently operating under the major Mahadasha of ${activeDasha} and Antardasha of ${activeAntar}. In Vedic Shastra, the Mahadasha sets the cosmic environment and theme of your life, while the Antardasha dictates day-to-day results, emotional focus, and event precipitation.`,
+    `You are presently operating under the major Mahadasha of ${activeDasha} (${dashaState.mdStartYear}–${dashaState.mdEndYear}) and Antardasha of ${activeAntar} (${dashaState.adStartLabel}–${dashaState.adEndLabel}). In Vedic Shastra, the Mahadasha sets the cosmic environment and theme of your life, while the Antardasha dictates day-to-day results, emotional focus, and event precipitation.`,
     60,
     dashaBoxTop + 32,
     { width: 475, lineGap: 3 }
@@ -388,15 +418,15 @@ function renderPage2NatalPlacements(doc: PDFDoc, chart: ChartData, subject: stri
   doc.fontSize(10).fillColor("#8C6508").text("LAGNA & CHANDRA DYNAMICS", rightX + 14, cardY + 12);
 
   doc.fontSize(8.5).fillColor("#4A4238").text(
-    `• Lagna (${chart.lagnaRashi}): Represents your core life vitality, physical disposition, and outer manifestation. Your soul operates with natural discernment and steadfast resolve.`,
+    `• Lagna (${chart.lagnaRashi || "Ascendant"}): Represents your core life vitality, physical disposition, and outer manifestation. Your soul operates with natural discernment and steadfast resolve.`,
     rightX + 14,
     cardY + 30,
     { width: rightW - 28, lineGap: 2 }
   );
 
   const moonP = chart.planets?.["Moon"];
-  const moonRashi = moonP?.sign || "Taurus";
-  const moonNak = moonP?.nakshatra || "Rohini";
+  const moonRashi = moonP?.sign || (moonP ? SIGN_NAMES[Math.floor(getPlanetLon(moonP) / 30)] : "—");
+  const moonNak = moonP?.nakshatra || "—";
   doc.fontSize(8.5).fillColor("#4A4238").text(
     `• Chandra (${moonRashi} • ${moonNak}): Governs mental peace, emotional intuition, and subconscious processing. Stabilizing emotional equilibrium is essential during major dasha transitions.`,
     rightX + 14,
@@ -451,74 +481,149 @@ function renderPage3ThematicAnalysis(
 }
 
 function getThematicContent(reportId: string, chart: ChartData): Array<{ title: string; body: string; metric?: string }> {
-  if (reportId.includes("union") || reportId.includes("marriage") || reportId.includes("milan")) {
+  const safeId = (reportId || "").toLowerCase();
+  const lagnaNum =
+    typeof chart.lagnaNum === "number" && Number.isFinite(chart.lagnaNum)
+      ? ((Math.trunc(chart.lagnaNum) % 12) + 12) % 12
+      : 0;
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Ascendant";
+  const dashaState = getActiveDashaState(chart);
+  const activeMD = dashaState.activeDasha;
+  const activeAD = dashaState.activeAntar;
+
+  let houseSav = Array(12).fill(28);
+  try {
+    const akv = calculateAshtakavarga(
+      chart.planets as unknown as Parameters<typeof calculateAshtakavarga>[0],
+      lagnaNum
+    );
+    houseSav = getAkvHouseSav(akv, lagnaNum);
+  } catch {
+    // keep neutral 28 baseline
+  }
+
+  if (safeId.includes("union") || safeId.includes("marriage") || safeId.includes("milan") || safeId.includes("family")) {
+    let d9Lagna = getSignFromHouse(lagnaNum, 9);
+    let d9SeventhSign = getSignFromHouse(lagnaNum, 7);
+    let d9SeventhLord = SIGN_LORDS[d9SeventhSign] || "Venus";
+    try {
+      const divs = calculateDivisional(
+        chart.planets as unknown as Parameters<typeof calculateDivisional>[0],
+        lagnaNum,
+        chart.lagnaLon
+      );
+      const d9 = divs.find((c) => c.key === "D9");
+      if (d9) {
+        d9Lagna = d9.lagna;
+        d9SeventhSign = getSignFromHouse(d9.lagnaNum, 7);
+        d9SeventhLord = SIGN_LORDS[d9SeventhSign] || "Venus";
+      }
+    } catch {
+      // keep fallback
+    }
+
+    let dkText = "Darakaraka";
+    try {
+      const karakas = calculateKarakas(chart.planets);
+      const dk = karakas.find((k) => k.role === "DK");
+      if (dk) dkText = `${dk.planet} in ${dk.sign}`;
+    } catch {
+      // keep fallback
+    }
+
+    const marsP = chart.planets?.["Mars"];
+    const jupP = chart.planets?.["Jupiter"];
+    const venP = chart.planets?.["Venus"];
+    const h7Sign = getSignFromHouse(lagnaNum, 7);
+    const h7Lord = SIGN_LORDS[h7Sign] || "Venus";
+    const h7LordP = chart.planets?.[h7Lord];
+    const h7Dignity = h7LordP ? computeClassicalDignity(h7Lord, h7LordP.sign, getPlanetLon(h7LordP)) : "Balanced";
+    const marsHouse = marsP?.house || (marsP?.sign ? getHouseFromLagna(marsP.sign, lagnaNum) : 1);
+    const jupHouse = jupP?.house || (jupP?.sign ? getHouseFromLagna(jupP.sign, lagnaNum) : 1);
+    const isManglik = [1, 4, 7, 8, 12].includes(marsHouse);
+    const jupAspectsMars = [1, 5, 7, 9].some((off) => ((jupHouse + off - 2) % 12) + 1 === marsHouse);
+    const venDignity = venP ? computeClassicalDignity("Venus", venP.sign, getPlanetLon(venP)) : "Balanced";
+
     return [
       {
-        title: "D-9 Navamsha Partner Trait & Dharma Resonance",
-        body: "The D9 Navamsha chart reveals the soul characteristics and emotional temperament of your lifelong companion. Planetary lords governing the 7th house in D9 indicate a partner with strong ethical clarity, supportive communication, and deep ancestral respect.",
-        metric: "7th House Lord in D9 indicates harmonizing communicative axis with mutual respect.",
+        title: `D-9 Navamsha (${d9Lagna}) Partner Trait & Dharma Resonance`,
+        body: `Your D-9 Navamsha Lagna rises in ${d9Lagna}, placing your D-9 7th house in ${d9SeventhSign} (lord ${d9SeventhLord}). Combined with Jaimini Darakaraka (${dkText}) and 7th lord ${h7Lord} (${h7Dignity}) from ${lagnaRashi} Lagna, your chart seeks principled alignment, mutual respect, and shared dharmic vision.`,
+        metric: `D-9 7th House: ${d9SeventhSign} (${d9SeventhLord}) · Darakaraka: ${dkText}`,
       },
       {
         title: "Mangal Dosha & Passion Equilibrium",
-        body: "Mars energy regulates marital passion, patience, and directness. In your natal configuration, Mars is placed in a balanced house, indicating that friction can be completely dissolved through honest dialogue and avoiding hasty assumptions during peak transits.",
-        metric: "Mangal Dosha Level: Mild to Neutralized through natural benefic Jupiter/Venus aspect.",
+        body: `Mars is placed in ${marsP?.sign || "your natal sign"} (House ${marsHouse}) while Venus holds ${venDignity} dignity. ${isManglik ? (jupAspectsMars ? "Although Mars occupies a Manglik bhava, Jupiter casts a stabilizing benefic aspect from House " + jupHouse + ", moderating friction." : "Mars activates a Manglik bhava from Lagna; deliberate communication, patience, and mutual pacing maintain equilibrium.") : "Mars sits outside primary Manglik houses from Lagna, supporting steady relational temperament."}`,
+        metric: `Mars House ${marsHouse} (${isManglik ? (jupAspectsMars ? "Mitigated by Guru Drishti" : "Manglik Active") : "Non-Manglik"}) · Venus: ${venDignity}`,
       },
       {
-        title: "Vivah Timing Windows & Next 12-Month Alignment",
-        body: "Transit Jupiter and Venus movements across your 1st, 5th, and 7th houses create powerful golden windows for solemnizing relationships, marital harmony, or initiating long-term family decisions.",
-        metric: "Highest Auspicious Window: Q2 & Q3 during benefic Jupiter-Venus trine.",
+        title: `Vivah Timing & ${activeMD}–${activeAD} Alignment`,
+        body: `Under your active ${activeMD} Mahadasha and ${activeAD} Antardasha, 7th-house SAV strength (${houseSav[6]} bindus) and Jupiter's position in House ${jupHouse} govern relationship milestones. Align major commitments with ${PLANET_WEEKDAYS[h7Lord] || "Friday"} observances and supportive transits over ${h7Sign}.`,
+        metric: `7th House (${h7Sign}) SAV: ${houseSav[6]} Bindus · Active Cycle: ${activeMD}–${activeAD}`,
       },
     ];
   }
 
-  if (reportId.includes("wealth") || reportId.includes("yoga")) {
-    // Pull real planetary data for personalized wealth insights
+  if (safeId.includes("wealth") || safeId.includes("yoga") || safeId.includes("stock") || safeId.includes("raja")) {
     const rawPlanetsW = chart.planets || {};
-    const planetEntriesW = Object.entries(rawPlanetsW) as [string, any][];
+    const planetEntriesW = Object.entries(rawPlanetsW);
     const h2Planets = planetEntriesW.filter(([, p]) => p?.house === 2).map(([n]) => n);
     const h11Planets = planetEntriesW.filter(([, p]) => p?.house === 11).map(([n]) => n);
     const h10Planets = planetEntriesW.filter(([, p]) => p?.house === 10).map(([n]) => n);
-    const activeMDW = chart.dashas?.find((d) => d.active)?.planet || "current Mahadasha lord";
-    const h2Text = h2Planets.length ? `${h2Planets.join(" & ")} in 2nd house` : "2nd house (aspected)";
-    const h11Text = h11Planets.length ? `${h11Planets.join(" & ")} in 11th house` : "11th house (aspected)";
-    const h10Text = h10Planets.length ? `${h10Planets.join(", ")} in 10th house (Karma Bhava)` : "10th house activated";
+    const h2Sign = getSignFromHouse(lagnaNum, 2);
+    const h11Sign = getSignFromHouse(lagnaNum, 11);
+    const h10Sign = getSignFromHouse(lagnaNum, 10);
+    const h9Sign = getSignFromHouse(lagnaNum, 9);
+    const h9Lord = SIGN_LORDS[h9Sign] || "Jupiter";
+    const h2Text = h2Planets.length ? `${h2Planets.join(" & ")} in 2nd house (${h2Sign})` : `2nd house ${h2Sign} (${SIGN_LORDS[h2Sign]})`;
+    const h11Text = h11Planets.length ? `${h11Planets.join(" & ")} in 11th house (${h11Sign})` : `11th house ${h11Sign} (${SIGN_LORDS[h11Sign]})`;
+    const h10Text = h10Planets.length ? `${h10Planets.join(", ")} in 10th house (${h10Sign})` : `10th house ${h10Sign} (${SIGN_LORDS[h10Sign]})`;
+    const sav11 = houseSav[10];
+    const sav12 = houseSav[11];
 
     return [
       {
         title: "Dhana Yogas & Wealth Accumulation Axis (2nd & 11th House)",
-        body: `${h2Text} and ${h11Text} form your primary wealth axis. Under the active ${activeMDW} Mahadasha, the Dhana-karaka alignment supports systematic accumulation when income is channeled into structured assets rather than liquid speculation. Lagnesh coordination with the 11th cusp confirms recurring gains from multiple income streams.`,
-        metric: `Active Dhana axis: ${h2Text} → ${h11Text}. Favour long-term allocation over short-cycle trading.`,
+        body: `${h2Text} and ${h11Text} form your primary wealth axis for ${lagnaRashi} Lagna. Under active ${activeMD}–${activeAD} (${dashaState.mdStartYear}–${dashaState.mdEndYear}), Dhana alignment favors structured asset accumulation over unhedged speculation.`,
+        metric: `2nd SAV: ${houseSav[1]}B · 11th SAV: ${sav11}B · Active: ${activeMD}–${activeAD}`,
       },
       {
         title: "Ashtakavarga 11th vs 12th House Bindu Balance",
-        body: `In Parashari Ashtakavarga, when 11th-house bindus exceed 12th-house bindus the native retains wealth with minimal leakage. Your chart shows ${h11Text} generating gains, while expenditure control depends on conscious boundary-setting during 12th-house sub-lord periods. Prioritize savings automation during the first quarter of each calendar year.`,
-        metric: "Shastra guideline: 11th > 12th bindus = net-positive retention cycle. Monitor closely during Rahu–Ketu sub-periods.",
+        body: `Your 11th house (Labha, ${h11Sign}) holds ${sav11} SAV bindus compared to ${sav12} bindus in the 12th house (Vyaya). ${sav11 > sav12 ? "Net-positive gain-to-outflow ratio supports long-term capital retention." : "Outflow bindus match or exceed gain bindus — enforce automated savings sweeps before discretionary spending."}`,
+        metric: `11th (${sav11} Bindus) vs 12th (${sav12} Bindus) · ${sav11 >= sav12 ? "Net Retention Positive" : "Enforce Strict Capital Buffers"}`,
       },
       {
         title: "Raja Yoga Activation & Career Authority Window",
-        body: `${h10Text} establishes strong Karma Bhava density. When the ${activeMDW} lord also rules or aspects the 9th or 1st house, it triggers Raja Yoga conditions awakening public recognition, promotions, and high-value professional contracts. These milestones intensify during benefic Antardasha windows.`,
-        metric: `Key activation corridor: ${activeMDW} Mahadasha × 9th-lord Antardasha. Document milestones reached.`,
+        body: `${h10Text} establishes your Karma Bhava foundation. Coordination between ${activeMD} Mahadasha and 9th lord ${h9Lord} (${h9Sign}) activates institutional authority, contracts, and strategic advancement.`,
+        metric: `10th House (${h10Sign}) SAV: ${houseSav[9]}B · 9th Lord: ${h9Lord}`,
       },
     ];
   }
 
   // Default Universal / Holistic Vedic Blueprint
-  const resolvedMoonSign = (chart as any).moonSign || (chart.planets as any)?.Moon?.sign || "Chandra";
+  const moonP = chart.planets?.["Moon"];
+  const resolvedMoonSign = (chart as ChartWithLegacyMeta).moonSign || moonP?.sign || "—";
+  const kendraPlanets = Object.entries(chart.planets || {})
+    .filter(([, p]) => [1, 4, 7, 10].includes(p?.house))
+    .map(([n, p]) => `${n} (H${p.house})`);
+  const kendraSummary = kendraPlanets.length
+    ? `Kendra anchors (${kendraPlanets.join(", ")}) reinforce structural resilience.`
+    : `Your Lagna lord ${SIGN_LORDS[lagnaRashi] || "Lagnesh"} coordinates house rulerships with steady persistence.`;
+
   return [
     {
       title: "Core Karmic Blueprint & Life Mission",
-      body: `Born under ${chart.lagnaRashi} Lagna and ${resolvedMoonSign} Rashi, your life path involves balancing worldly responsibilities with inner spiritual sovereignty. Benefic planets in key angular houses safeguard you against sudden adversities.`,
-      metric: "Planetary Equilibrium Index: Balanced with high resilient recovery.",
+      body: `Born under ${lagnaRashi} Lagna and ${resolvedMoonSign} Rashi, your life path balances worldly responsibilities with inner sovereignty. ${kendraSummary}`,
+      metric: `Lagna: ${lagnaRashi} (SAV ${houseSav[0]}B) · Moon: ${resolvedMoonSign}`,
     },
     {
       title: "Varga & Divisional Depth Alignment",
-      body: "Divisional charts (D9 Dharma, D10 Profession) act as celestial microscopes confirming that natal potentials manifest in the physical world without internal conflict when timed accurately.",
-      metric: "Varga Harmony: Aligned across major life pillars.",
+      body: `Divisional charts (D-9 Navamsha and D-10 Dasamsa) confirm how natal potentials manifest across inner maturity and career execution under ${activeMD}–${activeAD}.`,
+      metric: `Active Cycle: ${activeMD} Mahadasha / ${activeAD} Antardasha`,
     },
     {
-      title: "Upcoming Celestial Transits & Gochar Radar",
-      body: "Major slow-moving planets (Saturn and Jupiter) are actively transiting supporting angles. Maintaining steady discipline in diet, professional ethics, and daily rituals guarantees lasting peace.",
-      metric: "Optimal Focus: Consistency over speed yields 3x greater karmic returns.",
+      title: "Celestial Transits & Gochar Discipline",
+      body: `Honor your strongest SAV pillars (House ${houseSav.indexOf(Math.max(...houseSav)) + 1} with ${Math.max(...houseSav)} bindus) while maintaining structured discipline in lower-bindu sectors.`,
+      metric: `Peak SAV Bhava: House ${houseSav.indexOf(Math.max(...houseSav)) + 1} (${Math.max(...houseSav)} Bindus)`,
     },
   ];
 }
@@ -535,46 +640,66 @@ function renderPage4QuarterlyHorizon(doc: PDFDoc, chart: ChartData, subject: str
 
   doc.moveTo(45, 75).lineTo(550, 75).lineWidth(0.8).strokeColor("#B8860B").stroke();
 
-  // Build personalized quarterly guidance from actual dasha data
-  const activeMahadasha = chart.dashas?.find((d) => d.active)?.planet || "current lord";
-  const activeAntardasha = chart.antardasha?.find((a) => a.active)?.planet || "sub-lord";
-  const h10List = Object.entries(chart.planets || {}).filter(([, p]: [string, any]) => p?.house === 10).map(([n]) => n);
-  const h9List = Object.entries(chart.planets || {}).filter(([, p]: [string, any]) => p?.house === 9).map(([n]) => n);
-  const h2List = Object.entries(chart.planets || {}).filter(([, p]: [string, any]) => p?.house === 2).map(([n]) => n);
-  const h12List = Object.entries(chart.planets || {}).filter(([, p]: [string, any]) => p?.house === 12).map(([n]) => n);
-  const karmaGrahas = h10List.length ? h10List.join(" & ") : "aspected Karma Bhava";
-  const bhagyaGrahas = h9List.length ? h9List.join(" & ") : "aspected Bhagya Bhava";
-  const dhanaGrahas = h2List.length ? h2List.join(" & ") : "aspected Dhana Bhava";
-  const vyayaGrahas = h12List.length ? h12List.join(" & ") : "12th house";
+  const lagnaNum =
+    typeof chart.lagnaNum === "number" && Number.isFinite(chart.lagnaNum)
+      ? ((Math.trunc(chart.lagnaNum) % 12) + 12) % 12
+      : 0;
+  const lagnaSign = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Ascendant";
+  const dashaState = getActiveDashaState(chart);
+  const activeMahadasha = dashaState.activeDasha;
+  const activeAntardasha = dashaState.activeAntar;
+
+  const h10Sign = getSignFromHouse(lagnaNum, 10);
+  const h9Sign = getSignFromHouse(lagnaNum, 9);
+  const h2Sign = getSignFromHouse(lagnaNum, 2);
+  const h12Sign = getSignFromHouse(lagnaNum, 12);
+  const h10Lord = SIGN_LORDS[h10Sign] || "Saturn";
+  const h9Lord = SIGN_LORDS[h9Sign] || "Jupiter";
+  const h12Lord = SIGN_LORDS[h12Sign] || "Jupiter";
+
+  const h10List = Object.entries(chart.planets || {}).filter(([, p]) => p?.house === 10).map(([n]) => n);
+  const h9List = Object.entries(chart.planets || {}).filter(([, p]) => p?.house === 9).map(([n]) => n);
+  const h2List = Object.entries(chart.planets || {}).filter(([, p]) => p?.house === 2).map(([n]) => n);
+  const h12List = Object.entries(chart.planets || {}).filter(([, p]) => p?.house === 12).map(([n]) => n);
+  const karmaGrahas = h10List.length ? h10List.join(" & ") : `${h10Lord} (${h10Sign})`;
+  const bhagyaGrahas = h9List.length ? h9List.join(" & ") : `${h9Lord} (${h9Sign})`;
+  const dhanaGrahas = h2List.length ? h2List.join(" & ") : `${SIGN_LORDS[h2Sign]} (${h2Sign})`;
+  const vyayaGrahas = h12List.length ? h12List.join(" & ") : `${h12Lord} (${h12Sign})`;
+
+  const mdDay = PLANET_WEEKDAYS[activeMahadasha] || "Thursday";
+  const adDay = PLANET_WEEKDAYS[activeAntardasha] || "Wednesday";
+  const h10Day = PLANET_WEEKDAYS[h10Lord] || "Wednesday";
+  const h9Day = PLANET_WEEKDAYS[h9Lord] || "Thursday";
+  const h12Day = PLANET_WEEKDAYS[h12Lord] || "Saturday";
 
   const quarters = [
     {
       quarter: "Q1 (MONTHS 1–3)",
       title: `${activeMahadasha.toUpperCase()}–${activeAntardasha.toUpperCase()} PHASE: INTERNAL RECALIBRATION`,
-      theme: `You are running ${activeMahadasha} Mahadasha under ${activeAntardasha} Antardasha. This sub-period demands patience and inner audit. ${dhanaGrahas} in your 2nd house (Dhana Bhava) supports quiet savings accumulation. Avoid impulsive decisions—allow karmic cycles to stabilise before major capital commitments.`,
-      timing: `Auspicious Days for ${activeMahadasha}: ${activeMahadasha === "Rahu" || activeMahadasha === "Saturn" ? "Saturdays" : activeMahadasha === "Jupiter" ? "Thursdays" : "Wednesdays"} • Avoid Tuesdays for financial decisions`,
-      precaution: `${activeMahadasha} Mahadasha can amplify impatience—slow down, document every agreement in writing.`,
+      theme: `For ${lagnaSign} Lagna under ${activeMahadasha} Mahadasha and ${activeAntardasha} Antardasha, prioritize steady cashflow discipline. ${dhanaGrahas} governing your 2nd house (${h2Sign}) rewards structured reserves before major capital commitments.`,
+      timing: `Key Alignment Days: ${mdDay}s & ${adDay}s • Focus: Written milestones & budget clarity`,
+      precaution: `Verify assumptions during ${activeMahadasha}–${activeAntardasha} transitions and document key terms in writing.`,
     },
     {
       quarter: "Q2 (MONTHS 4–6)",
-      title: `${karmaGrahas.toUpperCase()} IN KARMA BHAVA: CAREER VELOCITY WINDOW`,
-      theme: `${karmaGrahas} occupying your 10th house (Karma Bhava) activates professional authority and leadership recognition in this period. High-velocity window for client acquisition, role changes, promotions, and strengthening professional alliances. Transit Mercury and Venus will conjunctively support 10th-house significations.`,
-      timing: `Auspicious Windows: Wednesdays and Fridays • Favorable Colors: Emerald Green, Soft Gold`,
-      precaution: `Maintain meticulous documentation in professional transactions—${activeAntardasha} sub-period can create miscommunication if verbal agreements replace written ones.`,
+      title: `${karmaGrahas.toUpperCase()} IN KARMA BHAVA: CAREER VELOCITY`,
+      theme: `${karmaGrahas} directing your 10th house (${h10Sign}) activates professional authority and operational execution. Ideal window for client acquisition, leadership initiatives, and formalizing durable agreements.`,
+      timing: `Karma Alignment Day: ${h10Day}s (${h10Lord} lordship) • Focus: 10th-house execution`,
+      precaution: `Maintain clear operational documentation so ${activeAntardasha} sub-period momentum stays structured.`,
     },
     {
       quarter: "Q3 (MONTHS 7–9)",
-      title: `${bhagyaGrahas.toUpperCase()} IN BHAGYA BHAVA: FORTUNE & DHARMA PEAK`,
-      theme: `${bhagyaGrahas} in your 9th house (Bhagya Bhava) generates concentrated fortune, divine support, and mentorship connections. Excellent period for higher learning, long journeys, philosophical study, and establishing dharmic clarity. Legalised partnerships, collaborations with established institutions, and guru-shishya bonds flourish.`,
-      timing: `Auspicious Windows: Thursdays and Sundays • Favorable Colors: Saffron, Royal Yellow`,
-      precaution: `${bhagyaGrahas} in Bhagya can generate overconfidence—validate all opportunities with facts, not just enthusiasm.`,
+      title: `${bhagyaGrahas.toUpperCase()} IN BHAGYA BHAVA: FORTUNE & DHARMA`,
+      theme: `${bhagyaGrahas} governing your 9th house (${h9Sign}) elevates mentorship, strategic foresight, and higher learning. Legalized partnerships and advisory alliances gain traction through principled action.`,
+      timing: `Bhagya Alignment Day: ${h9Day}s (${h9Lord} lordship) • Focus: Mentorship & long-range strategy`,
+      precaution: `Validate high-optimism opportunities against concrete timelines and verified fundamentals.`,
     },
     {
       quarter: "Q4 (MONTHS 10–12)",
-      title: `${vyayaGrahas.toUpperCase()} TRANSFORMATION: KARMIC HARVEST & RESET`,
-      theme: `${vyayaGrahas} in the 12th house (Vyaya Bhava) governs spiritual expansion, foreign connections, and subconscious karmic clearing. Cumulative efforts of the year crystallise into achievements. Excellent period for pilgrimages, international collaborations, creative solitude, and long-term estate or legacy planning.`,
-      timing: `Auspicious Windows: Tuesdays and Thursdays • Favorable Colors: Royal Blue, Ivory`,
-      precaution: `12th-house activation can create sleep disruptions and scattered focus—maintain structured routines during this quarter.`,
+      title: `${vyayaGrahas.toUpperCase()} TRANSFORMATION: KARMIC RESET`,
+      theme: `${vyayaGrahas} directing the 12th house (${h12Sign}) governs global reach, restorative solitude, and overhead pruning. Consolidate gains, audit recurring expenses, and prepare next year's strategic blueprint.`,
+      timing: `Vyaya Alignment Day: ${h12Day}s (${h12Lord} lordship) • Focus: Global outreach & recovery`,
+      precaution: `Protect sleep consistency and trim unnecessary overhead during 12th-house review windows.`,
     },
   ];
 
@@ -608,7 +733,7 @@ function renderPage4QuarterlyHorizon(doc: PDFDoc, chart: ChartData, subject: str
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE 5: CLASSICAL REMEDIES & UPAYAS
 // ─────────────────────────────────────────────────────────────────────────────
-function renderPage5RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId: string) {
+function renderPage5RemediesAndGuidance(doc: PDFDoc, chart: ChartData, options: PackageDossierOptions) {
   doc.rect(25, 25, 545, 765).lineWidth(1).strokeColor("#B8860B").stroke();
 
   doc.moveDown(1);
@@ -617,25 +742,61 @@ function renderPage5RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId:
 
   doc.moveTo(45, 75).lineTo(550, 75).lineWidth(0.8).strokeColor("#B8860B").stroke();
 
+  const lagnaNum =
+    typeof chart.lagnaNum === "number" && Number.isFinite(chart.lagnaNum)
+      ? ((Math.trunc(chart.lagnaNum) % 12) + 12) % 12
+      : 0;
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Aries";
+  const lagnaLord = SIGN_LORDS[lagnaRashi] || "Mars";
+  const resolvedGender = resolveGender(options, chart as ChartData & { gender?: string });
+  const genderLat = getGenderLateralizationSafe(resolvedGender);
+  const gemRx = getDynamicGemstonePrescription(lagnaRashi, resolvedGender);
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha;
+  const moonP = chart.planets?.["Moon"];
+  const moonRashi = moonP?.sign || (moonP ? SIGN_NAMES[Math.floor(getPlanetLon(moonP) / 30)] : "Moon");
+
+  let lagnaRud = { mukhi: "5-Mukhi Rudraksha", bead: "Panchamukhi", mantra: gemRx.mantra };
+  try {
+    const lp = chart.planets?.[lagnaLord];
+    const r = makeRudrakshaRecommendation(
+      lagnaLord as Parameters<typeof makeRudrakshaRecommendation>[0],
+      lp
+        ? {
+            planet: lagnaLord as Parameters<typeof makeRudrakshaRecommendation>[0],
+            sign: lp.sign as NonNullable<Parameters<typeof makeRudrakshaRecommendation>[1]>["sign"],
+            degree: getPlanetLon(lp) % 30,
+            house: lp.house,
+            isRetrograde: lp.retrograde,
+            nakshatra: lp.nakshatra,
+            nakshatraPada: lp.pada,
+          }
+        : undefined
+    );
+    lagnaRud = { mukhi: `${r.mukhi} Rudraksha`, bead: r.bead, mantra: r.mantra };
+  } catch {
+    // safe fallback
+  }
+
   // Remedial Box 1: Sacred Mantra Therapy
   let y = 88;
   doc.rect(45, y, 505, 95).fillAndStroke("#FAF7F0", "#E0D7C6");
-  doc.fontSize(10).fillColor("#8C6508").text("1. JAPA & MANTRA RECALIBRATION", 60, y + 10);
+  doc.fontSize(10).fillColor("#8C6508").text(`1. LAGNESH (${lagnaLord.toUpperCase()}) JAPA & MANTRA RECALIBRATION`, 60, y + 10);
   doc.fontSize(8.5).fillColor("#2A2520").text(
-    "Sound vibrations (Shabda Brahma) directly harmonize afflicted neurological and planetary frequencies. Chant the following sacred mantra 108 times daily during sunrise or sunset:",
+    `Sound vibrations (Shabda Brahma) harmonize ${lagnaRashi} Lagna neurological pathways. Chant your Lagna lord (${lagnaLord}) seed mantra on ${PLANET_WEEKDAYS[lagnaLord] || "Thursday"} mornings:`,
     60,
     y + 26,
     { width: 475, lineGap: 2.5 }
   );
   doc.rect(60, y + 60, 475, 24).fill("#FFFFFF");
-  doc.fontSize(9).fillColor("#8C6508").text("Om Namah Shivaya (Shiva Panchakshara Stotra) / Gayatri Mantra", 70, y + 67, { align: "center", width: 455 });
+  doc.fontSize(8.5).fillColor("#8C6508").text(gemRx.mantra, 70, y + 67, { align: "center", width: 455 });
 
   // Remedial Box 2: Dana & Karmic Balancing
   y += 105;
   doc.rect(45, y, 505, 90).fillAndStroke("#FFFFFF", "#E0D7C6");
   doc.fontSize(10).fillColor("#8C6508").text("2. DANA (CHARITABLE GIVING & SERVICE)", 60, y + 10);
   doc.fontSize(8.5).fillColor("#2A2520").text(
-    "Vedic remedies prioritize conscious karmic repayment over material expenditure. Offer green fodder or grain to birds and cows on Wednesdays or Saturdays. Serving the underprivileged dissolves malefic planetary transits faster than any gemstone.",
+    `Vedic remedies prioritize conscious karmic service over material expenditure. Offer clean water, wholesome grains, or educational support on ${PLANET_WEEKDAYS[lagnaLord] || "Thursday"}s (Lagnesh ${lagnaLord}) and ${PLANET_WEEKDAYS[activeDasha] || "Saturday"}s (${activeDasha} Mahadasha) to harmonize active transits.`,
     60,
     y + 26,
     { width: 475, lineGap: 2.5 }
@@ -644,9 +805,9 @@ function renderPage5RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId:
   // Remedial Box 3: Lifestyle & Astro-Vastu Alignment
   y += 100;
   doc.rect(45, y, 505, 90).fillAndStroke("#FAF7F0", "#E0D7C6");
-  doc.fontSize(10).fillColor("#8C6508").text("3. LIFESTYLE & DIRECTIONAL HARMONIZATION", 60, y + 10);
+  doc.fontSize(10).fillColor("#8C6508").text("3. LIFESTYLE & LATERAL HARMONIZATION", 60, y + 10);
   doc.fontSize(8.5).fillColor("#2A2520").text(
-    "Ensure your workspace faces North or East to harness positive magnetic flow. Avoid clutter in the North-East (Ishan) zone of your dwelling. Wearing warm ivory, saffron, or white hues harmonizes the Moon and Jupiter axis.",
+    `Keep your primary workspace clutter-free and well-lit to support ${lagnaRashi} Lagna (${lagnaLord}) and ${moonRashi} Chandra. Apply sacred threads or talismanic metals via ${genderLat.hand} (${genderLat.sanskritTerm}) for balanced bio-field alignment.`,
     60,
     y + 26,
     { width: 475, lineGap: 2.5 }
@@ -656,30 +817,76 @@ function renderPage5RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId:
   y += 100;
   doc.rect(45, y, 505, 115).fillAndStroke("#FFFFFF", "#E0D7C6");
   doc.fontSize(10).fillColor("#8C6508").text("4. SACRED GEMSTONE & RUDRAKSHA HARMONY MATRIX", 60, y + 10);
-  
+
   // Table Header
   const tableY = y + 26;
   doc.rect(60, tableY, 475, 18).fill("#8C6508");
   doc.fontSize(7.8).fillColor("#FAF7F0");
   doc.text("PRIMARY GRAHA", 70, tableY + 5);
-  doc.text("SHASTRA GEMSTONE", 175, tableY + 5);
-  doc.text("RUDRAKSHA", 305, tableY + 5);
-  doc.text("HARMONIZING ELEMENT", 405, tableY + 5);
+  doc.text("SHASTRA PRESCRIPTION", 175, tableY + 5);
+  doc.text("RUDRAKSHA", 325, tableY + 5);
+  doc.text("LATERALITY / TIMING", 415, tableY + 5);
+
+  const isMoonDusthana = isDusthanaLord("Moon", lagnaNum);
+  const isDashaDusthana = isDusthanaLord(activeDasha, lagnaNum);
+  const dashaGemOrMantra =
+    isDashaDusthana || ["Rahu", "Ketu", "Saturn", "Mars"].includes(activeDasha)
+      ? `Mantra & Seva (${PLANET_WEEKDAYS[activeDasha] || "Saturday"})`
+      : getDynamicGemstonePrescription(
+          SIGN_NAMES.find((s) => SIGN_LORDS[s] === activeDasha) || lagnaRashi,
+          resolvedGender
+        ).primaryGem;
+
+  let dashaRud = "5-Mukhi Rudraksha";
+  try {
+    const dp = chart.planets?.[activeDasha];
+    dashaRud = `${makeRudrakshaRecommendation(
+      activeDasha as Parameters<typeof makeRudrakshaRecommendation>[0],
+      dp
+        ? {
+            planet: activeDasha as Parameters<typeof makeRudrakshaRecommendation>[0],
+            sign: dp.sign as NonNullable<Parameters<typeof makeRudrakshaRecommendation>[1]>["sign"],
+            degree: getPlanetLon(dp) % 30,
+            house: dp.house,
+            isRetrograde: dp.retrograde,
+            nakshatra: dp.nakshatra,
+            nakshatraPada: dp.pada,
+          }
+        : undefined
+    ).mukhi} Rudraksha`;
+  } catch {
+    // safe default
+  }
 
   const harmonyRows = [
-    { graha: "Lagnesh / Sun", gem: "Natural Ruby / Yellow Sapphire", rud: "1-Mukhi / 5-Mukhi", elem: "Tejas (Pure Solar Light)" },
-    { graha: "Chandra (Moon)", gem: "Natural Pearl / Moonstone", rud: "2-Mukhi Rudraksha", elem: "Jala (Emotional Calm)" },
-    { graha: "Guru (Jupiter)", gem: "Yellow Topaz / Citrine", rud: "5-Mukhi Rudraksha", elem: "Akasha (Wisdom & Grace)" },
+    {
+      graha: `Lagnesh (${lagnaLord})`,
+      gem: gemRx.primaryGem,
+      rud: lagnaRud.mukhi,
+      elem: gemRx.finger,
+    },
+    {
+      graha: `Chandra (${moonRashi})`,
+      gem: isMoonDusthana ? "Silver / Mantra (Dusthana safe)" : "Natural Pearl / Moonstone",
+      rud: "2-Mukhi Rudraksha",
+      elem: "Monday · Calm Mind",
+    },
+    {
+      graha: `Dasha (${activeDasha})`,
+      gem: dashaGemOrMantra,
+      rud: dashaRud,
+      elem: `${PLANET_WEEKDAYS[activeDasha] || "Thursday"} Cycle`,
+    },
   ];
 
   let rY = tableY + 18;
   harmonyRows.forEach((row, idx) => {
     doc.rect(60, rY, 475, 16).fill(idx % 2 === 0 ? "#FAF7F2" : "#FFFFFF");
-    doc.fontSize(7.8).fillColor("#1A1A1A");
-    doc.text(row.graha, 70, rY + 4);
-    doc.text(row.gem, 175, rY + 4);
-    doc.text(row.rud, 305, rY + 4);
-    doc.text(row.elem, 405, rY + 4);
+    doc.fontSize(7.4).fillColor("#1A1A1A");
+    doc.text(row.graha, 70, rY + 4, { width: 100, lineBreak: false });
+    doc.text(row.gem, 175, rY + 4, { width: 145, lineBreak: false });
+    doc.text(row.rud, 325, rY + 4, { width: 85, lineBreak: false });
+    doc.text(row.elem, 415, rY + 4, { width: 115, lineBreak: false });
     rY += 16;
   });
 
@@ -693,7 +900,7 @@ function renderPage5RemediesAndGuidance(doc: PDFDoc, chart: ChartData, reportId:
     y + 36,
     { width: 475, align: "center", lineGap: 3 }
   );
-  doc.fontSize(8).fillColor("#9C948A").text("www.astrolife-ai.vercel.app • Verified Immutable Shastra Record", 60, y + 88, { align: "center", width: 475 });
+  doc.fontSize(8).fillColor("#9C948A").text("www.astrolife.io • Verified Immutable Shastra Record", 60, y + 88, { align: "center", width: 475 });
 }
 
 function renderPageSampleLockedNotice(
@@ -747,7 +954,7 @@ function renderPageSampleLockedNotice(
   );
 
   doc.rect(130, y + 78, 335, 30).fillAndStroke("#B8860B", "#D4AF37");
-  doc.fontSize(10.5).fillColor("#FFFFFF").text("VISIT: https://astrolife-ai.vercel.app/reports", 130, y + 87, { align: "center", width: 335 });
+  doc.fontSize(10.5).fillColor("#FFFFFF").text("VISIT: https://www.astrolife.io/reports", 130, y + 87, { align: "center", width: 335 });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -760,12 +967,16 @@ function renderPageDualKundliAndVargas(doc: PDFDoc, chart: ChartData, subject: s
   doc.fontSize(9).fillColor("#6B635B").text(`D1 Lagna (Physical Reality) & D9 Navamsha (Dharma & Soul Destiny) for ${subject}`);
   doc.moveTo(45, 75).lineTo(550, 75).lineWidth(0.8).strokeColor("#B8860B").stroke();
 
-  const divCharts = calculateDivisional(chart.planets as any, chart.lagnaNum, chart.lagnaLon);
+  const divCharts = calculateDivisional(
+    chart.planets as unknown as Parameters<typeof calculateDivisional>[0],
+    chart.lagnaNum,
+    chart.lagnaLon
+  );
   const d9 = divCharts.find((c) => c.key === "D9");
   const d10 = divCharts.find((c) => c.key === "D10");
 
   // Build D9 ChartData-compatible object for vector renderer
-  const d9PlanetsMap: Record<string, any> = {};
+  const d9PlanetsMap: Record<string, PlanetLike> = {};
   if (d9) {
     d9.planets.forEach((dp) => {
       d9PlanetsMap[dp.planet] = {
@@ -777,11 +988,11 @@ function renderPageDualKundliAndVargas(doc: PDFDoc, chart: ChartData, subject: s
     });
   }
 
-  const d9ChartObj: any = {
+  const d9ChartObj = {
     lagnaNum: d9?.lagnaNum ?? chart.lagnaNum,
     lagnaRashi: d9?.lagna ?? chart.lagnaRashi,
     planets: d9PlanetsMap,
-  };
+  } as unknown as ChartData;
 
   // Side-by-side 220x220 Vector Charts
   const chartsY = 92;
@@ -804,7 +1015,9 @@ function renderPageDualKundliAndVargas(doc: PDFDoc, chart: ChartData, subject: s
   });
 
   // Shadbala & Dignity Summary Box
-  const shadbala = calculateShadbala(chart.planets as any);
+  const shadbala = calculateShadbala(
+    chart.planets as unknown as Parameters<typeof calculateShadbala>[0]
+  );
   let y = 345;
   doc.rect(45, y, 505, 165).fillAndStroke("#FAF8F5", "#E0D7C6");
   doc.fontSize(10).fillColor("#8C6508").text("SHADBALA PLANETARY STRENGTH MATRIX (SIX-FOLD POWER)", 60, y + 10);
@@ -891,22 +1104,28 @@ function renderPageDashaCalendar(doc: PDFDoc, chart: ChartData, subject: string)
     return `${years}y ${months}m`;
   };
 
+  const dashaStateCal = getActiveDashaState(chart);
+  const activeMD = dashaStateCal.activeDasha;
+  const activeAD = dashaStateCal.activeAntar;
+
   (chart.dashas || []).slice(0, 9).forEach((d, idx) => {
-    const bg = d.active ? "#FAF0D7" : idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
+    const isMdActive = dashaStateCal.activeMD
+      ? d === dashaStateCal.activeMD || (d.planet === activeMD && fmtDate(d.start) === fmtDate(dashaStateCal.activeMD.start))
+      : Boolean(d.active);
+    const bg = isMdActive ? "#FAF0D7" : idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
     doc.rect(45, y, 505, 20).fill(bg);
-    doc.fontSize(8.2).fillColor(d.active ? "#8C6508" : "#1A1A1A");
+    doc.fontSize(8.2).fillColor(isMdActive ? "#8C6508" : "#1A1A1A");
     doc.text(d.planet, 55, y + 6);
     doc.text(fmtYrs(Number(d.yrs)), 185, y + 6);
     doc.text(fmtDate(d.start), 275, y + 6);
     doc.text(fmtDate(d.end), 385, y + 6);
-    doc.fillColor(d.active ? "#15803D" : "#6B635B");
-    doc.text(d.active ? "ACTIVE NOW" : "Scheduled", 480, y + 6);
+    doc.fillColor(isMdActive ? "#15803D" : "#6B635B");
+    doc.text(isMdActive ? "ACTIVE NOW" : "Scheduled", 480, y + 6);
     y += 20;
   });
 
   // Table 2: Active Antardasha Sub-Periods
   y += 25;
-  const activeMD = chart.dashas?.find((d) => d.active)?.planet || chart.dashas?.[0]?.planet || "Current";
   doc.fontSize(10).fillColor("#8C6508").text(`2. ACTIVE ANTARDASHA SUB-PERIODS (UNDER ${activeMD.toUpperCase()} MAHADASHA)`, 45, y);
   y += 18;
 
@@ -918,15 +1137,18 @@ function renderPageDashaCalendar(doc: PDFDoc, chart: ChartData, subject: string)
   doc.text("STATUS", 470, y + 6);
 
   y += 20;
-  (chart.antardasha || []).slice(0, 9).forEach((ad, idx) => {
-    const bg = ad.active ? "#FAF0D7" : idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
+  dashaStateCal.adSeq.slice(0, 9).forEach((ad, idx) => {
+    const isAdActive = dashaStateCal.activeAD
+      ? ad.planet === activeAD && fmtDate(ad.start) === dashaStateCal.activeAD.start.slice(0, 10)
+      : Boolean(ad.active);
+    const bg = isAdActive ? "#FAF0D7" : idx % 2 === 0 ? "#FAF8F5" : "#FFFFFF";
     doc.rect(45, y, 505, 20).fill(bg);
-    doc.fontSize(8.2).fillColor(ad.active ? "#8C6508" : "#1A1A1A");
+    doc.fontSize(8.2).fillColor(isAdActive ? "#8C6508" : "#1A1A1A");
     doc.text(`${activeMD} — ${ad.planet}`, 55, y + 6);
     doc.text(fmtDate(ad.start), 220, y + 6);
     doc.text(fmtDate(ad.end), 345, y + 6);
-    doc.fillColor(ad.active ? "#15803D" : "#6B635B");
-    doc.text(ad.active ? "ACTIVE NOW" : "Sub-Period", 470, y + 6);
+    doc.fillColor(isAdActive ? "#15803D" : "#6B635B");
+    doc.text(isAdActive ? "ACTIVE NOW" : "Sub-Period", 470, y + 6);
     y += 20;
   });
 
@@ -952,7 +1174,11 @@ function renderPageDetectedYogas(doc: PDFDoc, chart: ChartData, subject: string)
   doc.fontSize(9).fillColor("#6B635B").text(`Classical planetary combinations computed for ${subject}`);
   doc.moveTo(45, 75).lineTo(550, 75).lineWidth(0.8).strokeColor("#B8860B").stroke();
 
-  const presentYogas = getPresentYogas(chart.planets as any, chart.lagnaNum, "pro");
+  const presentYogas = getPresentYogas(
+    chart.planets as unknown as Parameters<typeof getPresentYogas>[0],
+    chart.lagnaNum,
+    "elite"
+  );
   const topYogas = presentYogas.slice(0, 6);
 
   let y = 90;
@@ -1013,7 +1239,7 @@ function renderPageTwelveHousesOverview(doc: PDFDoc, chart: ChartData, subject: 
 
   // Group planets by house
   const planetsByHouse: Record<number, string[]> = {};
-  Object.entries(chart.planets || {}).forEach(([name, pData]: [string, any]) => {
+  Object.entries(chart.planets || {}).forEach(([name, pData]) => {
     const hNum = pData?.house || 1;
     if (!planetsByHouse[hNum]) planetsByHouse[hNum] = [];
     planetsByHouse[hNum].push(name);
@@ -1029,7 +1255,11 @@ function renderPageTwelveHousesOverview(doc: PDFDoc, chart: ChartData, subject: 
       const boxW = 248;
       const boxH = 105;
 
-      const signIdx = (chart.lagnaNum + item.h - 1) % 12;
+      const safeLagnaNum =
+        typeof chart.lagnaNum === "number" && Number.isFinite(chart.lagnaNum)
+          ? ((Math.trunc(chart.lagnaNum) % 12) + 12) % 12
+          : 0;
+      const signIdx = (safeLagnaNum + item.h - 1) % 12;
       const signName = RASHIS[signIdx] || "Rashi";
       const occupants = planetsByHouse[item.h]?.length ? planetsByHouse[item.h].join(", ") : "Empty (Aspect Driven)";
 

@@ -27,6 +27,18 @@ import { calculateKarakas } from "../../astro-engine/jaimini";
 import { detectYogas } from "../../astro-engine/yogas";
 import { calculateDestiny, type DestinyPoint, type DashaBand, type DestinyArea } from "../../astro-engine/destiny";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getSeekerAge, resolveGender } from "../dossier-shared-helpers";
+import {
+  ordinal,
+  withArticle,
+  signFromHouse,
+  getSignLord,
+  getPlanetaryDignity,
+  getPlanetHousesOwned,
+  getDynamicGemstonePrescription,
+  ALL_NAKSHATRAS,
+  calculateTaraBala,
+} from "../../astro/human-translator";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -85,7 +97,8 @@ function renderDiamondKundliSVG(
   Object.entries(planetMap).forEach(([pName, pData]) => {
     if (pData && pData.house && housePlanets[pData.house]) {
       const abbr = PLANET_ABBR[pName] || pName.slice(0, 2);
-      const retro = pData.isRetrograde ? "(R)" : "";
+      const isRetro = (pData as any).retrograde || (pData as any).isRetrograde;
+      const retro = isRetro ? "(R)" : "";
       housePlanets[pData.house].push(`${abbr}${retro}`);
     }
   });
@@ -258,21 +271,26 @@ function renderDestinyCurveSVG(
 }
 
 export function generateDestinyCurveDossierHTML(chart: ChartData, options: PackageDossierOptions = {}): string {
-  const subjectName = escapeHtml(options.customerName || chart.name || "Mukul Mohan Pal");
-  const reportTitle = "📈 Destiny Curve: 90-Year Life Master Dossier";
+  const subjectName = escapeHtml(options.customerName || chart.name || "Sacred Seeker");
+  const reportTitle = escapeHtml(options.reportTitle || "📈 Destiny Curve: 90-Year Life Master Dossier");
   const orderId = escapeHtml(options.orderId || `AL-DC-${Date.now().toString(36).toUpperCase()}`);
   const paymentId = escapeHtml(options.paymentId || "AL-VERIFIED-SHASTRA-CERT");
 
-  const birthDate = chart.dob || "1995-07-04";
-  const birthTime = chart.tob || "12:30";
-  const birthCity = escapeHtml(chart.city || "Delhi");
+  const birthDate = chart.dob || "Recorded";
+  const birthTime = chart.tob || "12:00";
+  const birthCity = escapeHtml(chart.city || "New Delhi");
   const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
 
-  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Virgo";
+  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Aries";
   const moonPlanet = chart.planets?.["Moon"];
-  const moonRashi = moonPlanet?.sign || "Leo";
-  const nakshatra = moonPlanet?.nakshatra || "Uttara Phalguni";
+  const moonRashi = moonPlanet?.sign || "Taurus";
+  const nakshatra = moonPlanet?.nakshatra || "Rohini";
+  const moonPada = moonPlanet?.pada || 1;
+
+  const resolvedGender = resolveGender(options, chart);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
 
   // Calculate full lifetime destiny dataset
   const destiny = calculateDestiny(chart.planets as any, chart.dashas, chart.dob, chart.lagnaNum ?? 0);
@@ -287,6 +305,16 @@ export function generateDestinyCurveDossierHTML(chart: ChartData, options: Packa
   const currentDrivers = destiny.currentDrivers;
   const nextMilestones = destiny.nextMilestones;
   const actionPlan = destiny.actionPlan;
+
+  const nowYear = new Date().getFullYear();
+  const next5YearEnd = nowYear + 5;
+  const nextYear = nowYear + 1;
+
+  // Active dasha cycle dates from chart.dashas if available
+  const activeDashaEntry = chart.dashas?.find((d) => d.planet === currentDasha) || chart.dashas?.find((d) => d.active);
+  const dashaStartYear = activeDashaEntry?.start ? new Date(activeDashaEntry.start).getFullYear() : (nowYear - 5);
+  const dashaEndYear = activeDashaEntry?.end ? new Date(activeDashaEntry.end).getFullYear() : (dashaStartYear + 18);
+  const dashaCycleStr = `${dashaStartYear} – ${dashaEndYear} Cycle`;
 
   // Safe Engine Calculations
   let divisionalCharts = [];
@@ -321,6 +349,138 @@ export function generateDestinyCurveDossierHTML(chart: ChartData, options: Packa
   const d1Svg = renderDiamondKundliSVG(chart, chart.planets, chart.lagnaNum, 310);
   const d9Svg = d9Chart ? renderDiamondKundliSVG(chart, d9Chart.planets, d9Chart.lagnaNum, 310) : d1Svg;
   const destinySvg = renderDestinyCurveSVG(points, bands, currentAge, peak, challenge, currentScore);
+
+  const lagnaLord = getSignLord(lagnaRashi);
+  const lagnaLonMod = chart.lagnaLon !== undefined ? (chart.lagnaLon % 30) : (chart.lagnaDegree || 0);
+  const lagnaDeg = Math.floor(lagnaLonMod);
+  const lagnaMin = Math.floor((lagnaLonMod - lagnaDeg) * 60);
+  const lagnaDms = `${lagnaDeg}° ${String(lagnaMin).padStart(2, "0")}'`;
+
+  const d9LagnaRashi = d9Chart?.lagnaRashi || SIGN_NAMES[d9Chart?.lagnaNum ?? 0] || lagnaRashi;
+  const d9LagnaLord = getSignLord(d9LagnaRashi);
+  const d9LagneshSign = d9Chart?.planets?.[lagnaLord]?.sign || d9LagnaRashi;
+  const lagneshD1 = chart.planets?.[lagnaLord];
+  const lagneshHouse = lagneshD1?.house || 1;
+  const lagneshSign = lagneshD1?.sign || lagnaRashi;
+
+  const fifthSign = signFromHouse(lagnaRashi, 5);
+  const ninthSign = signFromHouse(lagnaRashi, 9);
+  const fifthLord = getSignLord(fifthSign);
+  const ninthLord = getSignLord(ninthSign);
+  const secBenefic = ninthLord !== lagnaLord ? ninthLord : fifthLord;
+  const ninthLordData = chart.planets?.[ninthLord];
+  const secBeneficData = chart.planets?.[secBenefic];
+
+  const sunData = chart.planets?.["Sun"];
+  const jupData = chart.planets?.["Jupiter"];
+  const satData = chart.planets?.["Saturn"];
+  const rahuData = chart.planets?.["Rahu"];
+  const ketuData = chart.planets?.["Ketu"];
+  const jupHouse = jupData?.house || 1;
+  const jupAspectHouses = [((jupHouse - 1 + 4) % 12) + 1, ((jupHouse - 1 + 6) % 12) + 1, ((jupHouse - 1 + 8) % 12) + 1];
+  const satHouse = satData?.house || 1;
+  const rahuHouse = rahuData?.house || 11;
+  const rahuSign = rahuData?.sign || signFromHouse(lagnaRashi, rahuHouse);
+  const ketuHouse = ketuData?.house || 5;
+  const ketuSign = ketuData?.sign || signFromHouse(lagnaRashi, ketuHouse);
+  const moonHouse = moonPlanet?.house || 1;
+
+  const activeBand = bands.find((b) => currentAge >= b.startAge && currentAge <= b.endAge) || bands[0];
+  const activeStartYear = activeBand ? activeBand.start.getFullYear() : 2024;
+  const activeEndYear = activeBand ? activeBand.end.getFullYear() : 2042;
+  const activeMid1 = Math.round(activeStartYear + (activeEndYear - activeStartYear) * 0.33);
+  const activeMid2 = Math.round(activeStartYear + (activeEndYear - activeStartYear) * 0.68);
+  const nextBandAfterActive = bands.find((b) => b.startAge > (activeBand?.startAge ?? currentAge));
+
+  const sortedAreas = [...areas].sort((a, b) => b.score - a.score);
+  const topArea = sortedAreas[0] || { name: "Stability", score: 62 };
+  const secondArea = sortedAreas[1] || { name: "Career", score: 56 };
+  const lowArea = sortedAreas[sortedAreas.length - 1] || { name: "Health", score: 44 };
+
+  const HOUSE_ROLES: Record<number, string> = {
+    1: "Vitality / Self", 2: "Treasury / Assets", 3: "Courage / Siblings", 4: "Property / Peace",
+    5: "Purva Punya / Mind", 6: "Debt / Defense", 7: "Partnerships", 8: "Longevity / Secrets",
+    9: "Bhagya / Dharma", 10: "Career / Status", 11: "Gains / Cashflow", 12: "Expenditure / Loss",
+  };
+  const savRows = Array.from({ length: 12 }, (_, idx) => {
+    const h = idx + 1;
+    const found = akvRes?.houses?.find((item) => item.house === h);
+    return {
+      h,
+      sign: signFromHouse(lagnaRashi, h),
+      b: found?.score ?? 28,
+      role: HOUSE_ROLES[h],
+    };
+  });
+  const b11 = savRows[10]?.b ?? 28;
+  const b12 = savRows[11]?.b ?? 24;
+  const bDelta = b11 - b12;
+
+  const nakIdx = Math.max(0, ALL_NAKSHATRAS.indexOf(nakshatra));
+  const supportStar27 = ALL_NAKSHATRAS[(nakIdx + 26) % 27] || "Revati";
+  const taraStars = (tNum: number) =>
+    ALL_NAKSHATRAS.filter((n) => calculateTaraBala(nakshatra, n).taraNum === tNum).join(", ");
+
+  const shadbalaRows = (shadbalaRes?.planets && shadbalaRes.planets.length > 0)
+    ? shadbalaRes.planets.map((sp) => ({
+        p: sp.planet,
+        rupa: Number((sp.totalRupas ?? 6.0).toFixed(2)),
+        req: Number((sp.requiredRupas ?? 5.5).toFixed(2)),
+        ratio: Number((sp.shadbalaRatio ?? 1.05).toFixed(2)),
+        status: sp.grade || (sp.passesThreshold ? "Fortified" : "Moderate"),
+        passes: sp.passesThreshold ?? true,
+      }))
+    : ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"].map((p) => ({
+        p, rupa: 6.5, req: 5.5, ratio: 1.18, status: "Balanced", passes: true,
+      }));
+  const strongestShadbala = [...shadbalaRows].sort((a, b) => b.ratio - a.ratio)[0] || shadbalaRows[0];
+
+  const gemRx = getDynamicGemstonePrescription(lagnaRashi, options.gender);
+  const PLANET_GEM_MAP: Record<string, { gem: string; sanskrit: string; finger: string; metal: string; day: string; weight: string; benefit: string }> = {
+    Sun: { gem: "Natural Ruby", sanskrit: "Manikya", finger: "Ring Finger", metal: "22k Gold / Copper", day: "Sunday Sunrise", weight: "3.25 – 4.5 Ratti", benefit: "vitality, royal authority, and decisive clarity" },
+    Moon: { gem: "Natural Pearl", sanskrit: "Moti", finger: "Little Finger", metal: "Pure Silver", day: "Monday Dawn", weight: "4.25 – 5.5 Ratti", benefit: "emotional equilibrium, sleep quality, and intuitive calm" },
+    Mars: { gem: "Red Coral", sanskrit: "Moonga", finger: "Ring Finger", metal: "Copper / Gold", day: "Tuesday Sunrise", weight: "5.25 – 6.5 Ratti", benefit: "courage, land acquisition, and metabolic drive" },
+    Mercury: { gem: "Natural Emerald", sanskrit: "Panna", finger: "Little Finger", metal: "Panchadhatu / Gold", day: "Wednesday Dawn", weight: "3.5 – 5.0 Ratti", benefit: "cognitive clarity, speech, and commercial precision" },
+    Jupiter: { gem: "Yellow Sapphire", sanskrit: "Pukhraj", finger: "Index Finger", metal: "22k Gold / Brass", day: "Thursday Sunrise", weight: "4.25 – 5.5 Ratti", benefit: "dharmic wisdom, mentorship, and multi-year prosperity" },
+    Venus: { gem: "Natural Diamond / White Sapphire", sanskrit: "Heera / Safed Pukhraj", finger: "Middle / Ring Finger", metal: "Platinum / Silver", day: "Friday Dawn", weight: "1.0 – 3.5 Ratti", benefit: "creative magnetism, luxury, and relational harmony" },
+    Saturn: { gem: "Blue Sapphire (Trial-Verified)", sanskrit: "Neelam", finger: "Middle Finger", metal: "Silver / Panchadhatu", day: "Saturday Dawn", weight: "3.5 – 4.5 Ratti", benefit: "structural discipline, longevity, and institutional scale" },
+  };
+  const secGemInfo = PLANET_GEM_MAP[secBenefic] || PLANET_GEM_MAP.Jupiter;
+  const handSide = options.gender === "female" ? "Left" : "Right";
+  const dusthana6Sign = signFromHouse(lagnaRashi, 6);
+  const dusthana8Sign = signFromHouse(lagnaRashi, 8);
+  const banned6Lord = getSignLord(dusthana6Sign);
+  const banned8Lord = getSignLord(dusthana8Sign);
+  const bannedLord = banned8Lord !== lagnaLord && banned8Lord !== secBenefic ? banned8Lord : (banned6Lord !== lagnaLord ? banned6Lord : "Rahu");
+  const bannedGemName = PLANET_GEM_MAP[bannedLord]?.gem || "Hessonite (Gomed)";
+
+  const RUDRAKSHA_MAP: Record<string, { mukhi: string; deity: string; desc: string }> = {
+    Sun: { mukhi: "12-Mukhi Rudraksha", deity: "Lord Surya", desc: "Resonates with Surya, radiating leadership authority, stamina, and fearless clarity." },
+    Moon: { mukhi: "2-Mukhi Rudraksha", deity: "Ardhanarishwara", desc: "Harmonizes Chandra, calming emotional turbulence and stabilizing mental focus." },
+    Mars: { mukhi: "3-Mukhi Rudraksha", deity: "Lord Agni", desc: "Balances Mangala, burning karmic inertia and sharpening decisive courage." },
+    Mercury: { mukhi: "4-Mukhi Rudraksha", deity: "Lord Brahma", desc: "Resonates with Budha, expanding logical acuity, memory retention, and communicative poise." },
+    Jupiter: { mukhi: "5-Mukhi Rudraksha", deity: "Kalagni Rudra", desc: "Channels Brihaspati, stabilizing blood pressure, wisdom, and dharmic abundance." },
+    Venus: { mukhi: "6-Mukhi Rudraksha", deity: "Lord Kartikeya", desc: "Refines Shukra, cultivating artistic poise, relational grace, and vitality." },
+    Saturn: { mukhi: "7-Mukhi Rudraksha", deity: "Mahalakshmi", desc: "Harmonizes Shani, dissolving cashflow bottlenecks and anchoring long-term wealth." },
+    Rahu: { mukhi: "8-Mukhi Rudraksha", deity: "Lord Ganesha", desc: "Neutralizes Rahu friction, removing obstacles in contracts and anchoring focus." },
+    Ketu: { mukhi: "9-Mukhi Rudraksha", deity: "Goddess Durga", desc: "Protects during Ketu currents, grounding intuition and shielding against sudden shifts." },
+  };
+  const rud1 = RUDRAKSHA_MAP[lagnaLord] || RUDRAKSHA_MAP.Jupiter;
+  const rud2 = RUDRAKSHA_MAP[currentDasha] || RUDRAKSHA_MAP.Rahu;
+
+  const MANTRA_MAP: Record<string, { title: string; dev: string; iast: string; timing: string }> = {
+    Sun: { title: "SURYA BEEJ MANTRA", dev: "ॐ ह्रां ह्रीं ह्रौं सः सूर्याय नमः ॥", iast: "Oṃ hrāṃ hrīṃ hrauṃ saḥ sūryāya namaḥ ॥", timing: "Sunday sunrise facing East (108x)" },
+    Moon: { title: "CHANDRA BEEJ MANTRA", dev: "ॐ श्रां श्रीं श्रौं सः चन्द्रमसे नमः ॥", iast: "Oṃ śrāṃ śrīṃ śrauṃ saḥ candramase namaḥ ॥", timing: "Monday evening facing North-West (108x)" },
+    Mars: { title: "MANGALA BEEJ MANTRA", dev: "ॐ क्रां क्रीं क्रौं सः भौमाय नमः ॥", iast: "Oṃ krāṃ krīṃ krauṃ saḥ bhaumāya namaḥ ॥", timing: "Tuesday morning facing South (108x)" },
+    Mercury: { title: "BUDHA BEEJ MANTRA", dev: "ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः ॥", iast: "Oṃ brāṃ brīṃ brauṃ saḥ budhāya namaḥ ॥", timing: "Wednesday sunrise facing East (108x)" },
+    Jupiter: { title: "GURU BEEJ MANTRA", dev: "ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः ॥", iast: "Oṃ grāṃ grīṃ grauṃ saḥ gurave namaḥ ॥", timing: "Thursday sunrise facing North-East (108x)" },
+    Venus: { title: "SHUKRA BEEJ MANTRA", dev: "ॐ द्रां द्रीं द्रौं सः शुक्राय नमः ॥", iast: "Oṃ drāṃ drīṃ drauṃ saḥ śukrāya namaḥ ॥", timing: "Friday morning facing South-East (108x)" },
+    Saturn: { title: "SHANI BEEJ MANTRA", dev: "ॐ प्रां प्रीं प्रौं सः शनैश्चराय नमः ॥", iast: "Oṃ prāṃ prīṃ prauṃ saḥ śanaiścarāya namaḥ ॥", timing: "Saturday dusk facing West (108x)" },
+    Rahu: { title: "RAHU SHANTI BEEJ MANTRA", dev: "ॐ भ्रां भ्रीं भ्रौं सः राहवे नमः ॥", iast: "Oṃ bhrāṃ bhrīṃ bhrauṃ saḥ rāhave namaḥ ॥", timing: "Saturday dusk (108x)" },
+    Ketu: { title: "KETU SHANTI BEEJ MANTRA", dev: "ॐ स्रां स्रीं स्रौं सः केतवे नमः ॥", iast: "Oṃ srāṃ srīṃ srauṃ saḥ ketave namaḥ ॥", timing: "Tuesday or Thursday dawn (108x)" },
+  };
+  const m1 = MANTRA_MAP[lagnaLord] || MANTRA_MAP.Jupiter;
+  const m2 = MANTRA_MAP[currentDasha] || MANTRA_MAP.Rahu;
 
   const headerRail = (chapter: string) => `
     <div class="page-rail">
@@ -544,8 +704,9 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
         <div><span class="kicker">PREPARED FOR</span><span style="font-size:14px; font-weight:700; color:var(--gold-bright);">${subjectName}</span></div>
         <div><span class="kicker">BIRTH TIMESTAMP</span><span style="font-size:12px; font-weight:600; font-family:'JetBrains Mono',monospace; color:var(--ivory);">${birthDate} · ${birthTime} IST</span></div>
+        <div><span class="kicker">SEEKER AGE &amp; GENDER</span><span style="font-size:12px; font-weight:600; color:var(--ivory);">${seekerAgeStr} · ${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</span></div>
         <div><span class="kicker">GEOGRAPHIC COORDINATES</span><span style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--ivory-dim);">${birthCity} (${lat}° N, ${lon}° E)</span></div>
-        <div><span class="kicker">AUTHENTIC LAGNA / MOON</span><span style="font-size:11px; font-weight:600; color:var(--gold);">${lagnaRashi} Lagna · ${moonRashi} Moon (${nakshatra})</span></div>
+        <div><span class="kicker">AUTHENTIC LAGNA / MOON</span><span style="font-size:11px; font-weight:600; color:var(--gold);">${lagnaRashi} Lagna · ${moonRashi} Moon (${nakshatra} Pada ${moonPada})</span></div>
       </div>
     </div>
 
@@ -573,7 +734,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       <div class="matrix-item">
         <span class="kicker">CURRENT AGE</span>
         <span class="val" style="font-size:22px; color:var(--gold-bright);">${currentAge}</span>
-        <span class="body-s">Year 2026</span>
+        <span class="body-s">Year ${nowYear}</span>
       </div>
       <div class="matrix-item">
         <span class="kicker">VITALITY SCORE</span>
@@ -583,7 +744,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       <div class="matrix-item">
         <span class="kicker">ACTIVE MAHADASHA</span>
         <span class="val" style="font-size:18px; color:var(--saffron);">${currentDasha}</span>
-        <span class="body-s">2017 – 2035 Cycle</span>
+        <span class="body-s">${dashaCycleStr}</span>
       </div>
       <div class="matrix-item">
         <span class="kicker">LIFETIME PEAK</span>
@@ -596,23 +757,23 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card" style="margin-bottom: 16px;">
       <div class="card-title">✦ THE CORE LIFE TRAJECTORY SUMMARY</div>
       <p class="body-text" style="margin-bottom: 10px;">
-        Your lifetime energetic curve experiences its initial foundational grounding in youth (Sun, Moon, Mars dashas), 
-        transitions into an aggressive social and institutional scaling wave under <strong>${currentDasha} Mahadasha</strong> (currently active at age ${currentAge}), 
-        and reaches its crowning material and intellectual zenith during the <strong>Jupiter and Saturn Mahadashas</strong> 
-        (spanning Ages 40 through 75), where your executive wisdom and asset accumulation achieve permanent consolidation.
+        Your lifetime energetic curve builds its foundational roots across early dashas, 
+        transitions into an active consolidation and scaling wave under <strong>${currentDasha} Mahadasha</strong> (currently active at age ${currentAge}, score ${currentScore}%), 
+        and reaches its highest golden zenith during your <strong>${peak.planet} Mahadasha</strong> 
+        (Ages ${peak.startAge.toFixed(0)} through ${peak.endAge.toFixed(0)}, peaking at ${peak.score}%), where executive wisdom and asset accumulation achieve lasting strength.
       </p>
       <div class="matrix-grid" style="grid-template-columns: repeat(3, 1fr); gap: 8px;">
         <div style="background:var(--surface); padding:8px 10px; border-radius:4px; border:1px solid rgba(201,169,97,0.2);">
           <span class="kicker">FOUNDATION PHASE</span>
-          <span style="font-size:11px; font-weight:600; color:var(--ivory);">Age 0 – 22 · Self &amp; Schooling</span>
+          <span style="font-size:11px; font-weight:600; color:var(--ivory);">Age 0 – 22 · Self &amp; Conditioning</span>
         </div>
         <div style="background:var(--surface); padding:8px 10px; border-radius:4px; border:1px solid rgba(201,169,97,0.2);">
-          <span class="kicker">EXPANSION PHASE (NOW)</span>
-          <span style="font-size:11px; font-weight:600; color:var(--gold-bright);">Age 22 – 40 · Social Capital &amp; Wealth</span>
+          <span class="kicker">ACTIVE CYCLE (AGE ${currentAge})</span>
+          <span style="font-size:11px; font-weight:600; color:var(--gold-bright);">${currentDasha} MD · ${currentScore}% Score</span>
         </div>
         <div style="background:var(--surface); padding:8px 10px; border-radius:4px; border:1px solid rgba(201,169,97,0.2);">
-          <span class="kicker">MASTER SOVEREIGNTY</span>
-          <span style="font-size:11px; font-weight:600; color:var(--jade);">Age 40 – 75 · Institutional Climax</span>
+          <span class="kicker">SOVEREIGN PEAK</span>
+          <span style="font-size:11px; font-weight:600; color:var(--jade);">${peak.planet} MD · Age ${peak.startAge.toFixed(0)}–${peak.endAge.toFixed(0)}</span>
         </div>
       </div>
     </div>
@@ -621,9 +782,8 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">✦ STRATEGIC BEHAVIORAL PROTOCOL AT AGE ${currentAge}</div>
       <p class="body-text">
-        At age ${currentAge}, you are navigating the high-torque acceleration of Rahu in the 11th house (Labha Bhava). 
-        This is an expansion period demanding structured delegation, international or technological leverage, 
-        and strict boundary management to prevent nervous exhaustion.
+        At age ${currentAge}, you are navigating <strong>${currentDasha} Mahadasha</strong> (${activeStartYear}&ndash;${activeEndYear}) with ${lagnaRashi} Ascendant ruled by ${lagnaLord} in your ${ordinal(lagneshHouse)} house (${lagneshSign}). 
+        This phase rewards structured execution, disciplined capital allocation, and steady nervous-system recovery.
       </p>
     </div>
   </div>
@@ -644,21 +804,21 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       <div style="flex:1; text-align:center;">
         <span class="kicker" style="margin-bottom:8px;">D-1 LAGNA CHART (PHYSICAL INCARNATION)</span>
         ${d1Svg}
-        <div class="body-s" style="margin-top:6px; color:var(--gold);">Ascendant: ${lagnaRashi} (26° 54') · Ruling Lord: Mercury</div>
+        <div class="body-s" style="margin-top:6px; color:var(--gold);">Ascendant: ${lagnaRashi} (${lagnaDms}) · Ruling Lord: ${lagnaLord}</div>
       </div>
       <div style="flex:1; text-align:center;">
         <span class="kicker" style="margin-bottom:8px;">D-9 NAVAMSHA CHART (DHARMA &amp; SOUL DESTINY)</span>
         ${d9Svg}
-        <div class="body-s" style="margin-top:6px; color:var(--gold);">D-9 Lagna: Virgo (Swakshetra/Exalted Mercury Fortification)</div>
+        <div class="body-s" style="margin-top:6px; color:var(--gold);">D-9 Lagna: ${d9LagnaRashi} · Ruling Lord: ${d9LagnaLord}</div>
       </div>
     </div>
 
     <div class="luxury-card">
       <div class="card-title">✦ KEY CHARTS SYNTHESIS</div>
       <p class="body-text">
-        Lagna Lord Mercury is placed with the Sun in the 10th house of profession (Gemini) in D-1, 
-        and ascends into its own exalted sign (Virgo) in D-9 Navamsha. 
-        This Vargottama-grade exaltation confirms that every career phase in your life curve rebounds with higher authority after temporary delays.
+        Lagna Lord <strong>${lagnaLord}</strong> sits in the ${ordinal(lagneshHouse)} house (${lagneshSign}) in D-1, 
+        and occupies <strong>${d9LagneshSign}</strong> in your D-9 Navamsha. 
+        This D-1 to D-9 harmonic bridge defines how your outward efforts mature into enduring institutional authority across your lifetime curve.
       </p>
     </div>
   </div>
@@ -692,7 +852,8 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
           const pd = chart.planets?.[p];
           if (!pd) return "";
           const d9Sign = d9Chart?.planets?.[p]?.sign || "—";
-          const retro = pd.isRetrograde ? " (R)" : "";
+          const isRetro = pd.retrograde || pd.isRetrograde;
+          const retro = isRetro ? " (R)" : "";
           const deg = Math.floor(pd.degree || 0);
           const min = Math.floor(((pd.degree || 0) - deg) * 60);
           const dms = `${deg}° ${min}'`;
@@ -701,7 +862,16 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
             : pd.dignity && pd.dignity.indexOf("Debilitated") >= 0
             ? "var(--crimson)"
             : "var(--ivory-dim)";
-          const fRole = p === "Mercury" ? "Lagnesh (Benefic)" : p === "Jupiter" ? "4th/7th Lord (Protective)" : p === "Venus" ? "9th Bhagyesh (Auspicious)" : p === "Saturn" ? "5th/6th Lord (Karmic)" : "Neutral";
+          const owned = getPlanetHousesOwned(p, lagnaRashi);
+          const fRole = p === lagnaLord
+            ? "Lagnesh (Primary)"
+            : owned.includes(9) || owned.includes(5)
+            ? `Trikona (${owned.map(ordinal).join("/")})`
+            : owned.includes(6) || owned.includes(8) || owned.includes(12)
+            ? `Dusthana (${owned.map(ordinal).join("/")})`
+            : owned.length > 0
+            ? `${owned.map(ordinal).join("/")} Lord`
+            : "Karmic Node";
           return `
             <tr>
               <td style="font-weight:700; color:${PLANET_COLORS[p] || "var(--gold)"};">${p}${retro}</td>
@@ -719,19 +889,19 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 
     <div class="matrix-grid" style="grid-template-columns: repeat(3, 1fr); gap: 12px;">
       <div class="luxury-card">
-        <div class="card-title">✦ STRONGEST DISPOSITOR</div>
-        <div class="display-s" style="color:var(--jade);">Mercury (Budha)</div>
-        <p class="body-s" style="margin-top:4px;">Exalted in D-9 Navamsha. Bestows elite analytical intellect and rapid commercial monetization.</p>
+        <div class="card-title">✦ LAGNESH ANCHOR</div>
+        <div class="display-s" style="color:var(--jade);">${lagnaLord} (${lagnaRashi})</div>
+        <p class="body-s" style="margin-top:4px;">Placed in House ${lagneshHouse} (${lagneshSign}) in D-1 and ${d9LagneshSign} in D-9 Navamsha.</p>
       </div>
       <div class="luxury-card">
         <div class="card-title">✦ DHARMA DISPOSITOR</div>
-        <div class="display-s" style="color:var(--gold-bright);">Venus (Shukra)</div>
-        <p class="body-s" style="margin-top:4px;">Ruler of the 9th house of fortune (Taurus) placed in Kendra (10th house) ensuring royal alliances.</p>
+        <div class="display-s" style="color:var(--gold-bright);">${ninthLord} (${ninthSign})</div>
+        <p class="body-s" style="margin-top:4px;">Ruler of your 9th house of fortune (${ninthSign}), placed in House ${ninthLordData?.house || 9} (${ninthLordData?.sign || ninthSign}).</p>
       </div>
       <div class="luxury-card">
         <div class="card-title">✦ KARMIC SHIELD</div>
         <div class="display-s" style="color:var(--saffron);">Jupiter (Guru)</div>
-        <p class="body-s" style="margin-top:4px;">Situated in Scorpio 3rd house casting auspicious 9th drishti on the 11th house of gains.</p>
+        <p class="body-s" style="margin-top:4px;">Situated in ${jupData?.sign || "Natal"} (House ${jupHouse}), casting protective drishti on Houses ${jupAspectHouses.map(ordinal).join(", ")}.</p>
       </div>
     </div>
   </div>
@@ -759,17 +929,17 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card" style="border-left: 3px solid var(--gold);">
       <div class="card-title">📍 CURRENT POSITION (AGE ${currentAge})</div>
       <div class="body-s" style="color:var(--gold-bright); font-weight:700; margin-bottom:4px;">Score: ${currentScore}% · ${currentDasha} Mahadasha</div>
-      <p class="body-s">You are located in the ascending mid-phase of Rahu MD. Expansion trajectory is climbing steadily toward the 60% mark.</p>
+      <p class="body-s">Active ${currentDasha} Mahadasha (${activeStartYear}&ndash;${activeEndYear}). ${activeBand?.functionalRole || "Core cycle"} shaping your current trajectory.</p>
     </div>
     <div class="luxury-card" style="border-left: 3px solid var(--jade);">
       <div class="card-title">★ HIGHEST GOLDEN PEAK</div>
       <div class="body-s" style="color:var(--jade); font-weight:700; margin-bottom:4px;">Score: ${peak.score}% · ${peak.planet} MD (Age ${peak.startAge.toFixed(0)}–${peak.endAge.toFixed(0)})</div>
-      <p class="body-s">Saturn acts as auspicious Yogakaraka / 5th lord, unlocking maximum legacy assets, social authority, and public consolidation.</p>
+      <p class="body-s">${peak.planet} (${peak.functionalRole || "Benefic cycle"}) unlocks your highest lifetime expansion, authority, and asset consolidation.</p>
     </div>
     <div class="luxury-card" style="border-left: 3px solid var(--saffron);">
-      <div class="card-title">⚠ HISTORICAL KARMIC DIP</div>
+      <div class="card-title">⚠ KARMIC CONSOLIDATION DIP</div>
       <div class="body-s" style="color:var(--saffron); font-weight:700; margin-bottom:4px;">Score: ${challenge.score}% · ${challenge.planet} MD (Age ${challenge.startAge.toFixed(0)}–${challenge.endAge.toFixed(0)})</div>
-      <p class="body-s">Early life emotional conditioning under 12th lord Moon. This formative phase is now behind you, replaced by robust adult vitality.</p>
+      <p class="body-s">${challenge.planet} (${challenge.functionalRole || "Test cycle"}) demands measured risk management, health discipline, and conservative liquidity.</p>
     </div>
   </div>
 
@@ -821,26 +991,26 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card" style="margin-bottom:14px;">
       <div class="card-title">✦ PILLAR SYNTHESIS &amp; GROWTH LEVERS</div>
       <p class="body-text" style="margin-bottom:8px;">
-        • <strong>Strongest Anchor — Stability &amp; Grounding (${areas.find(a=>a.name==="Stability")?.score || 62}%):</strong> 
-        Fortified by Kendra placement of Lagna lord Mercury and Jupiter's protective drishti, giving you remarkable emotional grit during crises.<br/>
-        • <strong>Primary Commercial Engine — Career (${areas.find(a=>a.name==="Career")?.score || 56}%):</strong> 
-        10th house Sun-Mercury conjunction ensures executive autonomy and advisory status.<br/>
-        • <strong>Active Attention Area — Health &amp; Vitality (${areas.find(a=>a.name==="Health")?.score || 44}%):</strong> 
-        Pitta-Vata constitution requires regular nervous system downtime and hydration to sustain intense intellectual output.
+        • <strong>Strongest Anchor — ${topArea.name} (${topArea.score}%):</strong> 
+        Supported by your ${lagnaRashi} Ascendant (${lagnaLord} in House ${lagneshHouse}) and active ${currentDasha} planetary currents.<br/>
+        • <strong>Secondary Engine — ${secondArea.name} (${secondArea.score}%):</strong> 
+        Builds compounding momentum when aligned with your 9th-lord ${ninthLord} (${ninthSign}) and Jupiter's ${ordinal(jupHouse)}-house placement.<br/>
+        • <strong>Active Attention Area — ${lowArea.name} (${lowArea.score}%):</strong> 
+        Requires conscious pacing, restorative sleep, and disciplined routine under ${currentDasha} Mahadasha.
       </p>
     </div>
   </div>
   ${footerRail("6-Pillar Life Balance Radar", 6)}
 </section>
 
-<!-- PAGE 7: CURRENT AGE DEEP DIVE (AGE 31 HORIZON) -->
+<!-- PAGE 7: CURRENT AGE DEEP DIVE -->
 <section class="page">
-  ${headerRail("MODULE VI: CURRENT AGE 31 STRATEGIC FOCUS")}
+  ${headerRail(`MODULE VI: CURRENT AGE ${currentAge} STRATEGIC FOCUS`)}
   <div>
-    <h2 class="display-l">Age 31 Diagnostic: The Mid-Rahu Pivot</h2>
+    <h2 class="display-l">Age ${currentAge} Diagnostic: The ${currentDasha} Cycle Pivot</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      Detailed analysis of your planetary drivers at Age 31 (2026–2027). Rahu's placement in the 11th house of Labha 
-      (Gains) creates an intense appetite for scale, unconventional systems, and network monetization.
+      Detailed analysis of your planetary drivers at Age ${currentAge} (${new Date().getFullYear()}&ndash;${new Date().getFullYear() + 1}). 
+      ${currentDasha} Mahadasha activates your ${ordinal(chart.planets?.[currentDasha]?.house || 1)} house (${chart.planets?.[currentDasha]?.sign || lagnaRashi}), shaping your core priorities and growth levers.
     </p>
 
     <!-- Current Driver Cards -->
@@ -857,56 +1027,56 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       `).join("")}
     </div>
 
-    <!-- 3 Core Milestones for Age 31-33 -->
+    <!-- 3 Core Milestones -->
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">✦ 3 CRITICAL MILESTONES FOR AGES 31 TO 33</div>
+      <div class="card-title">✦ 3 CRITICAL MILESTONES FOR AGES ${currentAge} TO ${currentAge + 2}</div>
       <div class="matrix-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top:8px;">
         <div style="background:var(--surface); padding:10px; border-radius:6px;">
           <span class="kicker">COMMERCIAL</span>
           <span style="font-size:11px; font-weight:700; color:var(--gold-bright);">Institutional Scale</span>
-          <p class="body-s" style="margin-top:4px;">Transition from manual execution to scalable digital/organizational platforms.</p>
+          <p class="body-s" style="margin-top:4px;">Transition from manual effort to repeatable, structured systems.</p>
         </div>
         <div style="background:var(--surface); padding:10px; border-radius:6px;">
           <span class="kicker">RELATIONAL</span>
           <span style="font-size:11px; font-weight:700; color:var(--jade);">Alliances of Destiny</span>
-          <p class="body-s" style="margin-top:4px;">Forming high-net-worth strategic alliances that multiply influence.</p>
+          <p class="body-s" style="margin-top:4px;">Cultivate high-trust alliances that reinforce long-term stability.</p>
         </div>
         <div style="background:var(--surface); padding:10px; border-radius:6px;">
           <span class="kicker">INNER SHIELD</span>
           <span style="font-size:11px; font-weight:700; color:var(--saffron);">Nervous Recovery</span>
-          <p class="body-s" style="margin-top:4px;">Preventing burnout by establishing disciplined daily meditation rituals.</p>
+          <p class="body-s" style="margin-top:4px;">Protect vitality through disciplined daily rest and meditative focus.</p>
         </div>
       </div>
     </div>
   </div>
-  ${footerRail("Current Age 31 Strategic Focus", 7)}
+  ${footerRail(`Current Age ${currentAge} Strategic Focus`, 7)}
 </section>
 
-<!-- PAGE 8: ACTIVE MAHADASHA OPERATING SYSTEM: RAHU -->
+<!-- PAGE 8: ACTIVE MAHADASHA OPERATING SYSTEM -->
 <section class="page">
   ${headerRail("MODULE VII: ACTIVE MAHADASHA OPERATING SYSTEM")}
   <div>
-    <h2 class="display-l">Rahu Mahadasha Strategy (2017 – 2035)</h2>
+    <h2 class="display-l">${currentDasha} Mahadasha Strategy (${activeStartYear} &ndash; ${activeEndYear})</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      Rahu in Pisces (House 11) is the great accelerator of worldly ambition. In the 11th house, 
-      Rahu produces substantial material rewards, unconventional business models, and powerful patron networks.
+      ${currentDasha} in ${chart.planets?.[currentDasha]?.sign || lagnaRashi} (House ${chart.planets?.[currentDasha]?.house || 1}) governs your active karmic chapter (${activeStartYear}&ndash;${activeEndYear}). 
+      Aligning decisions with ${currentDasha}'s ${activeBand?.functionalRole || "natal dignity"} maximizes compounding returns.
     </p>
 
-    <!-- 3 Phases of Rahu MD -->
+    <!-- 3 Phases of Active MD -->
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">✦ THE THREE CHRONOLOGICAL PHASES OF YOUR RAHU CYCLE</div>
+      <div class="card-title">✦ THE THREE CHRONOLOGICAL PHASES OF YOUR ${currentDasha.toUpperCase()} CYCLE</div>
       <div style="margin-top:10px; space-y:10px;">
         <div style="padding:8px 12px; background:var(--surface); border-radius:6px; margin-bottom:8px;">
-          <strong style="color:var(--muted);">Phase 1 (2017–2022) · The Shattering &amp; Re-Orientation:</strong>
-          <span class="body-s" style="display:block; margin-top:2px;">Disruption of old paradigms, shedding outdated circles, and discovering your independent technological and analytical edge.</span>
+          <strong style="color:var(--muted);">Phase 1 (${activeStartYear}&ndash;${activeMid1}) · Initiation &amp; Re-Orientation:</strong>
+          <span class="body-s" style="display:block; margin-top:2px;">Establishing new priorities, shedding outdated commitments, and recalibrating your primary direction.</span>
         </div>
         <div style="padding:8px 12px; background:var(--surface); border-radius:6px; margin-bottom:8px; border:1px solid var(--gold);">
-          <strong style="color:var(--gold-bright);">Phase 2 (2022–2029) · The High-Elevation Build (CURRENT):</strong>
-          <span class="body-s" style="display:block; margin-top:2px;">Building serious leverage, commercial products, institutional reputation, and establishing financial autonomy.</span>
+          <strong style="color:var(--gold-bright);">Phase 2 (${activeMid1}&ndash;${activeMid2}) · Structural Execution:</strong>
+          <span class="body-s" style="display:block; margin-top:2px;">Building durable assets, institutional reputation, and disciplined financial autonomy.</span>
         </div>
         <div style="padding:8px 12px; background:var(--surface); border-radius:6px;">
-          <strong style="color:var(--jade);">Phase 3 (2029–2035) · The Mega-Harvest &amp; Consolidation:</strong>
-          <span class="body-s" style="display:block; margin-top:2px;">Monetizing major assets, exiting high-friction operations, and preparing for the expansive royal grace of Jupiter Mahadasha.</span>
+          <strong style="color:var(--jade);">Phase 3 (${activeMid2}&ndash;${activeEndYear}) · Harvest &amp; Transition:</strong>
+          <span class="body-s" style="display:block; margin-top:2px;">Consolidating gains and preparing smoothly for ${nextBandAfterActive ? `${nextBandAfterActive.planet} Mahadasha` : "the next planetary era"}.</span>
         </div>
       </div>
     </div>
@@ -914,19 +1084,19 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <!-- Guardrails Grid -->
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
       <div class="luxury-card">
-        <div class="card-title">✅ WHAT PROSPERS IN RAHU MD</div>
+        <div class="card-title">✅ WHAT PROSPERS IN ${currentDasha.toUpperCase()} MD</div>
         <p class="body-text" style="font-size:11px;">
-          • Unconventional &amp; tech-forward business models.<br/>
-          • Direct international client exposure and digital platforms.<br/>
-          • Strategic delegation and automated systems.
+          • Disciplined strategy aligned with House ${chart.planets?.[currentDasha]?.house || 1} themes.<br/>
+          • Written agreements, verified counterparties, and patient compounding.<br/>
+          • Honoring your Lagnesh ${lagnaLord} daily routines.
         </p>
       </div>
       <div class="luxury-card">
-        <div class="card-title">❌ WHAT CREATES HAVOC IN RAHU MD</div>
+        <div class="card-title">❌ WHAT CREATES FRICTION IN ${currentDasha.toUpperCase()} MD</div>
         <p class="body-text" style="font-size:11px;">
-          • Unhedged high-leverage speculative trading.<br/>
-          • Verbal commitments without written contracts.<br/>
-          • Neglecting sleep hygiene and digestive health.
+          • Unhedged high-leverage speculative commitments.<br/>
+          • Verbal agreements without documented terms.<br/>
+          • Neglecting sleep hygiene and nervous recovery.
         </p>
       </div>
     </div>
@@ -938,7 +1108,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 <section class="page">
   ${headerRail("MODULE VIII: 5-YEAR ANTARDASHA HORIZON")}
   <div>
-    <h2 class="display-l">Next 5-Year Yearly Trajectory (2026 – 2031)</h2>
+    <h2 class="display-l">Next 5-Year Yearly Trajectory (${nowYear} – ${next5YearEnd})</h2>
     <p class="body-text" style="margin-bottom:16px;">
       Sequential sub-period transitions detailing how your vitality score evolves year by year over the next five years.
     </p>
@@ -981,7 +1151,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">✦ 5-YEAR EXECUTIVE ACTION PROTOCOL</div>
       <p class="body-text">
-        The trajectory across 2026–2031 moves from steady consolidation into an upward momentum surge. 
+        The trajectory across ${nowYear}–${next5YearEnd} moves from steady consolidation into an upward momentum surge. 
         Focus on creating unassailable intellectual property and asset ownership. 
         Avoid dividing your attention across more than two major ventures at any given time.
       </p>
@@ -996,7 +1166,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
   <div>
     <h2 class="display-l">Navtara 9-Chakra Classification</h2>
     <p class="body-text" style="margin-bottom:16px;">
-      Calculated from your Janma Nakshatra (<strong>Uttara Phalguni</strong>). In classical Vedic astrology, 
+      Calculated dynamically from your Janma Nakshatra (<strong>${nakshatra}</strong>). In classical Vedic astrology, 
       every dasha planet's real-world outcome depends heavily on whether it occupies a friendly or hostile Tara star.
     </p>
 
@@ -1004,41 +1174,41 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="matrix-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
       <div class="luxury-card" style="border-top:3px solid #34D399;">
         <div class="kicker">2. SAMPAT TARA (WEALTH)</div>
-        <div class="display-s" style="color:var(--jade);">Hastha, Shravana, Rohini</div>
+        <div class="display-s" style="color:var(--jade);">${taraStars(2)}</div>
         <p class="body-s" style="margin-top:4px;">Brings liquidity, sudden windfalls, and commercial expansion.</p>
       </div>
       <div class="luxury-card" style="border-top:3px solid #34D399;">
         <div class="kicker">4. KSHEMA TARA (WELLBEING)</div>
-        <div class="display-s" style="color:var(--jade);">Swati, Shatabhisha, Ardra</div>
+        <div class="display-s" style="color:var(--jade);">${taraStars(4)}</div>
         <p class="body-s" style="margin-top:4px;">Protects bodily health, domestic peace, and emotional stability.</p>
       </div>
       <div class="luxury-card" style="border-top:3px solid #34D399;">
         <div class="kicker">6. SADHAKA TARA (ACCOMPLISHMENT)</div>
-        <div class="display-s" style="color:var(--jade);">Anuradha, U. Bhadra, Pushya</div>
+        <div class="display-s" style="color:var(--jade);">${taraStars(6)}</div>
         <p class="body-s" style="margin-top:4px;">Guarantees success in high-stakes negotiations, exams, and projects.</p>
       </div>
       <div class="luxury-card" style="border-top:3px solid #EF4444;">
         <div class="kicker">3. VIPAT TARA (MISFORTUNE)</div>
-        <div class="display-s" style="color:var(--crimson);">Chitra, Dhanishta, Mrigashira</div>
+        <div class="display-s" style="color:var(--crimson);">${taraStars(3)}</div>
         <p class="body-s" style="margin-top:4px;">Avoid initiating major financial contracts when Moon transits here.</p>
       </div>
       <div class="luxury-card" style="border-top:3px solid #EF4444;">
         <div class="kicker">5. PRATYARI TARA (OBSTACLES)</div>
-        <div class="display-s" style="color:var(--crimson);">Vishakha, P. Bhadra, Punarvasu</div>
+        <div class="display-s" style="color:var(--crimson);">${taraStars(5)}</div>
         <p class="body-s" style="margin-top:4px;">Induces unnecessary resistance, rivalry, and delays in agreements.</p>
       </div>
       <div class="luxury-card" style="border-top:3px solid #EF4444;">
         <div class="kicker">7. NAIDHANA / VADHA (DANGER)</div>
-        <div class="display-s" style="color:var(--crimson);">Jyeshtha, Revati, Ashlesha</div>
+        <div class="display-s" style="color:var(--crimson);">${taraStars(7)}</div>
         <p class="body-s" style="margin-top:4px;">Strictly avoid high-risk surgeries, debt creation, or travel on these stars.</p>
       </div>
     </div>
 
     <div class="luxury-card">
-      <div class="card-title">✦ 27TH SUPPORT STAR SHIELD (PURVA PHALGUNI)</div>
+      <div class="card-title">✦ 27TH SUPPORT STAR SHIELD (${supportStar27.toUpperCase()})</div>
       <p class="body-text">
-        The 27th nakshatra preceding your Janma star is <strong>Purva Phalguni</strong> (ruled by Venus). 
-        This is your Sacred Support Star. Honoring Venus and resting during Purva Phalguni transits 
+        The 27th nakshatra preceding your Janma star (${nakshatra}) is <strong>${supportStar27}</strong>. 
+        This is your Sacred Support Star (Ati-Mitra). Resting and resetting during ${supportStar27} transits 
         instantly recharges your vital aura and eliminates karmic fatigue.
       </p>
     </div>
@@ -1052,64 +1222,26 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
   <div>
     <h2 class="display-l">The 5 Great Life Epochs (Age 0 to 90)</h2>
     <p class="body-text" style="margin-bottom:16px;">
-      Chronological segmentation of your entire life journey into five master shastric chapters.
+      Chronological segmentation of your Vimshottari Mahadasha timeline into five master shastric chapters.
     </p>
 
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <div class="luxury-card" style="border-left:4px solid #9C8348;">
+      ${bands.slice(0, 5).map((b, idx) => {
+        const isCurrent = currentAge >= b.startAge && currentAge <= b.endAge;
+        const isPeak = b.planet === peak.planet && Math.abs(b.startAge - peak.startAge) < 1;
+        const borderCol = isCurrent ? "#A855F7" : isPeak ? "#34D399" : "#C9A961";
+        const badgeText = isCurrent ? `${b.planet} MD ✦ CURRENT` : isPeak ? `${b.planet} MD ★ PEAK (${b.score}%)` : `${b.planet} Mahadasha (${b.score}%)`;
+        return `
+      <div class="luxury-card" style="border-left:4px solid ${borderCol}; ${isCurrent ? "background:rgba(168,85,247,0.06);" : isPeak ? "background:rgba(52,211,153,0.06);" : ""}">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <strong style="color:var(--gold-bright); font-size:13px;">EPOCH I: THE FOUNDATION &amp; EARLY KARMIC MOULDING (Age 0 – 21)</strong>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted);">Sun · Moon · Mars Dashas</span>
+          <strong style="color:var(--gold-bright); font-size:13px;">EPOCH ${idx + 1}: ${b.planet.toUpperCase()} ERA (Age ${b.startAge.toFixed(0)} &ndash; ${b.endAge.toFixed(0)})</strong>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:${borderCol}; font-weight:700;">${badgeText}</span>
         </div>
         <p class="body-text" style="font-size:11px;">
-          Early formative years shaped by emotional sensitivity (Moon MD) and physical drive (Mars MD). 
-          Instilled analytical curiosity and resilience under pressure.
+          ${b.functionalRole} cycle (${b.start.getFullYear()}&ndash;${b.end.getFullYear()}). ${isCurrent ? "Currently active: prioritize structured execution, written contracts, and steady pacing." : isPeak ? "Your highest lifetime trajectory window: deploy capital and scale long-term authority." : "Key karmic chapter shaping your long-term institutional and personal evolution."}
         </p>
-      </div>
-
-      <div class="luxury-card" style="border-left:4px solid #A855F7; background:rgba(168,85,247,0.06);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <strong style="color:#C084FC; font-size:13px;">EPOCH II: THE GREAT AMBITION &amp; COMMERCIAL SCALE (Age 22 – 40 · ACTIVE)</strong>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#C084FC; font-weight:700;">Rahu Mahadasha ✦ CURRENT</span>
-        </div>
-        <p class="body-text" style="font-size:11px;">
-          Your current era. Marked by unconventional career trajectories, rapid digital learning, commercial scaling, 
-          and establishing an independent institutional reputation.
-        </p>
-      </div>
-
-      <div class="luxury-card" style="border-left:4px solid #C9A961;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <strong style="color:var(--gold-bright); font-size:13px;">EPOCH III: THE GOLDEN SOVEREIGN PRIME (Age 40 – 56)</strong>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gold);">Jupiter (Guru) Mahadasha</span>
-        </div>
-        <p class="body-text" style="font-size:11px;">
-          The golden expansion era. Fused with wisdom, executive mentorship, expansive domestic harmony, 
-          and exponential growth of financial investments and family lineage.
-        </p>
-      </div>
-
-      <div class="luxury-card" style="border-left:4px solid #34D399; background:rgba(52,211,153,0.06);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <strong style="color:var(--jade); font-size:13px;">EPOCH IV: THE MASTER HARVEST &amp; AUTHORITY (Age 56 – 75 · ABSOLUTE PEAK)</strong>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--jade); font-weight:700;">Saturn (Shani) Mahadasha ★ PEAK</span>
-        </div>
-        <p class="body-text" style="font-size:11px;">
-          Your lifetime pinnacle score (66%). Saturn in Kendra/Trikona bestows lasting institutional governance, 
-          unassailable respect, and substantial multi-generational wealth.
-        </p>
-      </div>
-
-      <div class="luxury-card" style="border-left:4px solid #38BDF8;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <strong style="color:#38BDF8; font-size:13px;">EPOCH V: SAGE WISDOM, MOKSHA &amp; TRANSCENDENCE (Age 75 – 90+)</strong>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted);">Mercury (Budha) Mahadasha</span>
-        </div>
-        <p class="body-text" style="font-size:11px;">
-          Exalted D-9 Mercury activates higher contemplative philosophy, writing, spiritual teaching, 
-          and leaving an enduring cultural/charitable legacy.
-        </p>
-      </div>
+      </div>`;
+      }).join("")}
     </div>
   </div>
   ${footerRail("5 Great Life Epochs", 11)}
@@ -1125,11 +1257,10 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     </p>
 
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">✦ THE SUPREME GOLDEN PERIOD: AGE 56 TO 75 (SATURN MAHADASHA)</div>
+      <div class="card-title">✦ THE SUPREME GOLDEN PERIOD: AGE ${peak.startAge.toFixed(0)} TO ${peak.endAge.toFixed(0)} (${peak.planet.toUpperCase()} MAHADASHA)</div>
       <p class="body-text" style="margin-bottom:10px;">
-        While Saturn is often feared in popular superstition, in your Virgo Lagna chart, Saturn rules the 
-        5th house of Purva Punya (Past-life Merit) and speculative intelligence. 
-        When Saturn's 19-year dasha activates, your lifetime curve surges to its highest score of <strong>66%</strong>.
+        In your ${lagnaRashi} Lagna chart, <strong>${peak.planet}</strong> (${peak.functionalRole || "key benefic"}) activates your highest lifetime expansion wave. 
+        When ${peak.planet}'s Mahadasha runs, your lifetime curve surges to its peak score of <strong>${peak.score}%</strong>.
       </p>
       <div class="matrix-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
         <div style="background:var(--surface); padding:8px; text-align:center; border-radius:4px;">
@@ -1138,7 +1269,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
         </div>
         <div style="background:var(--surface); padding:8px; text-align:center; border-radius:4px;">
           <span class="kicker">REPUTATION</span>
-          <span style="color:var(--gold-bright); font-weight:700;">National Authority</span>
+          <span style="color:var(--gold-bright); font-weight:700;">Institutional Authority</span>
         </div>
         <div style="background:var(--surface); padding:8px; text-align:center; border-radius:4px;">
           <span class="kicker">FAMILY LEGACY</span>
@@ -1147,13 +1278,12 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       </div>
     </div>
 
-    <!-- Secondary Peak in Rahu-Jupiter -->
+    <!-- Secondary Peak -->
     <div class="luxury-card">
-      <div class="card-title">✦ INTERMEDIATE GOLDEN SURGE: 2028 TO 2031 (RAHU-JUPITER CYCLE)</div>
+      <div class="card-title">✦ INTERMEDIATE GOLDEN SURGE: ${currentDasha.toUpperCase()} &ndash; ${secBenefic.toUpperCase()} SUB-CYCLE</div>
       <p class="body-text">
-        Within your current Rahu era, the upcoming Jupiter Antardasha represents a major golden harvest window. 
-        Jupiter's expansive trine to natal 11th house positions opens doors for institutional funding, 
-        large real estate purchases, and high-visibility public honors.
+        Within your active ${currentDasha} Mahadasha, sub-periods governed by your Lagnesh <strong>${lagnaLord}</strong> and 9th/5th lord <strong>${secBenefic}</strong> 
+        represent high-leverage windows for strategic alliances, property acquisition, and public recognition.
       </p>
     </div>
   </div>
@@ -1171,11 +1301,10 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     </p>
 
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">✦ THE PRIMARY KARMIC VULNERABILITY: MOON IN THE 12TH HOUSE</div>
+      <div class="card-title">✦ THE PRIMARY KARMIC CONSOLIDATION WINDOW: ${challenge.planet.toUpperCase()} CYCLE</div>
       <p class="body-text">
-        Moon placed in Leo (12th house from Virgo Lagna) creates a natural tendency toward mental overthinking, 
-        insomnia during high-stress periods, and occasional feelings of isolation. 
-        During Moon sub-periods, your curve dips to <strong>34%</strong>.
+        In your ${lagnaRashi} Lagna chart, <strong>${challenge.planet}</strong> (${challenge.functionalRole || "karmic test"}) in House ${chart.planets?.[challenge.planet]?.house || 12} (${chart.planets?.[challenge.planet]?.sign || moonRashi}) 
+        marks your primary consolidation phase (Ages ${challenge.startAge.toFixed(0)}&ndash;${challenge.endAge.toFixed(0)}), where the curve dips to <strong>${challenge.score}%</strong> to enforce discipline and asset protection.
       </p>
     </div>
 
@@ -1183,7 +1312,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="matrix-grid" style="grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom:16px;">
       <div class="luxury-card">
         <div class="card-title" style="color:var(--saffron);">RULE 1: STRICT STOP-LOSS</div>
-        <p class="body-s">Never initiate unhedged financial speculations or angel investments during low-score dips.</p>
+        <p class="body-s">Never initiate unhedged financial speculations or impulsive commitments during low-score dips.</p>
       </div>
       <div class="luxury-card">
         <div class="card-title" style="color:var(--saffron);">RULE 2: REPAIR, DON'T PUSH</div>
@@ -1191,7 +1320,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
       </div>
       <div class="luxury-card">
         <div class="card-title" style="color:var(--saffron);">RULE 3: NATURE DANA</div>
-        <p class="body-s">Feeding cows and giving clean water charity completely dissolves 12th house emotional friction.</p>
+        <p class="body-s">Consistent charitable seva and clean water offerings dissolve dusthana friction calmly.</p>
       </div>
     </div>
   </div>
@@ -1210,20 +1339,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 
     <!-- SAV Heatmap Grid -->
     <div class="matrix-grid" style="grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px;">
-      ${[
-        { h: 1, sign: "Virgo", b: 35, role: "Vitality / Self" },
-        { h: 2, sign: "Libra", b: 31, role: "Treasury / Assets" },
-        { h: 3, sign: "Scorpio", b: 28, role: "Courage / Siblings" },
-        { h: 4, sign: "Sagittarius", b: 29, role: "Property / Peace" },
-        { h: 5, sign: "Capricorn", b: 25, role: "Purva Punya / Mind" },
-        { h: 6, sign: "Aquarius", b: 24, role: "Debt / Defense" },
-        { h: 7, sign: "Pisces", b: 27, role: "Partnerships" },
-        { h: 8, sign: "Aries", b: 28, role: "Longevity / Secrets" },
-        { h: 9, sign: "Taurus", b: 26, role: "Bhagya / Dharma" },
-        { h: 10, sign: "Gemini", b: 34, role: "Career / Status" },
-        { h: 11, sign: "Cancer", b: 28, role: "Gains / Cashflow" },
-        { h: 12, sign: "Leo", b: 22, role: "Expenditure / Loss" },
-      ].map((item) => `
+      ${savRows.map((item) => `
         <div class="matrix-item" style="border-top:3px solid ${item.b >= 30 ? "var(--jade)" : item.b >= 26 ? "var(--gold)" : "var(--crimson)"};">
           <span class="kicker">H${item.h} · ${item.sign.slice(0,3).toUpperCase()}</span>
           <span class="val" style="color:${item.b >= 30 ? "var(--jade)" : item.b >= 26 ? "var(--gold-bright)" : "var(--crimson)"};">${item.b} Bindus</span>
@@ -1235,8 +1351,8 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">✦ 11TH VS 12TH BINDU WEALTH RATIO</div>
       <p class="body-text">
-        Your 11th House of Gains has <strong>28 Bindus</strong> against only <strong>22 Bindus</strong> in the 12th House of Losses. 
-        This favorable positive delta of +6 bindus guarantees lifetime wealth accumulation and prevents involuntary insolvency.
+        Your 11th House of Gains has <strong>${b11} Bindus</strong> against <strong>${b12} Bindus</strong> in the 12th House of Expenditure. 
+        ${bDelta >= 0 ? `This positive delta (+${bDelta} bindus) supports net capital retention and long-term accumulation.` : `This ${bDelta} bindu spread advises structured automated savings and conscious expense guardrails.`}
       </p>
     </div>
   </div>
@@ -1267,35 +1383,27 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
         </tr>
       </thead>
       <tbody>
-        ${[
-          { p: "Sun", rupa: 7.2, req: 6.5, status: "Robust" },
-          { p: "Moon", rupa: 6.1, req: 6.0, status: "Adequate" },
-          { p: "Mars", rupa: 6.8, req: 5.0, status: "Very Strong" },
-          { p: "Mercury", rupa: 8.4, req: 7.0, status: "Supreme Potency" },
-          { p: "Jupiter", rupa: 7.6, req: 6.5, status: "Powerful" },
-          { p: "Venus", rupa: 6.9, req: 5.5, status: "High Grace" },
-          { p: "Saturn", rupa: 7.1, req: 5.0, status: "Fortified" },
-        ].map((item) => `
+        ${shadbalaRows.map((item) => `
           <tr>
             <td style="font-weight:700; color:${PLANET_COLORS[item.p] || "var(--gold)"};">${item.p}</td>
-            <td>Strong</td>
-            <td>Elevated</td>
+            <td>${item.passes ? "Strong" : "Moderate"}</td>
+            <td>${item.ratio >= 1.1 ? "Elevated" : "Balanced"}</td>
             <td>Favorable</td>
             <td style="font-weight:700; color:var(--gold-bright);">${item.rupa} Rupas</td>
             <td>${item.req} Rupas</td>
-            <td style="color:var(--jade); font-weight:700;">${(item.rupa / item.req).toFixed(2)}x</td>
-            <td style="color:var(--jade);">${item.status}</td>
+            <td style="color:${item.passes ? "var(--jade)" : "var(--saffron)"}; font-weight:700;">${item.ratio.toFixed(2)}x</td>
+            <td style="color:${item.passes ? "var(--jade)" : "var(--saffron)"};">${item.status}</td>
           </tr>
         `).join("")}
       </tbody>
     </table>
 
     <div class="luxury-card">
-      <div class="card-title">✦ SUPREME ENGINE: BUDHA (MERCURY) AT 8.4 RUPAS</div>
+      <div class="card-title">✦ SUPREME ENGINE: ${strongestShadbala.p.toUpperCase()} AT ${strongestShadbala.rupa} RUPAS</div>
       <p class="body-text">
-        Mercury achieves the highest Shadbala score in your chart (1.20x required threshold). 
-        This confirms your natural aptitude for intellectual synthesis, strategic communications, 
-        and building complex software, mathematical, or financial architectures.
+        <strong>${strongestShadbala.p}</strong> achieves the highest Shadbala ratio in your chart (${strongestShadbala.ratio.toFixed(2)}x required threshold). 
+        This confirms your natural aptitude for disciplined synthesis, strategic communications, 
+        and building durable institutional, analytical, or commercial ventures.
       </p>
     </div>
   </div>
@@ -1313,18 +1421,17 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
       <div class="luxury-card">
-        <div class="card-title">✦ MERCURY EXALTATION IN D-9 VIRGO</div>
+        <div class="card-title">✦ ${lagnaLord.toUpperCase()} IN D-9 ${d9LagneshSign.toUpperCase()}</div>
         <p class="body-text">
-          Mercury shifts into its own exalted sign (Virgo) in the 9th harmonic. 
-          This is an extraordinary Shastric asset: any confusion or obstacles in early life 
-          dissolve into crystal-clear strategic execution and profound writing/advisory ability.
+          Your Lagnesh <strong>${lagnaLord}</strong> occupies <strong>${d9LagneshSign}</strong> in the 9th harmonic (D-9 Navamsha). 
+          This harmonic anchor reveals how early-life lessons mature into clear strategic execution and authority.
         </p>
       </div>
       <div class="luxury-card">
-        <div class="card-title">✦ VENUS &amp; MARS SYNASTRY IN D-9</div>
+        <div class="card-title">✦ D-9 LAGNA (${d9LagnaRashi.toUpperCase()}) &amp; DHARMA LORD (${d9LagnaLord.toUpperCase()})</div>
         <p class="body-text">
-          Venus placed in a harmonious sign in D-9 supports domestic peace and refinement, 
-          while Mars brings productive creative passion without explosive ego clashes.
+          Your D-9 Ascendant rises in <strong>${d9LagnaRashi}</strong> ruled by ${d9LagnaLord}, while ${ninthLord} governs your D-1 9th house of fortune, 
+          supporting steady relational maturity and principled leadership.
         </p>
       </div>
     </div>
@@ -1332,8 +1439,8 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">✦ NAVAMSHA CONCLUSION FOR DESTINY TRAJECTORY</div>
       <p class="body-text">
-        Because your D-9 chart is significantly more fortified than your D-1 natal chart, 
-        the second half of your life (Ages 35–90) will consistently outperform your early years in both wealth and inner contentment.
+        By aligning your ${lagnaRashi} D-1 temperament with your ${d9LagnaRashi} D-9 harmonic signature, 
+        the mature decades of your life consistently reward patience, integrity, and long-term compounding.
       </p>
     </div>
   </div>
@@ -1352,26 +1459,26 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
       <div class="luxury-card">
-        <div class="card-title">✦ SHANI TRANSIT (SATURN IN PISCES)</div>
+        <div class="card-title">✦ SHANI NATAL &amp; TRANSIT AXIS (${satData?.sign?.toUpperCase() || "NATAL"} · H${satHouse})</div>
         <p class="body-text">
-          Saturn transits your 7th house of partnerships and commercial contracts. 
-          Enforces seriousness, eliminates non-performing alliances, and rewards patient long-term institutional agreements.
+          Natal Saturn in your ${ordinal(satHouse)} house (${satData?.sign || lagnaRashi}) rewards patient structural commitments, 
+          filters out fragile alliances, and anchors long-term institutional agreements.
         </p>
       </div>
       <div class="luxury-card">
-        <div class="card-title">✦ GURU TRANSIT (JUPITER IN TAURUS &amp; GEMINI)</div>
+        <div class="card-title">✦ GURU DRISHTI AXIS (${jupData?.sign?.toUpperCase() || "NATAL"} · H${jupHouse})</div>
         <p class="body-text">
-          Jupiter moves across your 9th house of fortune into your 10th house of career. 
-          Casts direct trine aspects on your wealth ascendants, initiating unprecedented professional elevation.
+          Natal Jupiter in your ${ordinal(jupHouse)} house casts protective drishti across Houses ${jupAspectHouses.map(ordinal).join(", ")}, 
+          expanding wisdom, mentorship, and timely material growth.
         </p>
       </div>
     </div>
 
     <div class="luxury-card">
-      <div class="card-title">✦ THE ACTIVE DOUBLE-TRANSIT TARGET: 10TH HOUSE (CAREER)</div>
+      <div class="card-title">✦ DOUBLE-TRANSIT SANCTION FOR ${lagnaRashi.toUpperCase()} LAGNA</div>
       <p class="body-text">
-        Both Saturn and Jupiter actively aspect and influence your 10th house of profession. 
-        This dual sanction confirms that the current period is prime for establishing an enduring sovereign business enterprise.
+        Whenever transit Jupiter and transit Saturn simultaneously aspect your 1st, 9th, or 10th houses from ${lagnaRashi}, 
+        major career and wealth milestones receive full karmic sanction for durable execution.
       </p>
     </div>
   </div>
@@ -1389,18 +1496,18 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
       <div class="luxury-card">
-        <div class="card-title">✦ RAHU IN 11TH HOUSE (PISCES)</div>
-        <div class="display-s" style="color:var(--gold-bright); margin-bottom:6px;">The Great Material Networker</div>
+        <div class="card-title">✦ RAHU IN ${ordinal(rahuHouse).toUpperCase()} HOUSE (${rahuSign.toUpperCase()})</div>
+        <div class="display-s" style="color:var(--gold-bright); margin-bottom:6px;">The Evolutionary Frontier</div>
         <p class="body-text">
-          Urges you to connect with global communities, harness internet-scale leverage, 
-          and build systems that generate decentralized abundance.
+          Rahu in your ${ordinal(rahuHouse)} house (${rahuSign}) urges you to innovate, embrace modern scale, 
+          and build systems that turn unconventional vision into tangible abundance.
         </p>
       </div>
       <div class="luxury-card">
-        <div class="card-title">✦ KETU IN 5TH HOUSE (VIRGO)</div>
-        <div class="display-s" style="color:var(--saffron); margin-bottom:6px;">The Analytical Master</div>
+        <div class="card-title">✦ KETU IN ${ordinal(ketuHouse).toUpperCase()} HOUSE (${ketuSign.toUpperCase()})</div>
+        <div class="display-s" style="color:var(--saffron); margin-bottom:6px;">Innate Past-Life Mastery</div>
         <p class="body-text">
-          Past-life mastery of mathematics, grammar, and critical logic. 
+          Ketu in your ${ordinal(ketuHouse)} house (${ketuSign}) reflects natural discernment and detachment. 
           Release perfectionistic anxiety and trust your intuitive strategic vision.
         </p>
       </div>
@@ -1409,7 +1516,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">✦ BALANCING THE NODAL POLARITY</div>
       <p class="body-text">
-        Ground Ketu's sharp intellect through daily creative creation, while directing Rahu's ambitious drive 
+        Ground Ketu's sharp discernment through daily creative discipline, while directing Rahu's ${ordinal(rahuHouse)}-house drive 
         into ethical, institution-building ventures that serve society.
       </p>
     </div>
@@ -1423,33 +1530,33 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
   <div>
     <h2 class="display-l">Precision Ratna Pariksha Prescription</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      Authentic Anukul Graha gemstone therapy based on your Virgo Lagna and benefic dispositors.
+      Authentic Anukul Graha gemstone therapy tailored for ${withArticle(lagnaRashi)} Lagna and benefic dispositors.
     </p>
 
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
       <div class="luxury-card" style="border-top:3px solid #34D399;">
-        <div class="card-title">✦ PRIMARY LIFE GEM: NATURAL EMERALD (PANNA)</div>
+        <div class="card-title">✦ PRIMARY LIFE GEM: ${gemRx.primaryGem.toUpperCase()}</div>
         <p class="body-text" style="margin-bottom:8px;">
-          Strengthens Lagnesh Mercury. Enhances cognitive clarity, public speech, nervous resilience, and commercial monetization.
+          ${gemRx.rationale}
         </p>
         <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px;">
-          <div><span class="kicker">CARAT</span><span class="body-s" style="color:var(--gold);">3.5 – 5.0 Ratti</span></div>
-          <div><span class="kicker">FINGER</span><span class="body-s" style="color:var(--gold);">Little Finger (Right)</span></div>
-          <div><span class="kicker">METAL</span><span class="body-s" style="color:var(--gold);">Panchadhatu / Gold</span></div>
-          <div><span class="kicker">DAY</span><span class="body-s" style="color:var(--gold);">Wednesday Dawn</span></div>
+          <div><span class="kicker">CARAT</span><span class="body-s" style="color:var(--gold);">${PLANET_GEM_MAP[lagnaLord]?.weight || "3.5 – 5.0 Ratti"}</span></div>
+          <div><span class="kicker">FINGER</span><span class="body-s" style="color:var(--gold);">${gemRx.finger}</span></div>
+          <div><span class="kicker">METAL</span><span class="body-s" style="color:var(--gold);">${gemRx.metal}</span></div>
+          <div><span class="kicker">DAY</span><span class="body-s" style="color:var(--gold);">${gemRx.day}</span></div>
         </div>
       </div>
 
       <div class="luxury-card" style="border-top:3px solid #C9A961;">
-        <div class="card-title">✦ FORTUNE GEM: YELLOW SAPPHIRE (PUKHRAJ)</div>
+        <div class="card-title">✦ FORTUNE GEM: ${secGemInfo.gem.toUpperCase()} (${secGemInfo.sanskrit.toUpperCase()})</div>
         <p class="body-text" style="margin-bottom:8px;">
-          Energizes Jupiter's protective drishti on the 11th house, inviting mentor support, divine wisdom, and moral clarity.
+          Strengthens your trinal benefic <strong>${secBenefic}</strong>, enhancing ${secGemInfo.benefit}.
         </p>
         <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px;">
-          <div><span class="kicker">CARAT</span><span class="body-s" style="color:var(--gold);">4.25 – 5.5 Ratti</span></div>
-          <div><span class="kicker">FINGER</span><span class="body-s" style="color:var(--gold);">Index Finger (Right)</span></div>
-          <div><span class="kicker">METAL</span><span class="body-s" style="color:var(--gold);">Pure Gold / Brass</span></div>
-          <div><span class="kicker">DAY</span><span class="body-s" style="color:var(--gold);">Thursday Sunrise</span></div>
+          <div><span class="kicker">CARAT</span><span class="body-s" style="color:var(--gold);">${secGemInfo.weight}</span></div>
+          <div><span class="kicker">FINGER</span><span class="body-s" style="color:var(--gold);">${secGemInfo.finger} (${handSide})</span></div>
+          <div><span class="kicker">METAL</span><span class="body-s" style="color:var(--gold);">${secGemInfo.metal}</span></div>
+          <div><span class="kicker">DAY</span><span class="body-s" style="color:var(--gold);">${secGemInfo.day}</span></div>
         </div>
       </div>
     </div>
@@ -1457,8 +1564,8 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">⚠️ STRICTLY PROHIBITED GEMSTONES</div>
       <p class="body-text">
-        Do NOT wear Red Coral (Moonga) or Yellow Topaz on the middle finger. 
-        Mars is a functional malefic for Virgo Lagna; wearing untreated red coral increases conflict and erratic blood pressure.
+        Do NOT wear <strong>${bannedGemName}</strong> (associated with dusthana lord ${bannedLord} for ${lagnaRashi} Lagna). 
+        Amplifying 6th/8th/12th-house rulers through gemstones increases unnecessary energetic friction.
       </p>
     </div>
   </div>
@@ -1471,22 +1578,20 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
   <div>
     <h2 class="display-l">Electromagnetic Bead Resonance</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      Sacred beads from the Shiva Purana to balance electro-magnetic currents and calm active dasha friction.
+      Sacred beads from the Shiva Purana matched to your Lagnesh (${lagnaLord}) and active Mahadasha (${currentDasha}).
     </p>
 
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
       <div class="luxury-card">
-        <div class="card-title">✦ 4-MUKHI RUDRAKSHA (LORD BRAHMA)</div>
+        <div class="card-title">✦ ${rud1.mukhi.toUpperCase()} (${rud1.deity.toUpperCase()})</div>
         <p class="body-text">
-          Resonates directly with Mercury (Budha). Expands logical acuity, memory retention, 
-          and creative problem solving while neutralizing intellectual fatigue.
+          ${rud1.desc}
         </p>
       </div>
       <div class="luxury-card">
-        <div class="card-title">✦ 8-MUKHI RUDRAKSHA (LORD GANESHA)</div>
+        <div class="card-title">✦ ${rud2.mukhi.toUpperCase()} (${rud2.deity.toUpperCase()})</div>
         <p class="body-text">
-          Direct counter-measure to Rahu friction. Removes stubborn obstacles in contracts, 
-          grounds erratic ambition, and anchors focus.
+          ${rud2.desc}
         </p>
       </div>
     </div>
@@ -1494,7 +1599,7 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
     <div class="luxury-card">
       <div class="card-title">✦ SACRED CONSECRATION PROTOCOL</div>
       <p class="body-text">
-        String beads together in pure unpolished yellow silk thread. Wash in raw unboiled cow milk and Ganga water 
+        String beads together in pure unpolished natural silk thread. Wash in raw unboiled cow milk and Ganga water 
         on a Monday morning while chanting <em>Om Namah Shivaya</em> 108 times before wearing.
       </p>
     </div>
@@ -1508,31 +1613,31 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
   <div>
     <h2 class="display-l">Sacred Vedic Seed Mantras (Beej Japa)</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      Phonetic vibrational remedies to align cellular frequencies with ruling planetary deities.
+      Phonetic vibrational remedies to align cellular frequencies with your Lagnesh (${lagnaLord}) and active Mahadasha (${currentDasha}).
     </p>
 
-    <!-- Mantra 1: Mercury -->
+    <!-- Mantra 1: Lagnesh -->
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">1. BUDHA BEEJ MANTRA (LAGNA LORD MERCURY)</div>
+      <div class="card-title">1. ${m1.title} (LAGNA LORD ${lagnaLord.toUpperCase()})</div>
       <div style="font-family:'Noto Serif Devanagari',serif; font-size:18px; color:var(--gold-bright); margin:8px 0; font-weight:600;">
-        ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः ॥
+        ${m1.dev}
       </div>
       <div class="body-s" style="font-family:'JetBrains Mono',monospace; color:var(--ivory);">
-        IAST: Oṃ brāṃ brīṃ brauṃ saḥ budhāya namaḥ ॥
+        IAST: ${m1.iast}
       </div>
-      <p class="body-s" style="margin-top:4px;">Chant 108 times at sunrise on Wednesdays facing East to sharpen intellectual breakthroughs.</p>
+      <p class="body-s" style="margin-top:4px;">Chant ${m1.timing} to fortify your physical vitality and executive clarity.</p>
     </div>
 
-    <!-- Mantra 2: Rahu -->
+    <!-- Mantra 2: Active Mahadasha -->
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">2. RAHU SHANTI BEEJ MANTRA (ACTIVE MAHADASHA)</div>
+      <div class="card-title">2. ${m2.title} (ACTIVE ${currentDasha.toUpperCase()} MAHADASHA)</div>
       <div style="font-family:'Noto Serif Devanagari',serif; font-size:18px; color:var(--gold-bright); margin:8px 0; font-weight:600;">
-        ॐ भ्रां भ्रीं भ्रौं सः राहवे नमः ॥
+        ${m2.dev}
       </div>
       <div class="body-s" style="font-family:'JetBrains Mono',monospace; color:var(--ivory);">
-        IAST: Oṃ bhrāṃ bhrīṃ bhrauṃ saḥ rāhave namaḥ ॥
+        IAST: ${m2.iast}
       </div>
-      <p class="body-s" style="margin-top:4px;">Chant 108 times at dusk on Saturdays to dissolve anxiety and amplify commercial networks.</p>
+      <p class="body-s" style="margin-top:4px;">Chant ${m2.timing} to harmonize your active dasha currents.</p>
     </div>
   </div>
   ${footerRail("Tri-Layer Sanskrit Mantras", 21)}
@@ -1544,31 +1649,31 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
   <div>
     <h2 class="display-l">Daily Ethical Upayas &amp; Nature Seva</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      100% free, nature-based ethical adjustments from the 1952 Lal Kitab Shastra.
+      100% free, nature-based ethical adjustments from the 1952 Lal Kitab Shastra for ${withArticle(lagnaRashi)} Lagna.
     </p>
 
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
       <div class="luxury-card">
-        <div class="card-title">✦ WEDNESDAY SPINACH SEVA</div>
+        <div class="card-title">✦ LAGNESH (${lagnaLord.toUpperCase()}) NATURE SEVA</div>
         <p class="body-text">
-          Feed fresh green grass or spinach to cows on Wednesday mornings. 
-          Neutralizes communicative friction and unblocks business cashflows.
+          Honor your Lagnesh <strong>${lagnaLord}</strong> through silent weekly acts of nourishment and bird/nature seva. 
+          Harmonizes personal vitality and unblocks stalled cashflows.
         </p>
       </div>
       <div class="luxury-card">
         <div class="card-title">✦ SILVER SQUARE IN WALLET</div>
         <p class="body-text">
           Keep a small solid square silver coin in your wallet. 
-          Anchors 12th house Moon energy and stabilizes emotional expenditures.
+          Anchors your ${ordinal(moonHouse)}-house Moon energy (${moonRashi}) and stabilizes emotional expenditures.
         </p>
       </div>
     </div>
 
     <div class="luxury-card">
-      <div class="card-title">✦ AVOID FREE SECOND-HAND ELECTRONICS</div>
+      <div class="card-title">✦ WORKSPACE ORDER &amp; ENERGETIC HYGIENE</div>
       <p class="body-text">
-        During Rahu Mahadasha, never accept defective second-hand gadgets or broken electronic clocks for free. 
-        Discard non-functional electronics from your workspace immediately.
+        During ${currentDasha} Mahadasha, keep your primary workspace clutter-free and discard broken electronics or stopped clocks immediately 
+        to prevent stagnant energetic friction.
       </p>
     </div>
   </div>
@@ -1579,27 +1684,27 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 700; color: 
 <section class="page">
   ${headerRail("MODULE XXII: 12-MONTH STRATEGIC BLUEPRINT")}
   <div>
-    <h2 class="display-l">12-Month Tactical Operating System (2026 – 2027)</h2>
+    <h2 class="display-l">12-Month Tactical Operating System (${nowYear} – ${nextYear})</h2>
     <p class="body-text" style="margin-bottom:18px;">
-      Quarter-by-quarter strategic execution roadmap tailored to your active double-transit activations.
+      Quarter-by-quarter strategic execution roadmap tailored to your ${lagnaRashi} Ascendant and active ${currentDasha} Mahadasha.
     </p>
 
     <div style="display:flex; flex-direction:column; gap:12px;">
       <div class="luxury-card" style="border-left:4px solid var(--jade);">
-        <strong style="color:var(--jade); font-size:13px;">Q1 2026 · SYSTEM ARCHITECTURE &amp; LEVERAGE</strong>
-        <p class="body-s" style="margin-top:2px;">Consolidate your core platform and digital infrastructure. Secure intellectual property rights.</p>
+        <strong style="color:var(--jade); font-size:13px;">Q1 · ARCHITECTURE &amp; LEVERAGE</strong>
+        <p class="body-s" style="margin-top:2px;">Consolidate your core operational systems and lock in long-term intellectual or asset foundations.</p>
       </div>
       <div class="luxury-card" style="border-left:4px solid var(--gold);">
-        <strong style="color:var(--gold-bright); font-size:13px;">Q2 2026 · COMMERCIAL NEGOTIATION &amp; PARTNERSHIPS</strong>
-        <p class="body-s" style="margin-top:2px;">Enter into high-value B2B alliances under favorable Mercury transits. Expand outbound channels.</p>
+        <strong style="color:var(--gold-bright); font-size:13px;">Q2 · COMMERCIAL NEGOTIATION &amp; PARTNERSHIPS</strong>
+        <p class="body-s" style="margin-top:2px;">Enter into high-value alliances on your ${lagnaLord}-favorable windows. Expand outbound reach.</p>
       </div>
       <div class="luxury-card" style="border-left:4px solid var(--saffron);">
-        <strong style="color:var(--saffron); font-size:13px;">Q3 2026 · AUDIT &amp; RETREAT</strong>
-        <p class="body-s" style="margin-top:2px;">Consolidate gains, audit balance sheets, and prioritize biological recovery and family time.</p>
+        <strong style="color:var(--saffron); font-size:13px;">Q3 · AUDIT &amp; BIOLOGICAL RECOVERY</strong>
+        <p class="body-s" style="margin-top:2px;">Consolidate gains, audit balance sheets, and prioritize nervous-system recovery and family time.</p>
       </div>
       <div class="luxury-card" style="border-left:4px solid var(--jade);">
-        <strong style="color:var(--jade); font-size:13px;">Q4 2026 – Q1 2027 · EXPANSIVE BREAKTHROUGH SURGE</strong>
-        <p class="body-s" style="margin-top:2px;">Launch major sovereign initiatives. Double-transit Jupiter-Saturn sanctions monumental rewards.</p>
+        <strong style="color:var(--jade); font-size:13px;">Q4 – Q1 · EXPANSIVE BREAKTHROUGH SURGE</strong>
+        <p class="body-s" style="margin-top:2px;">Launch major sovereign initiatives aligned with your highest Ashtakavarga and Tara Bala windows.</p>
       </div>
     </div>
   </div>

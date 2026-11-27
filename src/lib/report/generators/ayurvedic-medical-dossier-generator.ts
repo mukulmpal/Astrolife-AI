@@ -23,6 +23,7 @@
 
 import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getActiveDashaState, getPlanetLon, getSeekerAge, resolveGender, PLANET_WEEKDAYS } from "../dossier-shared-helpers";
 import { calculateMedical, type MedicalResult } from "../../astro-engine/medical";
 import {
   ALL_RASHIS,
@@ -163,6 +164,11 @@ export function generateAyurvedicMedicalDossierHTML(
   const moonPlanet = chart.planets?.["Moon"];
   const moonRashi = moonPlanet?.sign || "Leo";
   const nakshatra = moonPlanet?.nakshatra || "Uttara Phalguni";
+  const moonPada = moonPlanet?.pada || 1;
+
+  const resolvedGender = resolveGender(options, chart);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
 
   const sunPlanet = chart.planets?.["Sun"];
   const sunRashi = sunPlanet?.sign || "Gemini";
@@ -175,7 +181,9 @@ export function generateAyurvedicMedicalDossierHTML(
   const rahuPlanet = chart.planets?.["Rahu"];
   const ketuPlanet = chart.planets?.["Ketu"];
 
-  const activeDasha = chart.dashas?.find((d) => d.active)?.planet || chart.dashas?.[0]?.planet || "Rahu";
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha || "Rahu";
+  const activeAntar = dashaState.activeAntar || "Jupiter";
 
   // Calculate Medical Profile from Engine
   const med: MedicalResult = calculateMedical(chart);
@@ -211,12 +219,12 @@ export function generateAyurvedicMedicalDossierHTML(
   // Compute real Jaimini AK & AmK across 7 grahas
   const sevenGrahas = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
   const sortedByDeg = sevenGrahas
-    .map(p => ({ p, deg: ((chart.planets?.[p]?.longitude ?? chart.planets?.[p]?.degree ?? 0) % 30 + 30) % 30 }))
+    .map(p => ({ p, deg: ((getPlanetLon(chart.planets?.[p]) || chart.planets?.[p]?.degree || 0) % 30 + 30) % 30 }))
     .sort((a, b) => b.deg - a.deg);
   const akPlanet = sortedByDeg[0]?.p || "Moon";
   const amkPlanet = sortedByDeg[1]?.p || "Mercury";
   const akPd = chart.planets?.[akPlanet];
-  const akDegStr = formatDMS(akPd?.longitude ?? akPd?.degree ?? 0).slice(0, 6);
+  const akDegStr = formatDMS(getPlanetLon(akPd) || akPd?.degree || 0).slice(0, 6);
 
   // Dynamic Dusthana (6, 8, 12) and Recovery/Family houses
   const occupantsInHouse = (h: number): string[] =>
@@ -629,16 +637,16 @@ body {
       <div>
         <div class="kicker">MOON (CHANDRA)</div>
         <div style="font-weight:700;font-size:12.5px;color:var(--teal-bright);">${moonRashi}</div>
-        <div style="font-size:9px;color:var(--ivory-mute);">${nakshatra}</div>
+        <div style="font-size:9px;color:var(--ivory-mute);">${nakshatra} (Pada ${moonPada})</div>
       </div>
       <div>
-        <div class="kicker">SUN (SURYA)</div>
-        <div style="font-weight:700;font-size:12.5px;color:var(--gold-bright);">${sunRashi}</div>
-        <div style="font-size:9px;color:var(--ivory-mute);">${sunBadge}</div>
+        <div class="kicker">SEEKER AGE &amp; GENDER</div>
+        <div style="font-weight:700;font-size:12.5px;color:var(--gold-bright);">${seekerAgeStr}</div>
+        <div style="font-size:9px;color:var(--ivory-mute);">${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</div>
       </div>
       <div>
         <div class="kicker">ACTIVE DASHA</div>
-        <div style="font-weight:700;font-size:12.5px;color:var(--purple-bright);">${activeDasha}</div>
+        <div style="font-weight:700;font-size:12.5px;color:var(--purple-bright);">${activeDasha} &mdash; ${activeAntar}</div>
         <div style="font-size:9px;color:var(--ivory-mute);">Vimshottari Engine</div>
       </div>
     </div>
@@ -861,7 +869,7 @@ body {
     <div class="luxury-card" style="border-top:2px solid var(--teal-bright);margin-bottom:8px;">
       <div class="kicker" style="color:var(--teal-bright);margin-bottom:2px;">✦ THE 1-5-11 RECOVERY TRIAD VS 6-8-12 DUSTHANA AXIS</div>
       <p class="body-text" style="font-size:10.5px;">
-        In AstroLife's classical health matrix, while houses 6, 8, and 12 govern acute, chronic, and hospitalizing friction, <strong>Houses 1, 5, and 11 form the Invincible Recovery Triad</strong>. Your 1st House (Lagna Lord ${lagnaLord} in House ${lagneshData?.house || 1}) grants innate stamina (<em>Deha Arogya</em>), your 5th House (${fifthSign}) governs swift therapeutic response (<em>Upachaya</em>), and your 11th House (${eleventhSign}) guarantees disease recovery (<em>Roga Mukti</em>) and cellular immunity.
+        In AstroLife's classical health matrix, while houses ${ordinal(6)}, ${ordinal(8)}, and ${ordinal(12)} govern acute, chronic, and hospitalizing friction, <strong>Houses ${ordinal(1)}, ${ordinal(5)}, and ${ordinal(11)} form the Invincible Recovery Triad</strong>. Your 1st House (Lagna Lord ${lagnaLord} in House ${lagneshData?.house || 1}) grants innate stamina (<em>Deha Arogya</em>), your 5th House (${fifthSign}) governs swift therapeutic response (<em>Upachaya</em>), and your 11th House (${eleventhSign}) guarantees disease recovery (<em>Roga Mukti</em>) and cellular immunity.
       </p>
     </div>
 
@@ -1302,7 +1310,7 @@ body {
       <!-- Moon -->
       <div class="luxury-card" style="border:1.5px solid var(--purple);background:var(--surface);padding:8px 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--purple-bright);">MOON IN ${moonRashi.toUpperCase()} (${ordinal(moonHouse).toUpperCase()} HOUSE &middot; ${formatDMS(moonPlanet?.longitude ?? moonPlanet?.degree ?? 0).slice(0, 6)}${akPlanet === "Moon" ? " &middot; ATMAKARAKA" : ""})</div>
+          <div class="kicker" style="color:var(--purple-bright);">MOON IN ${moonRashi.toUpperCase()} (${ordinal(moonHouse).toUpperCase()} HOUSE &middot; ${formatDMS(getPlanetLon(moonPlanet) || moonPlanet?.degree || 0).slice(0, 6)}${akPlanet === "Moon" ? " &middot; ATMAKARAKA" : ""})</div>
           <span class="tag-badge tag-purple">${moonHouse === 12 ? "INTUITIVE &middot; SOLITARY PROCESSING" : "EMOTIONAL &amp; SENSORY ANCHOR"}</span>
         </div>
         <p class="body-text" style="font-size:10px;margin-top:2px;">
@@ -1313,7 +1321,7 @@ body {
       <!-- Mercury -->
       <div class="luxury-card" style="border:1.5px solid var(--emerald);background:var(--surface);padding:8px 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--emerald-bright);">MERCURY IN ${(mercuryPlanet?.sign || lagnaRashi).toUpperCase()} (${ordinal(mercuryHouse).toUpperCase()} HOUSE &middot; ${formatDMS(mercuryPlanet?.longitude ?? mercuryPlanet?.degree ?? 0).slice(0, 6)}${amkPlanet === "Mercury" ? " &middot; AMATYAKARAKA" : ""})</div>
+          <div class="kicker" style="color:var(--emerald-bright);">MERCURY IN ${(mercuryPlanet?.sign || lagnaRashi).toUpperCase()} (${ordinal(mercuryHouse).toUpperCase()} HOUSE &middot; ${formatDMS(getPlanetLon(mercuryPlanet) || mercuryPlanet?.degree || 0).slice(0, 6)}${amkPlanet === "Mercury" ? " &middot; AMATYAKARAKA" : ""})</div>
           <span class="tag-badge tag-emerald">BUDDHI &amp; SYNAPTIC TONE</span>
         </div>
         <p class="body-text" style="font-size:10px;margin-top:2px;">
@@ -1324,7 +1332,7 @@ body {
       <!-- Rahu -->
       <div class="luxury-card" style="border:1.5px solid var(--amber);background:var(--surface);padding:8px 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="kicker" style="color:var(--amber);">RAHU IN ${(rahuPlanet?.sign || "Libra").toUpperCase()} (${ordinal(rahuHouse).toUpperCase()} HOUSE &middot; ${formatDMS(rahuPlanet?.longitude ?? rahuPlanet?.degree ?? 0).slice(0, 6)})</div>
+          <div class="kicker" style="color:var(--amber);">RAHU IN ${(rahuPlanet?.sign || "Libra").toUpperCase()} (${ordinal(rahuHouse).toUpperCase()} HOUSE &middot; ${formatDMS(getPlanetLon(rahuPlanet) || rahuPlanet?.degree || 0).slice(0, 6)})</div>
           <span class="tag-badge tag-amber">SENSORY AMPLIFICATION</span>
         </div>
         <p class="body-text" style="font-size:10px;margin-top:2px;">
@@ -1911,7 +1919,7 @@ body {
         ✦ PRIMARY PERSONAL PRESCRIPTION FOR SEEKER
       </div>
       <p class="body-text" style="font-size:10.8px;">
-        With Moon in the ${ordinal(moonHouse)} house (${moonRashi}) and active ${activeDasha} Mahadasha, your master formulation is <strong>Kustha Root Powder on Monday evenings</strong> alternating with <strong>Mulethi on Thursday mornings</strong>. This dual hydrotherapy protocol balances water and earth elements for emotional equanimity and cellular Ojas.
+        With Moon in the ${ordinal(moonHouse)} house (${moonRashi}) and active ${activeDasha} Mahadasha, your master formulation is <strong>${dominantDosha.includes("Pitta") ? "Shatavari &amp; Chandana infusion" : dominantDosha.includes("Vata") ? "Ashwagandha with warm milk &amp; ghee" : "Trikatu &amp; Tulsi decoction"} on ${PLANET_WEEKDAYS[activeDasha] || "Monday"} evenings</strong> alternating with <strong>pure organic herbal decoction on Thursday mornings</strong>. This dual hydrotherapy protocol balances ${dominantDosha.toLowerCase()} elements for emotional equanimity and cellular Ojas.
       </p>
     </div>
   </div>
@@ -2237,7 +2245,7 @@ body {
         OM BHASKARAYA VIDMAHE MAHA-DYUTI-KARAYA DHIMAHI | TANNO SURYAH PRACHODAYAT ||
       </div>
       <p style="font-size:10.5px;color:var(--ivory-dim);margin-top:4px;">
-        <strong>Protocol:</strong> Offer pure water in a copper vessel to the rising Sun while chanting 3 times. Fills the cardiac center with solar prana, clears eye fatigue, and strengthens spinal posture.
+        <strong>Protocol:</strong> Offer pure water in a copper vessel to the rising Sun with your ${resolvedGender === "female" ? "Left hand (Vama Anga / lunar channel)" : "Right hand (Dakshina Anga / solar channel)"} while chanting 3 times. Fills the cardiac center with solar prana, clears eye fatigue, and strengthens spinal posture.
       </p>
     </div>
   </div>
@@ -2274,7 +2282,7 @@ body {
           </tr>
           <tr>
             <td><strong>07:00 &ndash; 07:30 AM</strong></td>
-            <td>Sun Surya Namaskar; 11x Dhanvantari Mantra; warm herbal bath (Kustha/Mulethi)</td>
+            <td>Sun Surya Namaskar; 11x Dhanvantari Mantra; warm herbal bath (classical snan aushadhi)</td>
             <td>Mars &middot; Muscular Tone</td>
           </tr>
           <tr>

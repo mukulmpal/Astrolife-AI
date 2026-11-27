@@ -26,6 +26,7 @@ import { calculateLalKitab } from "../../astro-engine/lalkitab";
 import { generateAstroTattooAudit } from "../../astro-engine/astro-tattoo-engine";
 import { evaluateTransitNakshatraRemedy } from "../../astro-engine/transit-nakshatra-remedies";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getActiveDashaState, getPlanetLon, getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 import {
   ALL_RASHIS,
   ALL_NAKSHATRAS,
@@ -205,9 +206,13 @@ export function generateBioVedicRemediesDossierHTML(
   const moonRashi = moonPlanet?.sign || "Leo";
   const moonNakshatra = moonPlanet?.nakshatra || "Ashwini";
 
-  const subjectGender = (options.gender || (chart as any).gender || "male").toLowerCase();
-  const latGender = getGenderLateralization(subjectGender);
+  const resolvedGender = resolveGender(options, chart);
+  const subjectGender = (resolvedGender || "male").toLowerCase();
+  const latGender = getGenderLateralization(resolvedGender);
   const gemPrescription = getDynamicGemstonePrescription(lagnaRashi, subjectGender);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
+  const moonPada = moonPlanet?.pada || 1;
 
   // Engines execution
   let gemReport: ReturnType<typeof generateGemstoneReportFromChart>;
@@ -238,10 +243,9 @@ export function generateBioVedicRemediesDossierHTML(
     transitRemedy = { activeDashaLord: "Rahu", taraName: "Vipat Tara" } as any;
   }
 
-  const activeMdObj = (chart.dashas as any[])?.find((d) => d.active);
-  const activeAdObj = activeMdObj?.antardashas?.find((a: any) => a.active);
-  const activeDasha = activeMdObj?.planet || "Rahu";
-  const activeAntar = activeAdObj?.planet || chart.antardasha?.planet || lagnaLord;
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha || "Rahu";
+  const activeAntar = dashaState.activeAntar || "Jupiter";
 
   // Dynamic 5th & 9th lord secondary gemstones (never repeat Lagnesh)
   const fifthSign = signFromHouse(lagnaRashi, 5);
@@ -279,7 +283,7 @@ export function generateBioVedicRemediesDossierHTML(
   const tableRowsHtml = PLANET_ORDER.map(p => {
     const pd = chart.planets?.[p];
     const pRashi = pd?.sign || "Aries";
-    const rawLon = pd?.longitude !== undefined ? pd.longitude : (pd?.degree !== undefined ? pd.degree : 0);
+    const rawLon = getPlanetLon(pd) || (pd?.degree !== undefined ? pd.degree : 0);
     const degVal = Math.abs(rawLon % 30);
     const degInt = Math.floor(degVal);
     const minInt = Math.floor((degVal - degInt) * 60);
@@ -291,7 +295,7 @@ export function generateBioVedicRemediesDossierHTML(
     const pDeg = `${pRashi} ${degInt}° ${minInt.toString().padStart(2, "0")}'`;
     const houseNum = pd?.house || 1;
     const pHouse = ordinal(houseNum);
-    const pDignity = computeClassicalDignity(p, pRashi, pd?.longitude || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
+    const pDignity = computeClassicalDignity(p, pRashi, getPlanetLon(pd) || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
     const funcStatus = getRemedyFunctionalStatus(p, lagnaRashi, houseNum);
     const remedy = getPlanetRemedyRecommendation(p);
     return `<tr>
@@ -652,8 +656,12 @@ body {
         <div style="color:var(--ivory);">${birthCity} (${lat}°N, ${lon}°E)</div>
       </div>
       <div>
+        <span class="kicker">Seeker Age &amp; Gender</span>
+        <div style="color:var(--ivory);">${seekerAgeStr} · ${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</div>
+      </div>
+      <div>
         <span class="kicker">Lagna &amp; Moon Nakshatra</span>
-        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonNakshatra}</div>
+        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonNakshatra} (Pada ${moonPada})</div>
       </div>
       <div>
         <span class="kicker">Primary Life Catalyst</span>

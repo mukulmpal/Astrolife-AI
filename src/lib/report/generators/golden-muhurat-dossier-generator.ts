@@ -23,6 +23,7 @@
 
 import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getActiveDashaState, getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 import { calculatePanchang, type PanchangResult } from "../../astro-engine/panchang";
 import { scanAuspiciousMuhurats, type MuhuratWindow } from "../../astro-engine/muhurat";
 import {
@@ -138,6 +139,15 @@ export function generateGoldenMuhuratDossierHTML(
   const moonPlanet = chart.planets?.["Moon"];
   const moonRashi = moonPlanet?.sign || "Aries";
   const nakshatra = moonPlanet?.nakshatra || "Ashwini";
+  const moonPada = moonPlanet?.pada || 1;
+
+  const resolvedGender = resolveGender(options, chart);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
+
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha || "Jupiter";
+  const activeAntar = dashaState.activeAntar || "Saturn";
 
   const LAGNESH_SOVEREIGN_DAY: Record<string, { day: string; rahuKaal: string }> = {
     Sun: { day: "Sunday", rahuKaal: "04:30 PM to 06:00 PM" },
@@ -199,9 +209,8 @@ export function generateGoldenMuhuratDossierHTML(
     houseFromLagna("Pisces", lagnaRashi),
   ];
 
-  // Native age calculation (ref 2027)
-  const dobYear = parseInt(String(birthDate).slice(0, 4), 10) || 1995;
-  const nativeAge = 2027 - dobYear;
+  // Native age calculation
+  const nativeAge = typeof seekerAge === "number" ? seekerAge : (new Date().getFullYear() - (parseInt(String(birthDate).slice(0, 4), 10) || 1995));
   const isMatureNative = nativeAge >= 38;
 
   // Dynamic Hora suitability helper
@@ -671,12 +680,12 @@ export function generateGoldenMuhuratDossierHTML(
       <div>
         <div style="font-family:'Cinzel',serif;font-size:7.5px;color:var(--teal-bright);">LUNAR ANCHOR</div>
         <div style="font-weight:700;font-size:11px;color:var(--gold-bright);">${moonRashi} Moon</div>
-        <div style="font-size:9px;color:var(--ivory-mute);">${nakshatra} Nakshatra</div>
+        <div style="font-size:9px;color:var(--ivory-mute);">${nakshatra} (Pada ${moonPada})</div>
       </div>
       <div>
-        <div style="font-family:'Cinzel',serif;font-size:7.5px;color:var(--teal-bright);">DOSSIER REGISTRY</div>
-        <div style="font-weight:700;font-size:11px;color:var(--gold-bright);">${orderId}</div>
-        <div style="font-size:9px;color:var(--ivory-mute);">Sovereign 2026&ndash;2027</div>
+        <div style="font-family:'Cinzel',serif;font-size:7.5px;color:var(--teal-bright);">SEEKER VITALITY</div>
+        <div style="font-weight:700;font-size:11px;color:var(--gold-bright);">${seekerAgeStr}</div>
+        <div style="font-size:9px;color:var(--ivory-mute);">${activeDasha}&ndash;${activeAntar} Dasha</div>
       </div>
     </div>
 
@@ -1287,7 +1296,7 @@ export function generateGoldenMuhuratDossierHTML(
 
     <!-- Verified Upcoming Business Launch Windows -->
     <div class="luxury-card" style="margin-bottom:12px;">
-      <div class="kicker" style="color:var(--gold-bright);">VERIFIED COMMERCIAL LAUNCH RADAR (2026&ndash;2027 SELECTION)</div>
+      <div class="kicker" style="color:var(--gold-bright);">VERIFIED COMMERCIAL LAUNCH RADAR (ANNUAL CYCLE SELECTION)</div>
       <table class="data-table" style="margin-top:6px;">
         <thead>
           <tr>
@@ -1858,7 +1867,7 @@ export function generateGoldenMuhuratDossierHTML(
         <div class="kicker" style="color:var(--ruby-bright);">3. THE GAYATRI KAVACHA WATER PURIFICATION</div>
         <div style="font-weight:700;font-size:11px;color:var(--ivory);margin:2px 0;">Antidote to: Rahu Kaal &amp; Inauspicious Yogas</div>
         <p class="body-text" style="font-size:9.5px;">
-          Take a copper glass filled with clean water. Hold it in the right hand and chant the Gayatri Mantra 11 times. Drink half and sprinkle half over the contract papers or laptop screen before proceeding.
+          Take a copper glass filled with clean water. Hold it in the ${resolvedGender === "female" ? "left hand" : "right hand"} (${resolvedGender === "female" ? "Vama Anga" : "Dakshina Anga"}) and chant the Gayatri Mantra 11 times. Drink half and sprinkle half over the contract papers or laptop screen before proceeding.
         </p>
       </div>
 
@@ -1866,7 +1875,7 @@ export function generateGoldenMuhuratDossierHTML(
         <div class="kicker" style="color:var(--emerald-bright);">4. THE GODAAN &amp; ANNA DAAN MITIGATION</div>
         <div style="font-weight:700;font-size:11px;color:var(--ivory);margin:2px 0;">Antidote to: Panchaka &amp; Bhadra Karanas</div>
         <p class="body-text" style="font-size:9.5px;">
-          Donate fresh green fodder to a Desi Cow (for ${lagnesh} Lagnesh) or feed fresh cooked rice mixed with ghee to needy persons prior to embarking on the forced venture.
+          ${lagnesh === "Mercury" ? "Donate fresh green grass or green vegetables to a Desi Cow" : "Feed wholesome grains or fresh cooked rice mixed with ghee to needy persons or birds"} prior to embarking on the forced venture.
         </p>
       </div>
     </div>

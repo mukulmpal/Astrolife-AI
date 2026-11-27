@@ -26,6 +26,7 @@ import { calculateDivisional, type DivChart } from "../../astro-engine/divisiona
 import { calculateKarakas } from "../../astro-engine/jaimini";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
 import { getGenderLateralization } from "../../astro/human-translator";
+import { getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 
 const SIGN_NAMES = [
   "Aries", "Taurus", "Gemini", "Cancer",
@@ -242,13 +243,16 @@ export function generateSacredUnionDossierHTML(
   const orderId = options.orderId || (isSample ? "SAMPLE_PREVIEW" : `ORD_${Date.now().toString(36).toUpperCase()}`);
   const paymentId = options.paymentId || (isSample ? "SAMPLE_PREVIEW" : `PAY_${Date.now().toString(36).toUpperCase()}`);
 
-  const birthDate = chart.dob || "1995-07-04";
+  const birthDate = chart.dob || "Recorded";
   const birthTime = chart.tob || "12:00";
   const birthCity = chart.city || "New Delhi";
   const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
   const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
 
-  const latGender = getGenderLateralization(options.gender);
+  const resolvedGender = resolveGender(options, chart);
+  const latGender = getGenderLateralization(resolvedGender);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
 
   // Ascendant / Lagna
   const lagnaNum = chart.lagnaNum !== undefined ? chart.lagnaNum : 5;
@@ -646,8 +650,9 @@ body {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
         <div><span class="kicker">SEEKER NAME</span><div style="font-weight:600;color:var(--ivory);">${escapeHtml(subjectName)}</div></div>
         <div><span class="kicker">DATE & TIME OF BIRTH</span><div style="font-weight:600;color:var(--ivory);">${birthDate} · ${birthTime} IST</div></div>
+        <div><span class="kicker">SEEKER AGE & GENDER</span><div style="font-weight:600;color:var(--ivory);">${seekerAgeStr} · ${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</div></div>
         <div><span class="kicker">BIRTH LOCATION</span><div style="font-weight:600;color:var(--ivory);">${escapeHtml(birthCity)} (${lat}°N, ${lon}°E)</div></div>
-        <div><span class="kicker">LAGNA & NAKSHATRA</span><div style="font-weight:600;color:var(--ivory);">${lagnaRashi} Lagna · ${nakshatra} (${pada})</div></div>
+        <div><span class="kicker">LAGNA & NAKSHATRA</span><div style="font-weight:600;color:var(--ivory);">${lagnaRashi} Lagna · ${nakshatra} (Pada ${pada})</div></div>
         <div><span class="kicker">DARAKARAKA (SPOUSE PLANET)</span><div style="font-weight:600;color:var(--gold-bright);">${darakaraka.planet} in ${darakaraka.sign} (${darakaraka.degreeInSign.toFixed(2)}°)</div></div>
         <div><span class="kicker">CURRENT OPERATING DASHA</span><div style="font-weight:600;color:var(--gold-bright);">${activeDasha} — ${activeAntar} (${activeAntarSanskrit})</div></div>
       </div>
@@ -729,7 +734,7 @@ body {
     <div class="matrix-grid">
       <div class="matrix-item"><span class="kicker">7TH HOUSE PROMISE</span><div class="val">Assured</div></div>
       <div class="matrix-item"><span class="kicker">RELATIONSHIP TONE</span><div class="val">Intellectual</div></div>
-      <div class="matrix-item"><span class="kicker">UNION MATURITY</span><div class="val">Post Age 28</div></div>
+      <div class="matrix-item"><span class="kicker">UNION MATURITY</span><div class="val">${typeof seekerAge === "number" && seekerAge >= 28 ? `Post Age ${seekerAge}` : "Post 28th Year"}</div></div>
       <div class="matrix-item"><span class="kicker">OBSTACLE FACTOR</span><div class="val">Dissolving</div></div>
     </div>
   </div>
@@ -753,7 +758,21 @@ body {
     <div class="luxury-card" style="margin-bottom:14px;">
       <div class="card-title">✦ 2024–2025: RAHU-KETU DISILLUSIONMENT AXIS</div>
       <p class="body-text">
-        The lunar nodes transiting your 2nd and 8th houses created the classic "Mirage Syndrome": meeting individuals who presented a charismatic exterior but lacked emotional maturity or genuine family transparency. While frustrating, this transit hardened your boundaries and gave you crystalline clarity about the non-negotiable qualities you require in a lifelong companion.
+        ${(() => {
+          const SN = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+          const SL: Record<string,string> = { Aries:"Mars",Taurus:"Venus",Gemini:"Mercury",Cancer:"Moon",Leo:"Sun",Virgo:"Mercury",Libra:"Venus",Scorpio:"Mars",Sagittarius:"Jupiter",Capricorn:"Saturn",Aquarius:"Saturn",Pisces:"Jupiter" };
+          const lNum = chart.lagnaNum ?? 5;
+          const rahuPd = chart.planets?.["Rahu"];
+          const ketuPd = chart.planets?.["Ketu"];
+          const rahuH = rahuPd?.house ?? 0;
+          const ketuH = ketuPd?.house ?? 0;
+          const rahuSign = rahuPd?.sign || "";
+          const ketuSign = ketuPd?.sign || "";
+          if (rahuH && ketuH) {
+            return `The lunar nodes transiting your ${rahuH}${["","st","nd","rd"][rahuH]||"th"} and ${ketuH}${["","st","nd","rd"][ketuH]||"th"} houses created the classic nodal axis testing pattern: meeting individuals who presented a charismatic exterior but lacked emotional maturity or genuine family transparency. While frustrating, this transit hardened your boundaries and gave you crystalline clarity about the non-negotiable qualities you require in a lifelong companion.`;
+          }
+          return `The lunar nodes' disillusionment axis activated your relational houses, creating the classic nodal axis testing pattern: meeting individuals who presented a charismatic exterior but lacked emotional maturity or genuine family transparency. While frustrating, this transit hardened your boundaries and gave you crystalline clarity about the non-negotiable qualities you require in a lifelong companion.`;
+        })()}
       </p>
     </div>
 

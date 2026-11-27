@@ -27,6 +27,7 @@ import { calculateAshtakavarga } from "../../astro-engine/ashtakavarga";
 import { runAstroVastuHitEngine } from "../../astro-engine/astro-vastu-hit-engine";
 import { calculateKunda } from "../../astro-engine/birth-rectification-engine";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getAkvHouseSav, getActiveDashaState, getPlanetLon, getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 import {
   ALL_RASHIS,
   ALL_NAKSHATRAS,
@@ -195,7 +196,7 @@ export function generateSpaceDestinyDossierHTML(
   const moonPlanet = chart.planets?.["Moon"];
   const moonNakshatra = moonPlanet?.nakshatra || "Ashwini";
 
-  const subjectGender = (options.gender || (chart as any).gender || "male").toLowerCase();
+  const subjectGender = resolveGender(options, chart) || "male";
   const isFemale = subjectGender === "female";
   const genderLabel = isFemale ? "Female Gender Polarity Confirmed" : "Male Gender Polarity Confirmed";
   const birthTimeStr = chart.tob || "12:00";
@@ -206,7 +207,7 @@ export function generateSpaceDestinyDossierHTML(
   const cycleCount = Math.floor(elapsedFromSunrise / 90) + 1;
   const remMin = elapsedFromSunrise % 90;
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const birthDayIdx = new Date(chart.dob || "1995-07-04").getDay();
+  const birthDayIdx = chart.dob ? new Date(chart.dob).getDay() : new Date().getDay();
   const birthDayName = dayNames[birthDayIdx] || "Tuesday";
 
   // Dr. P.S. Sastri weekday-anchored Tattva sequence (Prithvi 6m, Jala 12m, Tejas 18m, Vayu 24m, Akasha 30m)
@@ -239,9 +240,13 @@ export function generateSpaceDestinyDossierHTML(
   const activeTattva = TATTVA_DEFS[activeTattvaKey].label;
   const tattvaNature = TATTVA_DEFS[activeTattvaKey].nature;
 
-  const dobYear = parseInt(String(birthDate).slice(0, 4), 10) || 1995;
-  const nativeAge = 2027 - dobYear;
+  const seekerAge = getSeekerAge(chart.dob);
+  const nativeAge = typeof seekerAge === "number" ? seekerAge : (new Date().getFullYear() - (parseInt(String(birthDate).slice(0, 4), 10) || 1995));
+  const nativeAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
   const isMatureNative = nativeAge >= 38;
+  const nowYear = new Date().getFullYear();
+  const nextYear = nowYear + 1;
+  const transitCycleStr = `${nowYear}–${nextYear}`;
 
   // Engine Calculations
   let vastuDossier: ReturnType<typeof runAstroVastuHitEngine>;
@@ -263,7 +268,8 @@ export function generateSpaceDestinyDossierHTML(
   let savPiscesBindus = 28;
   try {
     const av = calculateAshtakavarga(chart.planets as any, chart.lagnaNum);
-    savPiscesBindus = av.sarva[11] || 28;
+    const houseSav = getAkvHouseSav(av, lagnaNum);
+    savPiscesBindus = houseSav[satPiscesHouse - 1] || 28;
   } catch {
     savPiscesBindus = 28;
   }
@@ -275,16 +281,17 @@ export function generateSpaceDestinyDossierHTML(
   const rahuAquariusHouse = ((10 - lagnaNum + 12) % 12) + 1;
   const ketuLeoHouse = ((4 - lagnaNum + 12) % 12) + 1;
 
-  const activeMdObj = (chart.dashas as any[])?.find((d) => d.active);
-  const activeAdObj = activeMdObj?.antardashas?.find((a: any) => a.active);
-  const activeDasha = activeMdObj?.planet || "Rahu";
-  const activeAntar = activeAdObj?.planet || chart.antardasha?.planet || "Jupiter";
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha || "Rahu";
+  const activeAntar = dashaState.activeAntar || "Jupiter";
 
   // Dynamic Kunda trinal check
+  const moonLord = (chart.planets as any)?.["Moon"]?.nakshatraLord || "Moon";
+  const moonLon = getPlanetLon(moonPlanet);
   const kundaIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === (kundaData.kundaNakshatra || "").toLowerCase());
   const moonNakIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === (moonNakshatra || "").toLowerCase());
-  const kundaTrineMatch = kundaIdx >= 0 && moonNakIdx >= 0 && ((kundaIdx - moonNakIdx + 27) % 9 === 0 || kundaData.kundaLord === moonPlanet?.lord);
-  const kundaDegreeDelta = Math.abs((((kundaData.kundaLon || 0) - (moonPlanet?.longitude || 0) + 540) % 360) - 180).toFixed(1);
+  const kundaTrineMatch = kundaIdx >= 0 && moonNakIdx >= 0 && ((kundaIdx - moonNakIdx + 27) % 9 === 0 || kundaData.kundaLord === moonLord);
+  const kundaDegreeDelta = Math.abs((((kundaData.kundaLon || 0) - moonLon + 540) % 360) - 180).toFixed(1);
 
   // Dynamic 16-Zone House Mapping & Power Clusters
   const occupantsInHouse = (h: number) =>
@@ -292,7 +299,7 @@ export function generateSpaceDestinyDossierHTML(
       .filter(([, pd]) => pd && pd.house === h)
       .map(([name, pd]) => ({
         name,
-        deg: formatDMS(pd!.longitude ?? pd!.degree ?? 0).slice(0, 7),
+        deg: formatDMS(getPlanetLon(pd) || (pd!.degree ?? 0)).slice(0, 7),
       }));
 
   const ZONE_SPEC = [
@@ -655,8 +662,12 @@ body {
         <div style="color:var(--ivory);">${birthCity} (${lat}°N, ${lon}°E)</div>
       </div>
       <div>
+        <span class="kicker">Seeker Age &amp; Gender</span>
+        <div style="color:var(--ivory);">${nativeAgeStr} · ${genderLabel}</div>
+      </div>
+      <div>
         <span class="kicker">Lagna &amp; Moon Nakshatra</span>
-        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonNakshatra} (1)</div>
+        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonNakshatra} (Pada ${moonPlanet?.pada || 1})</div>
       </div>
       <div>
         <span class="kicker">Optimal Work Zone</span>
@@ -782,7 +793,7 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--sapphire-bright);">
         <div class="kicker" style="color:var(--sapphire-bright);">1. JALA TATTVA (WATER ELEMENT · NORTH-EAST)</div>
         <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-          Governs clarity of vision, cosmic grace, and intuitive foresight. Saturn seated in Pisces here requires this zone to be kept light, clean, and free of heavy clutter.
+          Governs clarity of vision, cosmic grace, and intuitive foresight. ${(() => { const satPd = chart.planets?.["Saturn"]; const satSign = satPd?.sign || ""; const satH = satPd?.house ?? 0; return satSign ? `${lagnaLord === "Saturn" ? "Your Lagna lord" : ""} Saturn in ${satSign} (${satH}${["","st","nd","rd"][satH]||"th"} house) energizes this zone — keep it light, clean, and free of heavy clutter to honor Saturn's austere nature.` : "Keep this zone light, airy, and clutter-free to honor the water element's meditative clarity."; })()}
         </p>
       </div>
       <div class="luxury-card" style="border-left:3px solid var(--ruby-bright);">
@@ -800,7 +811,7 @@ body {
       <div class="luxury-card" style="border-left:3px solid var(--emerald-bright);">
         <div class="kicker" style="color:var(--emerald-bright);">4. VAYU TATTVA (AIR ELEMENT · NORTH-WEST)</div>
         <p class="body-text" style="font-size:11.5px;margin-top:4px;">
-          Governs movement, partnerships, and commercial support. Linked to your 10th house Gemini cluster. High-speed Wi-Fi routers and workstations thrive here.
+          Governs movement, partnerships, and commercial support. ${(() => { const h10Sign = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"][(lagnaNum + 9) % 12]; const h10Lord = SIGN_LORDS[h10Sign] || "Mercury"; const h10Pd = chart.planets?.[h10Lord]; const h10LordHouse = h10Pd?.house ?? 10; return `Linked to your 10th house ${h10Sign} cluster (${h10Lord} as lord, in ${h10LordHouse}${["","st","nd","rd"][h10LordHouse]||"th"} house). High-speed Wi-Fi routers and workstations thrive here.`; })()}
         </p>
       </div>
     </div>
@@ -856,7 +867,7 @@ body {
         2. THE 180-DEGREE NODAL AXIS: RAHU (${ordinal(rahuHouse).toUpperCase()} H) VS. KETU (${ordinal(ketuHouse).toUpperCase()} H)
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:4px;">
-        <strong>Planetary Dynamic:</strong> Rahu in ${rahuP?.sign || "Libra"} (${ordinal(rahuHouse)} House) directly opposes Ketu in ${ketuP?.sign || "Aries"} (${ordinal(ketuHouse)} House) at ${formatDMS(rahuP?.longitude ?? rahuP?.degree ?? 0).slice(0, 7)}.
+        <strong>Planetary Dynamic:</strong> Rahu in ${rahuP?.sign || "Libra"} (${ordinal(rahuHouse)} House) directly opposes Ketu in ${ketuP?.sign || "Aries"} (${ordinal(ketuHouse)} House) at ${formatDMS(getPlanetLon(rahuP) || (rahuP?.degree ?? 0)).slice(0, 7)}.
       </p>
       <div style="background:var(--surface-elevated);padding:8px 10px;border-radius:4px;margin-top:6px;font-size:11.5px;">
         <strong style="color:var(--gold-bright);">Physical Manifestation:</strong>
@@ -996,7 +1007,7 @@ body {
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px;margin-top:6px;">
         <div>
-          <strong style="color:var(--ruby-bright);">1. North-West Zone (Electronic Clutter Hazard):</strong> Audit for tangled wires, obsolete mobile chargers, broken hard drives, or unboxed hardware. Tangled electronics in NW directly agitate Rahu's 2nd-house axis, precipitating unforeseen expenditures.
+          <strong style="color:var(--ruby-bright);">1. North-West Zone (Electronic Clutter Hazard):</strong> Audit for tangled wires, obsolete mobile chargers, broken hard drives, or unboxed hardware. ${(() => { const rahuPd = chart.planets?.["Rahu"]; const rahuH = rahuPd?.house ?? 0; const rahuSign = rahuPd?.sign || ""; return rahuH ? `Tangled electronics in NW directly agitate Rahu's ${rahuH}${["","st","nd","rd"][rahuH]||"th"}-house axis${rahuSign ? ` (${rahuSign})` : ""}, precipitating unforeseen expenditures.` : "Tangled electronics in NW disturb the Vayu element and precipitate unforeseen expenditures."; })()}
         </div>
         <div>
           <strong style="color:var(--ruby-bright);">2. North-East Zone (Heavy Weight &amp; Shoe Hazard):</strong> Strictly remove heavy storage boxes, gym weights, or shoe racks from the North-East. This zone must feel weightless so Saturn's aspect does not induce chronic mental heaviness.
@@ -1403,7 +1414,7 @@ body {
         <tr>
           <td><strong>Natal Moon Nakshatra</strong></td>
           <td><strong>${moonNakshatra}</strong></td>
-          <td>Natal Moon Star Sovereign: ${moonPlanet?.lord || "Primary Luminary"}</td>
+          <td>Natal Moon Star Sovereign: ${(chart.planets as any)?.["Moon"]?.nakshatraLord || "Primary Luminary"}</td>
         </tr>
         <tr>
           <td><strong>Mathematical Concurrence</strong></td>
@@ -1487,7 +1498,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">1-Year Gochar: Jupiter &amp; Saturn Transits</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Mapping the macro-transit cycles of Jupiter (Guru) and Saturn (Shani) across 2026&ndash;2027 and their direct resonance with your natal house structure.
+      Mapping the macro-transit cycles of Jupiter (Guru) and Saturn (Shani) across ${transitCycleStr} and their direct resonance with your natal house structure.
     </p>
 
     <!-- Jupiter Gochar -->
@@ -1623,7 +1634,7 @@ body {
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">12-Month Sequential Timing Windows</h2>
     <p class="body-text" style="margin-bottom:10px;">
-      Month-by-month navigation roadmap for 2026&ndash;2027 identifying when to harvest and when to fortify reserves.
+      Month-by-month navigation roadmap for ${transitCycleStr} identifying when to harvest and when to fortify reserves.
     </p>
 
     <!-- Gate 1 -->

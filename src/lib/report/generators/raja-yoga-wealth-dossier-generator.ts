@@ -30,6 +30,7 @@ import { calculateAshtakavarga } from "../../astro-engine/ashtakavarga";
 import { calculateShadbala } from "../../astro-engine/shadbala";
 import { detectYogas } from "../../astro-engine/yogas";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getPlanetLon, getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 import {
   ALL_RASHIS,
   ALL_NAKSHATRAS,
@@ -301,9 +302,12 @@ export function generateRajaYogaWealthDossierHTML(
   const nakshatra = moonP?.nakshatra || "Ashwini";
   const pada = moonP?.pada || 1;
 
-  const subjectGender = (options.gender || (chart as any).gender || "male").toLowerCase();
-  const lat = getGenderLateralization(subjectGender);
+  const resolvedGender = resolveGender(options, chart);
+  const subjectGender = (resolvedGender || "male").toLowerCase();
+  const lat = getGenderLateralization(resolvedGender);
   const gemPrescription = getDynamicGemstonePrescription(lagnaRashi, subjectGender);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
 
   // Real-Time Dynamic Vimshottari Dasha Engine
   const now = new Date();
@@ -365,26 +369,26 @@ export function generateRajaYogaWealthDossierHTML(
     induAnalysis = calculateInduLagna(chart);
   } catch {
     induAnalysis = {
-      sign: "Capricorn",
-      signNum: 9,
-      house: 5,
-      lord: "Saturn",
-      degreeText: "29° 11'",
-      lagna9thLord: "Venus",
-      lagna9thRays: 12,
-      moon9thLord: "Mars",
-      moon9thRays: 6,
-      totalRays: 18,
-      remainder: 6,
+      sign: lagnaRashi,
+      signNum: lagnaNum,
+      house: 1,
+      lord: lagnaLord,
+      degreeText: "15° 00'",
+      lagna9thLord: lagnaLord,
+      lagna9thRays: 10,
+      moon9thLord: lagnaLord,
+      moon9thRays: 10,
+      totalRays: 20,
+      remainder: 8,
       occupants: [],
       aspectingPlanets: [],
       kuberYogaTier: "Generational Wealth Anchor",
       kuberYogaScore: 88,
-      verdict: "High-Yield Saturnian Wealth Treasury: Indu Lagna is placed in Capricorn in the 5th house of speculative foresight and intellect. Strengthened Saturn channels steady, scalable wealth.",
-      classicalReference: "Brihat Jataka & Jataka Parijata: Lagna 9th Lord (Venus: 12 rays) + Moon 9th Lord (Mars: 6 rays) = 18 rays % 12 = 6 remainder. Counting 6 signs from Moon (Leo) lands in Capricorn.",
+      verdict: `High-Yield Wealth Treasury: Indu Lagna activates financial foresight and compounding. Strengthened ${lagnaLord} channels steady, scalable wealth.`,
+      classicalReference: "Brihat Jataka & Jataka Parijata: Calculated from natal 9th lords from Lagna and Moon.",
       upay: [
-        "Indu Lagna Lord Seva: Strengthen Saturn through ethical stewardship, long-term investments, and discipline.",
-        "Kanakadhara & Sri Suktam: Chanted on Fridays and Wednesdays for steady capital inflow.",
+        `Indu Lagna Lord Seva: Strengthen ${lagnaLord} through ethical stewardship, long-term investments, and discipline.`,
+        "Kanakadhara & Sri Suktam: Chanted for steady capital inflow.",
       ],
     };
   }
@@ -432,7 +436,7 @@ export function generateRajaYogaWealthDossierHTML(
       .map(([name]) => name);
   const fmtDeg = (pName: string): string => {
     const pd = chart.planets?.[pName];
-    const lon = pd?.longitude ?? pd?.degree ?? 0;
+    const lon = getPlanetLon(pd) || (pd?.degree ?? 0);
     const degInSign = Math.abs(lon % 30);
     const d = Math.floor(degInSign);
     const m = Math.floor((degInSign - d) * 60);
@@ -524,7 +528,7 @@ export function generateRajaYogaWealthDossierHTML(
     const pDeg = `${pRashi} ${degInt}° ${minInt.toString().padStart(2, "0")}'`;
     const houseNum = pd?.house || 1;
     const nakStr = pd?.nakshatra ? `${pd.nakshatra} (${pd.pada || 1})` : "—";
-    const pDignity = computeClassicalDignity(p, pRashi, pd?.longitude || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
+    const pDignity = computeClassicalDignity(p, pRashi, getPlanetLon(pd) || (degVal + (SIGN_NAMES.indexOf(pRashi) * 30)));
     let role = "Functional Planetary Catalyst";
     if (p === amatyakaraka.planet) role = "Amatyakaraka (Career Catalyst)";
     else if (p === atmakaraka.planet) role = "Atmakaraka (Soul Sovereign)";
@@ -940,12 +944,16 @@ body {
           <div class="val">${birthDate} · ${birthTime} IST</div>
         </div>
         <div class="matrix-item">
+          <span class="kicker">SEEKER AGE &amp; GENDER</span>
+          <div class="val">${seekerAgeStr} · ${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</div>
+        </div>
+        <div class="matrix-item">
           <span class="kicker">BIRTH LOCATION</span>
           <div class="val">${birthCity} (${latStr}°N, ${lonStr}°E)</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">LAGNA &amp; MOON NAKSHATRA</span>
-          <div class="val">${lagnaRashi} Lagna · ${nakshatra} (${pada})</div>
+          <div class="val">${lagnaRashi} Lagna · ${nakshatra} (Pada ${pada})</div>
         </div>
         <div class="matrix-item">
           <span class="kicker">AMATYAKARAKA (CAREER &amp; FINANCE)</span>
@@ -961,7 +969,7 @@ body {
         </div>
         <div class="matrix-item">
           <span class="kicker">CURRENT OPERATING DASHA</span>
-          <div class="val" style="color:var(--gold);">${activeDasha} &mdash; ${activeAntar} (Budh)</div>
+          <div class="val" style="color:var(--gold);">${activeDasha} &mdash; ${activeAntar} (${activeAD?.planet ? `${activeAD.planet} Antardasha` : "Active"})</div>
         </div>
       </div>
     </div>
@@ -997,7 +1005,7 @@ body {
       </div>
       <div class="metric-box">
         <div class="label">AMK MONETIZATION</div>
-        <div class="val" style="color:var(--gold);">9th House Exch.</div>
+        <div class="val" style="color:var(--gold);">${ordinal(amkH)} House Engine</div>
       </div>
       <div class="metric-box">
         <div class="label">PRIME WEALTH ERA</div>
@@ -1202,10 +1210,42 @@ ${d1TableRowsHtml}
       <div class="luxury-card" style="margin-bottom:0;">
         <div class="card-title" style="color:var(--gold-bright);">✦ SURYA HORA (LEO · ACTIVE SOLAR FIRE)</div>
         <p class="body-text" style="margin-bottom:6px;">
-          <strong>Occupants: Mercury, Venus, Rahu, Ketu</strong>
+          <strong>Occupants: ${(() => {
+            const SIGN_NAMES_HORA = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+            const surya: string[] = [];
+            Object.entries(chart.planets || {}).forEach(([pn, pd]) => {
+              if (!pd) return;
+              const signIdx = SIGN_NAMES_HORA.indexOf(pd.sign || "");
+              if (signIdx === -1) return;
+              const isOdd = (signIdx + 1) % 2 === 1;
+              if (isOdd) surya.push(pn);
+            });
+            return surya.length ? surya.join(", ") : "None";
+          })()}</strong>
         </p>
         <p class="body-text">
-          Surya Hora governs self-effort, aggressive commercial expansion, negotiations, and intellectual product sales. Having both your Lagna lord Mercury and 9th lord Venus in Surya Hora proves that wealth is generated through bold entrepreneurial initiative, proprietary tools, and modern high-margin digital business models.
+          Surya Hora governs self-effort, aggressive commercial expansion, negotiations, and intellectual product sales. ${(() => {
+            const SIGN_NAMES_HORA = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+            const house2Sign = SIGN_NAMES_HORA[(lagnaNum + 1) % 12];
+            const house9Sign = SIGN_NAMES_HORA[(lagnaNum + 8) % 12];
+            const lord2 = SIGN_LORDS[house2Sign] || "";
+            const lord9 = SIGN_LORDS[house9Sign] || "";
+            const pd2 = chart.planets?.[lord2];
+            const pd9 = chart.planets?.[lord9];
+            const signIdx2 = pd2 ? SIGN_NAMES_HORA.indexOf(pd2.sign || "") : -1;
+            const signIdx9 = pd9 ? SIGN_NAMES_HORA.indexOf(pd9.sign || "") : -1;
+            const lord2InSurya = signIdx2 !== -1 && (signIdx2 + 1) % 2 === 1;
+            const lord9InSurya = signIdx9 !== -1 && (signIdx9 + 1) % 2 === 1;
+            if (lord2InSurya && lord9InSurya && lord2 !== lord9) {
+              return `Having both your 2nd lord ${lord2} and 9th lord ${lord9} in Surya Hora confirms that wealth is generated through bold entrepreneurial initiative, proprietary tools, and modern high-margin digital business models.`;
+            } else if (lord2InSurya) {
+              return `Your 2nd lord ${lord2} occupies Surya Hora, confirming that wealth is generated through direct effort, entrepreneurial initiative, and intellectual product sales.`;
+            } else if (lord9InSurya) {
+              return `Your 9th lord ${lord9} in Surya Hora connects fortune to bold action, proprietary tools, and high-margin commercial endeavors.`;
+            } else {
+              return `Surya Hora energizes self-made wealth through courageous action, proprietary tools, and direct commercial ventures.`;
+            }
+          })()}
         </p>
       </div>
 
@@ -1399,7 +1439,23 @@ ${d1TableRowsHtml}
         <span class="tag-badge tag-emerald">WEALTH MULTIPLIER</span>
       </div>
       <p class="body-text">
-        In your chart, Venus governs both the 2nd house of treasury (Libra) and the 9th house of sovereign fortune (Taurus). Furthermore, Venus sits in the 10th house while receiving the direct energy of Lagna lord Mercury. This creates a perpetual <strong>Dhana-Bhagya Loop</strong> where professional output directly feeds financial savings.
+        ${(() => {
+          const SIGN_NAMES_L = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+          const h2Sign = SIGN_NAMES_L[(lagnaNum + 1) % 12];
+          const h9Sign = SIGN_NAMES_L[(lagnaNum + 8) % 12];
+          const lord2nd = SIGN_LORDS[h2Sign] || lagnaLord;
+          const lord9th = SIGN_LORDS[h9Sign] || lagnaLord;
+          const pd2nd = chart.planets?.[lord2nd];
+          const pd9th = chart.planets?.[lord9th];
+          const h2House = pd2nd?.house ?? 2;
+          const h9House = pd9th?.house ?? 9;
+          const lagneshPd = chart.planets?.[lagnaLord];
+          const lagneshHouse = lagneshPd?.house ?? 1;
+          if (lord2nd === lord9th) {
+            return `In your chart, ${lord2nd} governs both the 2nd house of treasury (${h2Sign}) and the 9th house of sovereign fortune (${h9Sign}), sitting in the ${h2House}${["","st","nd","rd"][h2House]||"th"} house. This creates a perpetual <strong>Dhana-Bhagya Loop</strong> where professional output directly feeds financial savings.`;
+          }
+          return `In your chart, ${lord2nd} governs the 2nd house of treasury (${h2Sign}), while ${lord9th} rules the 9th house of sovereign fortune (${h9Sign}). ${lagneshPd ? `Your Lagna lord ${lagnaLord} in the ${lagneshHouse}${["","st","nd","rd"][lagneshHouse]||"th"} house energizes this axis.` : ""} This interlock creates a <strong>Dhana-Bhagya Loop</strong> where professional output directly feeds financial savings.`;
+        })()}
       </p>
     </div>
 
@@ -1897,7 +1953,7 @@ ${shadbalaRowsHtml}
     <div class="luxury-card" style="margin-bottom:10px;">
       <div class="card-title" style="color:var(--gold);">✦ SECONDARY TREASURY CATALYST: NATURAL BLUE SAPPHIRE (NEELAM)</div>
       <p class="body-text" style="margin-bottom:6px;">
-        <strong>Target Planet:</strong> Saturn (Shani) &mdash; Indu Lagna Lord (Capricorn) &amp; 5th Lord of Speculation.<br/>
+        <strong>Target Energy:</strong> ${induAnalysis.lord} &mdash; Indu Lagna Sovereign Anchor (${induAnalysis.sign}) &amp; Wealth Anchor.<br/>
         <strong>Astrological Purpose:</strong> Seals wealth leakages, enforces institutional discipline, and compounds long-range net worth.
       </p>
       <div class="matrix-grid" style="margin-bottom:6px;">
@@ -1914,7 +1970,18 @@ ${shadbalaRowsHtml}
     <div class="luxury-card">
       <div class="card-title">✦ SACRED RUDRAKSHA PAIRING FOR WEALTH</div>
       <p class="body-text">
-        <strong>4-Mukhi &amp; 7-Mukhi Rudraksha:</strong> 4-Mukhi (ruled by Mercury/Brahma) sharpens logical memory and strategic foresight; 7-Mukhi (ruled by Mahalakshmi and Venus) removes financial blockages and invites steady material abundance. Wear together on pure silk thread.
+        ${(() => {
+          const RUD_WEALTH: Record<string, string> = {
+            Sun: "<strong>12-Mukhi &amp; 5-Mukhi Rudraksha:</strong> 12-Mukhi (ruled by Lord Surya) radiates executive authority and sovereign leadership; 5-Mukhi (ruled by Brihaspati) anchors dharmic wisdom and steady wealth expansion.",
+            Moon: "<strong>2-Mukhi &amp; 5-Mukhi Rudraksha:</strong> 2-Mukhi (Ardhanarishwara) stabilizes emotional capital and partnerships; 5-Mukhi (Brihaspati) expands steady treasury growth.",
+            Mars: "<strong>3-Mukhi &amp; 5-Mukhi Rudraksha:</strong> 3-Mukhi (Lord Agni) burns stagnant inertia and sharpens decisive execution; 5-Mukhi (Brihaspati) protects long-term asset compounding.",
+            Mercury: "<strong>4-Mukhi &amp; 7-Mukhi Rudraksha:</strong> 4-Mukhi (ruled by Mercury/Brahma) sharpens logical memory and strategic foresight; 7-Mukhi (Mahalakshmi) removes financial blockages and invites steady abundance.",
+            Jupiter: "<strong>5-Mukhi &amp; 12-Mukhi Rudraksha:</strong> 5-Mukhi (Brihaspati) expands dharmic fortune and mentorship; 12-Mukhi (Lord Surya) fortifies executive visibility and royal authority.",
+            Venus: "<strong>6-Mukhi &amp; 7-Mukhi Rudraksha:</strong> 6-Mukhi (Lord Kartikeya/Shukra) refines creative magnetism; 7-Mukhi (Mahalakshmi) unlocks stagnant cashflows and stabilizes luxury.",
+            Saturn: "<strong>7-Mukhi &amp; 8-Mukhi Rudraksha:</strong> 7-Mukhi (Mahalakshmi &amp; Shani) unlocks long-term treasury stability; 8-Mukhi (Lord Ganesha) removes sudden nodal bottlenecks.",
+          };
+          return (RUD_WEALTH[lagnaLord] || RUD_WEALTH.Jupiter) + " Wear together on pure natural silk thread.";
+        })()}
       </p>
     </div>
   </div>
@@ -1987,7 +2054,7 @@ ${shadbalaRowsHtml}
         </div>
         <div>
           <span class="kicker">SACRED BEAD PAIRING</span>
-          <div style="color:var(--ivory);font-weight:600;">4-Mukhi &amp; 7-Mukhi Rudraksha</div>
+          <div style="color:var(--ivory);font-weight:600;">${({ Sun: "12-Mukhi &amp; 5-Mukhi", Moon: "2-Mukhi &amp; 5-Mukhi", Mars: "3-Mukhi &amp; 5-Mukhi", Mercury: "4-Mukhi &amp; 7-Mukhi", Jupiter: "5-Mukhi &amp; 12-Mukhi", Venus: "6-Mukhi &amp; 7-Mukhi", Saturn: "7-Mukhi &amp; 8-Mukhi" } as Record<string, string>)[lagnaLord] || "5-Mukhi &amp; 7-Mukhi"} Rudraksha</div>
         </div>
         <div>
           <span class="kicker">CORE MONETIZATION ENGINE</span>

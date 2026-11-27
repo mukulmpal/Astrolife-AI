@@ -35,8 +35,8 @@ export interface GenderLateralization {
 }
 
 export function getGenderLateralization(gender?: string): GenderLateralization {
-  const isFemale = (gender || "").toLowerCase().trim() === "female";
-  if (isFemale) {
+  const norm = (gender || "").toLowerCase().trim();
+  if (norm === "female" || norm === "f" || norm === "woman" || norm === "स्त्री") {
     return {
       wrist: "Left wrist",
       side: "Left side",
@@ -45,12 +45,21 @@ export function getGenderLateralization(gender?: string): GenderLateralization {
       channel: "Lunar / Ida Nadi (receptive polarity)",
     };
   }
+  if (norm === "male" || norm === "m" || norm === "man" || norm === "पुरुष") {
+    return {
+      wrist: "Right wrist",
+      side: "Right side",
+      hand: "Right hand",
+      sanskritTerm: "Dakshina Anga (दक्षिणाङ्ग)",
+      channel: "Solar / Pingala Nadi (projective polarity)",
+    };
+  }
   return {
-    wrist: "Right wrist",
-    side: "Right side",
-    hand: "Right hand",
-    sanskritTerm: "Dakshina Anga (दक्षिणाङ्ग)",
-    channel: "Solar / Pingala Nadi (projective polarity)",
+    wrist: "Right / Left wrist (Male: Right · Female: Left)",
+    side: "Right / Left side (Male: Right · Female: Left)",
+    hand: "Right / Left hand (Male: Right · Female: Left)",
+    sanskritTerm: "Dakshina / Vama Anga (दक्षिणाङ्ग / वामाङ्ग)",
+    channel: "Solar Pingala / Lunar Ida Nadi",
   };
 }
 
@@ -190,14 +199,40 @@ export function getPlanetHousesOwned(planet: string, lagnaSign: string): number[
 // ─────────────────────────────────────────────────────────────────────────────
 // DYNAMIC TARA BALA & ASHTAMA CHANDRA
 // ─────────────────────────────────────────────────────────────────────────────
+const NAKSHATRA_ALIASES: Record<string, string> = {
+  aswini: "ashwini",
+  mrigashirsha: "mrigashira",
+  mrigasira: "mrigashira",
+  ardhra: "ardra",
+  ashlesh: "ashlesha",
+  vishaka: "vishakha",
+  jyestha: "jyeshtha",
+  moola: "mula",
+  "purva ashadh": "purva ashadha",
+  "uttara ashadh": "uttara ashadha",
+  shravan: "shravana",
+  dhanishtha: "dhanishta",
+  shatbisha: "shatabhisha",
+  satabhisha: "shatabhisha",
+  "purva bhadra": "purva bhadrapada",
+  "uttara bhadra": "uttara bhadrapada",
+};
+
+function normalizeNakshatraForLookup(name: string): string {
+  const cleaned = String(name || "").toLowerCase().replace(/\s+/g, " ").trim();
+  return NAKSHATRA_ALIASES[cleaned] || cleaned;
+}
+
 export function calculateTaraBala(natalNakshatra: string, transitNakshatra: string): {
   taraNum: number;
   taraName: string;
   status: string;
   isSupportive: boolean;
 } {
-  const nIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === (natalNakshatra || "").toLowerCase());
-  const tIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === (transitNakshatra || "").toLowerCase());
+  const normNatal = normalizeNakshatraForLookup(natalNakshatra);
+  const normTransit = normalizeNakshatraForLookup(transitNakshatra);
+  const nIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === normNatal);
+  const tIdx = ALL_NAKSHATRAS.findIndex(n => n.toLowerCase() === normTransit);
   if (nIdx === -1 || tIdx === -1) {
     return { taraNum: 2, taraName: "Sampat", status: "Auspicious Flow", isSupportive: true };
   }
@@ -250,7 +285,8 @@ export interface GemstonePrescription {
 
 export function getDynamicGemstonePrescription(lagnaRashi: string, gender?: string): GemstonePrescription {
   const lat = getGenderLateralization(gender);
-  const rashi = (lagnaRashi || "Aries").trim();
+  const trimmed = (lagnaRashi || "").trim().toLowerCase();
+  const rashi = ALL_RASHIS.find((r) => r.toLowerCase() === trimmed) || "Aries";
 
   switch (rashi) {
     case "Aries":
@@ -493,17 +529,30 @@ export function translatePlanetShadbala(
     },
   };
 
-  const domain = planetDomains[planet] || planetDomains["Mercury"];
+  const normalizedPlanet =
+    Object.keys(planetDomains).find((k) => k.toLowerCase() === String(planet || "").trim().toLowerCase()) ||
+    String(planet || "Planet").trim() ||
+    "Planet";
+
+  const neutralDomain = {
+    high: "This planetary significator operates with reliable structural support, reinforcing steady progress across its governed houses.",
+    mid: "This planetary function stays balanced when supported by consistent habits and deliberate milestone tracking.",
+    low: "This planetary sphere benefits from conscious pacing, structured routines, and careful preparation before major commitments.",
+    watch: "Avoid assuming automatic momentum in this area without periodic review of practical outcomes.",
+    action: "Audit the houses governed by this planet in your chart and establish one clear weekly routine to strengthen them.",
+  };
+
+  const domain = planetDomains[normalizedPlanet] || neutralDomain;
   const plainWords = tier === "TIER_HIGH" ? domain.high : tier === "TIER_MID" ? domain.mid : domain.low;
 
   return {
     tier,
     badge,
-    title: `${planet} Operational Impact (${dignity} in ${sign} · House ${house})`,
+    title: `${normalizedPlanet} Operational Impact (${dignity} in ${sign} · House ${house})`,
     plainWords,
     watchOutFor: domain.watch,
     nextMove: domain.action,
-    shastricProof: `${planet} Shadbala: ${rupas.toFixed(2)} Rupas (${ratio.toFixed(2)}x Requirement) · Classical Dignity: ${dignity} · House: ${house}`,
+    shastricProof: `${normalizedPlanet} Shadbala: ${rupas.toFixed(2)} Rupas (${ratio.toFixed(2)}x Requirement) · Classical Dignity: ${dignity} · House: ${house}`,
   };
 }
 
@@ -513,10 +562,12 @@ export function translatePlanetShadbala(
 export function translateAshtakavargaHouse(
   house: number,
   bindus: number,
-  lagnaRashi = "Virgo",
-  signName = "Gemini"
+  lagnaRashi?: string,
+  signName?: string
 ): HumanImpactCard {
   const { tier, badge } = classifyMetricTier({ savBindus: bindus });
+  const cleanLagna = (lagnaRashi || "").trim();
+  const resolvedSign = (signName || "").trim() || (cleanLagna ? signFromHouse(cleanLagna, house) : `House ${house}`);
 
   const houseMeanings: Record<number, { domain: string; high: string; mid: string; low: string; watch: string; action: string }> = {
     1: {
@@ -534,6 +585,54 @@ export function translateAshtakavargaHouse(
       low: "Liquidity tends to exit as rapidly as it enters unless strict automated accounting and withdrawal friction are established.",
       watch: "Watch for impulsive discretionary expenditures during phases of emotional celebration or fatigue.",
       action: "Automate a fixed percentage transfer into liquid reserve vaults the moment revenue hits your operating account.",
+    },
+    3: {
+      domain: "Initiative, Communication & Skill Execution",
+      high: "Your tactical initiative, persuasive communication, and hands-on execution create rapid momentum in negotiations and launches.",
+      mid: "Your outreach and skill output compound steadily when channeled into focused, consistent weekly deliverables.",
+      low: "Scattered communication or hesitation before initiating difficult conversations can delay promising projects.",
+      watch: "Avoid diluting your focus across too many unprioritized side channels or short-term errands.",
+      action: "Block 45 uninterrupted morning minutes for your highest-leverage communication or writing deliverable.",
+    },
+    4: {
+      domain: "Domestic Sanctuary, Real Estate & Inner Peace",
+      high: "Your domestic environment, property stability, and emotional foundation anchor your ability to absorb high external pressure.",
+      mid: "Your home base and inner equilibrium stay steady when personal boundaries and tranquil living spaces are actively protected.",
+      low: "Environmental clutter or domestic turbulence can quietly drain decision bandwidth unless clear sanctuary routines are built.",
+      watch: "Do not carry unresolved work urgency into your restorative evening space.",
+      action: "Declutter your primary sleep and workspace zones and establish a calm evening wind-down ritual.",
+    },
+    5: {
+      domain: "Strategic Intellect, Creativity & Purva Punya",
+      high: "Your creative discernment, strategic foresight, and analytical judgment generate strong conviction in high-stakes decisions.",
+      mid: "Your creative output and calculated risk appetite perform reliably when paired with written investment checklists.",
+      low: "Speculative impatience or second-guessing your core thesis can erode returns before a thesis matures.",
+      watch: "Never commit capital or creative reputation to unverified impulses without a clear exit rule.",
+      action: "Document your decision criteria in writing before entering any creative or capital commitment.",
+    },
+    6: {
+      domain: "Operational Resilience, Service & Competition",
+      high: "Your daily discipline, problem-solving stamina, and capacity to out-execute competitors turn friction into durable advantage.",
+      mid: "Your workflow and health routines handle everyday friction well when preventive habits and clear schedules are maintained.",
+      low: "Unresolved minor conflicts or irregular daily routines can accumulate into preventable stress or fatigue.",
+      watch: "Do not ignore small recurring administrative bottlenecks or early physical fatigue signals.",
+      action: "Clear your oldest pending operational task tomorrow morning and lock in consistent meal and movement timing.",
+    },
+    7: {
+      domain: "Partnerships, Contracts & Public Diplomacy",
+      high: "Your bilateral alliances, client trust, and contractual diplomacy attract high-caliber counterparts and mutual prosperity.",
+      mid: "Your key partnerships stay productive when roles, deliverables, and expectations are documented clearly upfront.",
+      low: "Ambiguous expectations or over-accommodating counterparties can introduce friction into collaborative agreements.",
+      watch: "Ensure every significant partnership rests on explicit written terms rather than informal assumptions.",
+      action: "Review one active partnership or client agreement and align on explicit milestones for the next 30 days.",
+    },
+    8: {
+      domain: "Deep Research, Transformation & Shared Capital",
+      high: "Your forensic insight, crisis composure, and capacity to navigate sudden transitions uncover hidden institutional value.",
+      mid: "Your resilience during unexpected structural shifts remains solid when emergency reserves and transparent audits are kept.",
+      low: "Sudden unhedged exposures or neglected legal/tax paperwork can trigger avoidable turbulence during transition windows.",
+      watch: "Avoid opaque financial arrangements or leaving contingency buffers unreviewed.",
+      action: "Audit your emergency liquidity buffer, insurance, and tax/compliance records for complete clarity.",
     },
     9: {
       domain: "Strategic Fortune & Higher Mentorship",
@@ -579,15 +678,16 @@ export function translateAshtakavargaHouse(
   };
 
   const plainWords = tier === "TIER_HIGH" ? info.high : tier === "TIER_MID" ? info.mid : info.low;
+  const lagnaSuffix = cleanLagna ? ` · Lagna: ${cleanLagna}` : "";
 
   return {
     tier,
     badge,
-    title: `${info.domain} (House ${house} · ${signName})`,
+    title: `${info.domain} (House ${house} · ${resolvedSign})`,
     plainWords,
     watchOutFor: info.watch,
     nextMove: info.action,
-    shastricProof: `SAV-337 Parashari Score: ${bindus} Bindus in ${signName} (Baseline Average: 28 Bindus) · Lagna: ${lagnaRashi}`,
+    shastricProof: `SAV-337 Parashari Score: ${bindus} Bindus in ${resolvedSign} (Baseline Average: 28 Bindus)${lagnaSuffix}`,
   };
 }
 
@@ -600,8 +700,10 @@ export function translateDashaPeriod(
   mdDignity = "Friendly",
   adDignity = "Neutral"
 ): HumanImpactCard {
-  const isChallenging = mahadasha === "Rahu" && antardasha === "Saturn" || mahadasha === "Saturn" && antardasha === "Rahu";
-  const isHighGrowth = (mahadasha === "Jupiter" || mahadasha === "Mercury" || mahadasha === "Venus") && adDignity !== "Debilitated";
+  const mdKey = String(mahadasha || "").trim().toLowerCase();
+  const adKey = String(antardasha || "").trim().toLowerCase();
+  const isChallenging = (mdKey === "rahu" && adKey === "saturn") || (mdKey === "saturn" && adKey === "rahu");
+  const isHighGrowth = (mdKey === "jupiter" || mdKey === "mercury" || mdKey === "venus" || mdKey === "sun") && adDignity !== "Debilitated";
 
   const tier: TranslationTier = isChallenging ? "TIER_LOW" : isHighGrowth ? "TIER_HIGH" : "TIER_MID";
   const badge = isChallenging ? "Your Blind Spot & Fix" : isHighGrowth ? "Your Natural Edge" : "Steady Engine (Needs Structure)";
@@ -610,22 +712,42 @@ export function translateDashaPeriod(
   let watchOut = "";
   let action = "";
 
-  if (mahadasha === "Rahu") {
+  if (mdKey === "sun") {
+    plainWords = `During the ${mahadasha} Mahadasha with ${antardasha} Antardasha, visibility, personal authority, and decisive leadership step to the foreground. Recognition rises when you act with principled clarity and accountable stewardship.`;
+    watchOut = "Guard against ego friction or taking unilateral control where collaborative consensus is warranted.";
+    action = "Anchor your week around one high-visibility leadership objective and honor sunrise discipline.";
+  } else if (mdKey === "moon") {
+    plainWords = `The ${mahadasha}–${antardasha} chapter heightens emotional intelligence, public rapport, and adaptive intuition. Nourishing home stability and steady mental rhythms unlocks strong creative and interpersonal flow.`;
+    watchOut = "Avoid making major long-term commitments during moments of acute fatigue or emotional reactivity.";
+    action = "Protect consistent sleep hours and review decisions after a calm night's rest before finalizing.";
+  } else if (mdKey === "mars") {
+    plainWords = `During the ${mahadasha}–${antardasha} cycle, tactical courage, competitive drive, and decisive execution accelerate. Real estate, technical engineering, and bold single-pointed initiatives gain strong momentum.`;
+    watchOut = "Guard against impatience, blunt speech, or forcing rapid timelines when counterparts need steadier pacing.";
+    action = "Channel high physical drive into daily structured movement and verify contractual details before acting.";
+  } else if (mdKey === "rahu") {
     plainWords = `During the ${mahadasha} Mahadasha with ${antardasha} Antardasha, life pulls you toward rapid modernization, non-linear breakthroughs, and frontier expansion. Your ambition is heightened, urging you to break out of outdated conventional moulds.`;
     watchOut = "Guard against sudden speculative impulses or rushing into contracts without full due diligence.";
     action = "Anchor all major new projects to documented milestones and consult a trusted, grounded advisor before signing.";
-  } else if (mahadasha === "Jupiter") {
+  } else if (mdKey === "jupiter") {
     plainWords = `The ${mahadasha}–${antardasha} chapter represents a season of intellectual consolidation, institutional respect, and principled compounding. Opportunities expand naturally when aligned with ethical craftsmanship and deep domain expertise.`;
     watchOut = "Avoid expanding into too many parallel ventures that divide your leadership bandwidth.";
     action = "Focus your resources on your single most credible asset and systematize its delivery.";
-  } else if (mahadasha === "Saturn") {
+  } else if (mdKey === "Saturn".toLowerCase()) {
     plainWords = `The ${mahadasha}–${antardasha} period acts as an institutional stress-test, stripping away fragile shortcuts to build unbreakable foundations. What you construct with patience during this cycle remains permanently resilient.`;
     watchOut = "Do not mistake deliberate architectural compounding for a lack of forward progress.";
     action = "Embrace rigorous daily systems, honor commitments to the letter, and eliminate inefficient operational clutter.";
-  } else if (mahadasha === "Mercury") {
-    plainWords = `Under the ${mahadasha}–${antardasha} cycle, commercial agility, communication networks, and analytical clarity reach their annual peak. It is an ideal window for product launches, negotiations, and quantitative optimization.`;
+  } else if (mdKey === "mercury") {
+    plainWords = `Under the ${mahadasha}–${antardasha} cycle, commercial agility, communication networks, and analytical clarity reach their operational peak. It is an ideal window for product launches, negotiations, and quantitative optimization.`;
     watchOut = "Do not allow high intellectual velocity to cause scattered attention or mental restlessness.";
     action = "Publish your work, formalize partnership agreements, and optimize your commercial pricing structure.";
+  } else if (mdKey === "venus") {
+    plainWords = `Under the ${mahadasha}–${antardasha} chapter, relational harmony, aesthetic value creation, and financial refinement take center stage. Strategic alliances and brand equity compound smoothly through poised diplomacy.`;
+    watchOut = "Avoid over-compromising core standards or overspending on comfort merely to maintain surface harmony.";
+    action = "Strengthen one high-value alliance and align your pricing or asset strategy with enduring quality.";
+  } else if (mdKey === "ketu") {
+    plainWords = `The ${mahadasha}–${antardasha} phase invites deep discernment, technical specialization, and shedding of unaligned commitments. Clarity emerges through quiet mastery, research, and deliberate simplification.`;
+    watchOut = "Guard against abrupt detachment from ongoing responsibilities without clean documentation or handoff.";
+    action = "Simplify one cluttered workflow and dedicate focused quiet hours to deep research or spiritual grounding.";
   } else {
     plainWords = `The ${mahadasha}–${antardasha} period provides a stable operating runway where disciplined consistency yields predictable, reliable progress across all major life pillars.`;
     watchOut = "Avoid complacency; maintain steady momentum even when external pressures temporarily soften.";
@@ -644,14 +766,15 @@ export function translateDashaPeriod(
 }
 
 /**
- * 4. D-9 Navamsha Translation (Post-30 Evolution)
+ * 4. D-9 Navamsha Translation (Inner Dharma & Maturing Evolution)
  */
 export function translateD9Placement(
   planet: string,
   d9Sign: string,
   isVargottama: boolean,
   isExalted: boolean,
-  isDebilitated: boolean
+  isDebilitated: boolean,
+  age?: number
 ): HumanImpactCard {
   let tier: TranslationTier = "TIER_MID";
   let badge: "Your Natural Edge" | "Steady Engine (Needs Structure)" | "Your Blind Spot & Fix" = "Steady Engine (Needs Structure)";
@@ -665,16 +788,22 @@ export function translateD9Placement(
   }
 
   const statusLabel = isVargottama ? "Vargottama (Harmonized Across D-1 & D-9)" : isExalted ? "Exalted (Supreme Inner Power)" : isDebilitated ? "Conscious Cultivation Required" : `Placed in ${d9Sign}`;
+  const hasAge = typeof age === "number" && Number.isFinite(age);
+  const phaseClause = hasAge
+    ? age < 30
+      ? `At age ${age}, as your foundational habits compound over time,`
+      : `At age ${age}, as your inner chart matures,`
+    : `As your inner chart matures,`;
 
   const plainWords = (isVargottama || isExalted)
-    ? `As you mature past age 30, ${planet}'s core qualities become an unshakeable inner anchor. What felt like an uphill learning curve in youth transforms into your most dependable instinct.`
+    ? `${phaseClause} ${planet}'s core qualities become an unshakeable inner anchor. What initially felt like an uphill learning curve transforms into your most dependable instinct.`
     : isDebilitated
-    ? `In your mature years, ${planet}'s domain requires conscious systems rather than passive reliance. Deliberate discipline in this area builds profound, authentic mastery.`
-    : `Your post-30 personal evolution stabilizes ${planet}'s expression, providing reliable character maturity and consistent decision clarity.`;
+    ? `${phaseClause} ${planet}'s domain requires conscious systems rather than passive reliance. Deliberate discipline in this area builds profound, authentic mastery.`
+    : `${phaseClause} your Navamsha evolution stabilizes ${planet}'s expression, providing reliable character maturity and consistent decision clarity.`;
 
   const watchOut = isDebilitated
     ? `Do not neglect this domain under the assumption that past habits will suffice; build explicit checklists.`
-    : `Do not take your natural post-30 strength for granted; continue refining your core craft.`;
+    : `Do not take your natural Navamsha strength for granted; continue refining your core craft.`;
 
   const action = `Review how you handle ${planet}'s themes today compared to five years ago, and formalize your best operating practices.`;
 

@@ -20,7 +20,12 @@ import { calculateDivisional, type DivChart } from "../astro-engine/divisional";
 import { detectYogas, type YogaResult } from "../astro-engine/yogas";
 import { calculateShadbala, type ShadbalaResult } from "../astro-engine/shadbala";
 import { calculateAshtakavarga, type AKVResult } from "../astro-engine/ashtakavarga";
-import { calculateKarakas } from "../astro-engine/jaimini";
+import { buildJaiminiChart, calculateKarakas, type JaiminiResult } from "../astro-engine/jaimini";
+import { calculateInduLagna } from "../astro-engine/special-lagnas";
+import { calculateMedical, type MedicalResult } from "../astro-engine/medical";
+import { runAstroVastuHitEngine, type AstroVastuHitDossier } from "../astro-engine/astro-vastu-hit-engine";
+import { getKaranaName } from "../astro-engine/panchang";
+import { makeRudrakshaRecommendation } from "../astro-engine/gemstone";
 import { generateSacredUnionDossierHTML } from "./generators/sacred-union-dossier-generator";
 import { generateRajaYogaWealthDossierHTML } from "./generators/raja-yoga-wealth-dossier-generator";
 import { generateBioVedicRemediesDossierHTML } from "./generators/bio-vedic-remedies-dossier-generator";
@@ -30,10 +35,31 @@ import { generateJaiminiSoulDossierHTML } from "./generators/jaimini-soul-dossie
 import { generateAyurvedicMedicalDossierHTML } from "./generators/ayurvedic-medical-dossier-generator";
 import { generateGoldenMuhuratDossierHTML } from "./generators/golden-muhurat-dossier-generator";
 import { generateDestinyCurveDossierHTML } from "./generators/destiny-curve-dossier-generator";
+import { getDynamicGemstonePrescription, getSignLord, withArticle } from "../astro/human-translator";
+import {
+  SIGN_NAMES,
+  SIGN_LORDS,
+  PLANET_SANSKRIT,
+  PLANET_WEEKDAYS,
+  escapeHtml,
+  getPlanetLon,
+  formatDMS,
+  getHouseFromLagna,
+  getSignFromHouse,
+  computeClassicalDignity,
+  getActiveDashaState,
+  getSeekerAge,
+  resolveGender,
+  getGenderLateralizationSafe,
+  getAkvHouseSav,
+  getNakshatraMetadata,
+  renderNorthIndianSvg,
+  buildDynamicRollingMonths,
+} from "./dossier-shared-helpers";
 
 export interface PackageDossierOptions {
-  reportId: string;
-  reportTitle: string;
+  reportId?: string;
+  reportTitle?: string;
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
@@ -45,120 +71,131 @@ export interface PackageDossierOptions {
   gender?: "male" | "female" | string;
 }
 
-const SIGN_NAMES = [
-  "Aries", "Taurus", "Gemini", "Cancer",
-  "Leo", "Virgo", "Libra", "Scorpio",
-  "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+const PANCHANG_TITHIS = [
+  "Pratipada", "Dvitiya", "Tritiya", "Chaturthi", "Panchami",
+  "Shashthi", "Saptami", "Ashtami", "Navami", "Dashami",
+  "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Purnima / Amavasya",
 ];
 
-const SIGN_GLYPHS = [
-  "♈", "♉", "♊", "♋", "♌", "♍",
-  "♎", "♏", "♐", "♑", "♒", "♓"
+const PANCHANG_YOGAS = [
+  "Vishkumbha", "Preeti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda", "Sukarma",
+  "Dhriti", "Shoola", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana",
+  "Vajra", "Siddhi", "Vyatipata", "Variyana", "Parigha", "Shiva", "Siddha",
+  "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti",
 ];
 
-const PLANET_ABBR: Record<string, string> = {
-  Sun: "Su",
-  Moon: "Mo",
-  Mars: "Ma",
-  Mercury: "Me",
-  Jupiter: "Ju",
-  Venus: "Ve",
-  Saturn: "Sa",
-  Rahu: "Ra",
-  Ketu: "Ke",
-  Ascendant: "As",
+const WEEKDAYS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const DASHA_PROFILE_META: Readonly<Record<string, { element: string; chakra: string; field: string; guardrail: string }>> = {
+  Sun:     { element: "Agni / Solar Authority",   chakra: "Manipura / Solar Plexus", field: "Leadership & Stature",      guardrail: "Avoid Ego Rigidity" },
+  Moon:    { element: "Jala / Lunar Flow",        chakra: "Svadhishthana / Heart",   field: "Intuition & Public Care",   guardrail: "Avoid Emotional Reactivity" },
+  Mars:    { element: "Agni / Kinetic Will",      chakra: "Manipura / Root Drive",   field: "Execution & Real Estate",   guardrail: "Avoid Impulsive Friction" },
+  Mercury: { element: "Prithvi / Analytical Mind",chakra: "Vishuddha / Intellect",   field: "Commerce & Communication",  guardrail: "Avoid Mental Scattering" },
+  Jupiter: { element: "Akasha / Wisdom Dharma",   chakra: "Ajna / Higher Insight",   field: "Knowledge & Advisory",      guardrail: "Avoid Over-Commitment" },
+  Venus:   { element: "Jala / Harmonic Grace",    chakra: "Anahata / Relational",    field: "Alliances & Refinement",    guardrail: "Avoid Comfort Complacency" },
+  Saturn:  { element: "Vayu / Structural Law",    chakra: "Muladhara / Grounding",   field: "Discipline & Compounding",  guardrail: "Avoid Pacing Fatigue" },
+  Rahu:    { element: "Vayu / Frontier Surge",    chakra: "Ajna / Pattern Vision",   field: "Innovation & Global Scale", guardrail: "Avoid Unhedged Speculation" },
+  Ketu:    { element: "Agni / Subtle Insight",    chakra: "Sahasrara / Detachment",  field: "Research & Mastery",        guardrail: "Avoid Abrupt Withdrawal" },
 };
 
-// North Indian Diamond Chart House Coordinates [cx, cy] for 360x360 SVG
-const HOUSE_POSITIONS: Record<number, [number, number]> = {
-  1:  [180, 110], // Top center diamond
-  2:  [100, 55],  // Top-left triangle
-  3:  [55, 100],  // Upper-left corner triangle
-  4:  [110, 180], // Middle-left diamond
-  5:  [55, 260],  // Lower-left corner triangle
-  6:  [100, 305], // Bottom-left triangle
-  7:  [180, 250], // Bottom center diamond
-  8:  [260, 305], // Bottom-right triangle
-  9:  [305, 260], // Lower-right corner triangle
-  10: [250, 180], // Middle-right diamond
-  11: [305, 100], // Upper-right corner triangle
-  12: [260, 55],  // Top-right triangle
+const PLANET_RESONANCE_META: Readonly<Record<string, { hue: string; avoid: string; hz: string; plant: string }>> = {
+  Sun:     { hue: "Warm Saffron & Ruby",   avoid: "Dull Charcoal / Ash",     hz: "126.22 Hz Solar",   plant: "Bilva & Red Hibiscus" },
+  Moon:    { hue: "Pearl White & Silver",  avoid: "Harsh Neon / Dark Brown", hz: "210.42 Hz Lunar",   plant: "Tulsi & White Jasmine" },
+  Mars:    { hue: "Coral Red & Copper",    avoid: "Muddy Grey / Stale Blue", hz: "144.72 Hz Kinetic", plant: "Neem & Khadira" },
+  Mercury: { hue: "Emerald Green & Ivory", avoid: "Dull Charcoal / Rust",    hz: "141.27 Hz Neural",  plant: "Tulsi & Apamarga" },
+  Jupiter: { hue: "Warm Ivory & Gold",     avoid: "Dull Grey / Mud Brown",   hz: "183.58 Hz Dharma",  plant: "Peepal & Banana" },
+  Venus:   { hue: "Silk White & Rose Gold",avoid: "Mud Brown / Harsh Black", hz: "221.23 Hz Harmonic",plant: "White Sandal & Jasmine" },
+  Saturn:  { hue: "Midnight Indigo & Slate",avoid: "Flashy Neon / Crimson",  hz: "147.85 Hz Ground",  plant: "Shami & Peepal" },
 };
-
-function escapeHtml(str: string): string {
-  return String(str ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function renderNorthIndianSvg(
-  chart: ChartData,
-  customPlanets?: Record<string, { house: number; sign: string; retrograde?: boolean }>,
-  customLagnaNum?: number,
-  size = 340
-): string {
-  const houseContents: Record<number, string[]> = {};
-  for (let h = 1; h <= 12; h++) houseContents[h] = [];
-
-  houseContents[1].push("As");
-
-  const planetMap = customPlanets || chart.planets || {};
-  for (const [name, pd] of Object.entries(planetMap)) {
-    const abbr = PLANET_ABBR[name] || name.slice(0, 2);
-    const house = pd.house >= 1 && pd.house <= 12 ? pd.house : 1;
-    houseContents[house].push(abbr + (pd.retrograde ? "(R)" : ""));
-  }
-
-  const lagnaIndex = customLagnaNum !== undefined ? customLagnaNum : (chart.lagnaNum || 0);
-
-  let labels = "";
-  for (let h = 1; h <= 12; h++) {
-    const [cx, cy] = HOUSE_POSITIONS[h];
-    const items = houseContents[h];
-    const signIdx = ((lagnaIndex + (h - 1)) % 12 + 12) % 12;
-    const signNumber = signIdx + 1;
-
-    labels += `<text x="${cx}" y="${cy - 12}" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#8C7440">${signNumber}</text>`;
-
-    items.forEach((item, i) => {
-      const offsetY = (i - (items.length - 1) / 2) * 11;
-      labels += `<text x="${cx}" y="${cy + 6 + offsetY}" text-anchor="middle" dominant-baseline="middle" font-family="'Inter',sans-serif" font-size="8.5" font-weight="700" fill="#C9A961">${escapeHtml(item)}</text>`;
-    });
-  }
-
-  return `<svg width="${size}" height="${size}" viewBox="0 0 360 360" class="kundli-svg">
-  <g stroke="#C9A961" stroke-width="0.75" fill="none" opacity="0.65">
-    <rect x="10" y="10" width="340" height="340"/>
-    <polygon points="180,10 350,180 180,350 10,180"/>
-    <line x1="10" y1="10" x2="350" y2="350"/>
-    <line x1="350" y1="10" x2="10" y2="350"/>
-  </g>
-  ${labels}
-</svg>`;
-}
 
 export function generatePackageDossierHTML(
   chart: ChartData,
-  options: PackageDossierOptions
+  options: PackageDossierOptions = {}
 ): string {
-  const rawReportId = (options.reportId || "").toLowerCase();
-  const rawReportTitle = (options.reportTitle || "").toLowerCase();
-  const reportId = `${rawReportId} ${rawReportTitle}`;
+  const rawReportId = (options.reportId || "").trim().toLowerCase();
+  const rawReportTitle = (options.reportTitle || "").trim().toLowerCase();
+  const reportId = `${rawReportId} ${rawReportTitle}`.trim();
 
   // ─────────────────────────────────────────────────────────────────────────
-  // DEDICATED MASTER DOSSIER GENERATORS (24 Pages Each)
+  // 1. EXACT REPORT ID ROUTING (Prevents title keywords from hijacking IDs)
+  // ─────────────────────────────────────────────────────────────────────────
+  if (
+    rawReportId === "pkg_union_family" ||
+    rawReportId === "pkg_sacred_union" ||
+    rawReportId === "kundali_milan_single" ||
+    rawReportId === "family_karma_single"
+  ) {
+    return generateSacredUnionDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_wealth_yogas" ||
+    rawReportId === "classical_yogas_single" ||
+    rawReportId === "special_lagnas_single" ||
+    rawReportId === "numerology_single"
+  ) {
+    return generateRajaYogaWealthDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_bio_remedies" ||
+    rawReportId === "gemstone_rudraksha_single" ||
+    rawReportId === "dot_therapy_thread_single" ||
+    rawReportId === "astro_tattoo_single" ||
+    rawReportId === "astro_sound"
+  ) {
+    return generateBioVedicRemediesDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_space_destiny" ||
+    rawReportId === "vastu_radar_single" ||
+    rawReportId === "palmistry_scan" ||
+    rawReportId === "btr_mathematical"
+  ) {
+    return generateSpaceDestinyDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_stock_trading" ||
+    rawReportId === "sarvatobhadra_single" ||
+    rawReportId === "ashtakavarga_bindus_single"
+  ) {
+    return generateStockTradingDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_jaimini_soul" ||
+    rawReportId === "atmakaraka_soul_single"
+  ) {
+    return generateJaiminiSoulDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_ayurvedic_medical" ||
+    rawReportId === "medical_roga_single" ||
+    rawReportId === "cognitive_mind_single"
+  ) {
+    return generateAyurvedicMedicalDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "pkg_muhurat_panchang" ||
+    rawReportId === "prashna_instant" ||
+    rawReportId === "transit_purchase"
+  ) {
+    return generateGoldenMuhuratDossierHTML(chart, options);
+  }
+  if (
+    rawReportId === "destiny_curve_flagship" ||
+    rawReportId === "navtara_dasha_single" ||
+    rawReportId === "yearly_gochar"
+  ) {
+    return generateDestinyCurveDossierHTML(chart, options);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 2. FUZZY ROUTING FOR CUSTOM / LEGACY REPORT TITLES & IDS
   // ─────────────────────────────────────────────────────────────────────────
   // 1. Sacred Union & Family Destiny (Dossier I)
   if (
     reportId.includes("union") ||
     reportId.includes("family") ||
     reportId.includes("milan") ||
-    reportId.includes("marriage") ||
-    rawReportId === "kundali_milan_single" ||
-    rawReportId === "family_karma_single"
+    reportId.includes("marriage")
   ) {
     return generateSacredUnionDossierHTML(chart, options);
   }
@@ -172,9 +209,6 @@ export function generatePackageDossierHTML(
     reportId.includes("pkg_wealth_yogas") ||
     reportId.includes("classical_yogas") ||
     reportId.includes("yogas") ||
-    rawReportId === "special_lagnas_single" ||
-    rawReportId === "numerology_single" ||
-    rawReportId === "classical_yogas_single" ||
     reportId.includes("numerology")
   ) {
     return generateRajaYogaWealthDossierHTML(chart, options);
@@ -193,11 +227,7 @@ export function generatePackageDossierHTML(
     reportId.includes("thread") ||
     reportId.includes("tattoo") ||
     reportId.includes("yantra") ||
-    reportId.includes("sound") ||
-    rawReportId === "gemstone_rudraksha_single" ||
-    rawReportId === "dot_therapy_thread_single" ||
-    rawReportId === "astro_tattoo_single" ||
-    rawReportId === "astro_sound"
+    reportId.includes("sound")
   ) {
     return generateBioVedicRemediesDossierHTML(chart, options);
   }
@@ -211,10 +241,7 @@ export function generatePackageDossierHTML(
       reportId.includes("palmistry") ||
       reportId.includes("btr") ||
       reportId.includes("calibration") ||
-      reportId.includes("samudrika") ||
-      rawReportId === "vastu_radar_single" ||
-      rawReportId === "palmistry_scan" ||
-      rawReportId === "btr_mathematical"
+      reportId.includes("samudrika")
     )
   ) {
     return generateSpaceDestinyDossierHTML(chart, options);
@@ -229,9 +256,7 @@ export function generatePackageDossierHTML(
     reportId.includes("pkg_stock_trading") ||
     reportId.includes("market") ||
     reportId.includes("ashtakavarga") ||
-    reportId.includes("bindu") ||
-    rawReportId === "sarvatobhadra_single" ||
-    rawReportId === "ashtakavarga_bindus_single"
+    reportId.includes("bindu")
   ) {
     return generateStockTradingDossierHTML(chart, options);
   }
@@ -243,8 +268,7 @@ export function generatePackageDossierHTML(
     reportId.includes("karmic") ||
     reportId.includes("pkg_jaimini_soul") ||
     reportId.includes("karaka") ||
-    reportId.includes("atmakaraka") ||
-    rawReportId === "atmakaraka_soul_single"
+    reportId.includes("atmakaraka")
   ) {
     return generateJaiminiSoulDossierHTML(chart, options);
   }
@@ -260,9 +284,7 @@ export function generatePackageDossierHTML(
     reportId.includes("tridosha") ||
     reportId.includes("roga") ||
     reportId.includes("cognitive") ||
-    reportId.includes("mind") ||
-    rawReportId === "medical_roga_single" ||
-    rawReportId === "cognitive_mind_single"
+    reportId.includes("mind")
   ) {
     return generateAyurvedicMedicalDossierHTML(chart, options);
   }
@@ -276,8 +298,6 @@ export function generatePackageDossierHTML(
     reportId.includes("auspicious") ||
     reportId.includes("pkg_muhurat_panchang") ||
     reportId.includes("prashna") ||
-    rawReportId === "prashna_instant" ||
-    rawReportId === "transit_purchase" ||
     (reportId.includes("timing") && !reportId.includes("yogas") && !reportId.includes("raja"))
   ) {
     return generateGoldenMuhuratDossierHTML(chart, options);
@@ -287,9 +307,6 @@ export function generatePackageDossierHTML(
   if (
     reportId.includes("destiny") ||
     reportId.includes("curve") ||
-    rawReportId === "destiny_curve_flagship" ||
-    rawReportId === "navtara_dasha_single" ||
-    rawReportId === "yearly_gochar" ||
     reportId.includes("navtara") ||
     reportId.includes("gochar")
   ) {
@@ -302,51 +319,103 @@ export function generatePackageDossierHTML(
   const paymentId = escapeHtml(options.paymentId || `PAY_${Date.now().toString(36).toUpperCase()}`);
   const isSample = Boolean(options.isSample);
 
-  const birthDate = chart.dob || "Recorded";
-  const birthTime = chart.tob || "12:00";
-  const birthCity = escapeHtml(chart.city || "New Delhi");
-  const lat = chart.lat !== undefined ? Number(chart.lat).toFixed(4) : "28.6139";
-  const lon = chart.lon !== undefined ? Number(chart.lon).toFixed(4) : "77.2090";
+  const birthDate = escapeHtml(chart.dob || "Recorded");
+  const birthTime = escapeHtml(chart.tob || "12:00");
+  const tzNum = typeof chart.tz === "number" && Number.isFinite(chart.tz) ? chart.tz : 5.5;
+  const tzLabel = Math.abs(tzNum - 5.5) < 0.01 ? "IST" : `UTC${tzNum >= 0 ? "+" : ""}${tzNum}`;
+  const birthCity = escapeHtml(chart.city || "Recorded Location");
+  const lat = chart.lat !== undefined && Number.isFinite(Number(chart.lat)) ? Number(chart.lat).toFixed(4) : "—";
+  const lon = chart.lon !== undefined && Number.isFinite(Number(chart.lon)) ? Number(chart.lon).toFixed(4) : "—";
 
-  const lagnaRashi = chart.lagnaRashi || SIGN_NAMES[chart.lagnaNum || 0] || "Aries";
+  const lagnaNum =
+    typeof chart.lagnaNum === "number" && Number.isFinite(chart.lagnaNum)
+      ? ((Math.trunc(chart.lagnaNum) % 12) + 12) % 12
+      : 0;
+  const lagnaRashiRaw = chart.lagnaRashi || SIGN_NAMES[lagnaNum] || "Aries";
+  const lagnaRashi = escapeHtml(lagnaRashiRaw);
+  const lagnaLord = SIGN_LORDS[lagnaRashiRaw] || getSignLord(lagnaRashiRaw);
+
   const moonPlanet = chart.planets?.["Moon"];
-  const moonRashi = moonPlanet?.sign || "Taurus";
+  const moonLon = getPlanetLon(moonPlanet);
+  const moonRashiRaw = moonPlanet?.sign || (moonPlanet ? SIGN_NAMES[Math.floor(moonLon / 30)] : "—");
+  const moonRashi = escapeHtml(moonRashiRaw);
   const sunPlanet = chart.planets?.["Sun"];
-  const sunRashi = sunPlanet?.sign || "Leo";
-  const nakshatra = moonPlanet?.nakshatra || "Rohini";
-  const dashaLord = chart.dashas?.find((d) => d.active)?.planet || chart.dashas?.[0]?.planet || "Jupiter";
+  const sunLon = getPlanetLon(sunPlanet);
+  const sunRashiRaw = sunPlanet?.sign || (sunPlanet ? SIGN_NAMES[Math.floor(sunLon / 30)] : "—");
+  const sunRashi = escapeHtml(sunRashiRaw);
+  const nakshatraRaw = moonPlanet?.nakshatra || "—";
+  const nakshatra = escapeHtml(nakshatraRaw);
+
+  const dashaState = getActiveDashaState(chart);
+  const dashaLordRaw = dashaState.activeDasha;
+  const dashaLord = escapeHtml(dashaLordRaw);
+  const antarLordRaw = dashaState.activeAntar;
+  const antarLord = escapeHtml(antarLordRaw);
+
+  const resolvedGender = resolveGender(options, chart as ChartData & { gender?: string });
+  const genderLat = getGenderLateralizationSafe(resolvedGender);
+  const seekerAge = getSeekerAge(chart.dob);
 
   // Safe Engine Calculations
+  const planetsTyped = chart.planets as unknown as Parameters<typeof calculateDivisional>[0];
   let divisionalCharts: DivChart[] = [];
   try {
-    divisionalCharts = calculateDivisional(chart.planets as any, chart.lagnaNum, chart.lagnaLon);
+    divisionalCharts = calculateDivisional(planetsTyped, lagnaNum, chart.lagnaLon);
   } catch (err) {
     console.warn("[package-dossier] calculateDivisional fallback:", err);
   }
 
+  const d7Chart = divisionalCharts.find((c) => c.key === "D7");
   const d9Chart = divisionalCharts.find((c) => c.key === "D9");
   const d10Chart = divisionalCharts.find((c) => c.key === "D10");
 
+  const d9PlanetsMap: Record<string, { house: number; sign: string; retrograde?: boolean }> = {};
+  if (d9Chart?.planets) {
+    for (const dp of d9Chart.planets) {
+      d9PlanetsMap[dp.planet] = {
+        house: dp.house,
+        sign: dp.sign,
+        retrograde: dp.retrograde,
+      };
+    }
+  }
+  const vargottamaPlanets = Object.entries(chart.planets || {})
+    .filter(([name, pd]) => {
+      const d9p = d9Chart?.planets?.find((dp) => dp.planet === name);
+      return Boolean(d9p && pd?.sign && d9p.sign.toLowerCase() === pd.sign.toLowerCase());
+    })
+    .map(([name]) => name);
+
   let detectedYogas: YogaResult[] = [];
   try {
-    detectedYogas = detectYogas(chart.planets as any, chart.lagnaNum, "elite");
+    detectedYogas = detectYogas(
+      chart.planets as unknown as Parameters<typeof detectYogas>[0],
+      lagnaNum,
+      "elite"
+    );
   } catch (err) {
     console.warn("[package-dossier] detectYogas fallback:", err);
   }
 
   let shadbalaRes: ShadbalaResult | null = null;
   try {
-    shadbalaRes = calculateShadbala(chart.planets as any);
+    shadbalaRes = calculateShadbala(
+      chart.planets as unknown as Parameters<typeof calculateShadbala>[0]
+    );
   } catch (err) {
     console.warn("[package-dossier] calculateShadbala fallback:", err);
   }
 
   let akvRes: AKVResult | null = null;
   try {
-    akvRes = calculateAshtakavarga(chart.planets as any, chart.lagnaNum);
+    akvRes = calculateAshtakavarga(
+      chart.planets as unknown as Parameters<typeof calculateAshtakavarga>[0],
+      lagnaNum
+    );
   } catch (err) {
     console.warn("[package-dossier] calculateAshtakavarga fallback:", err);
   }
+  const houseSav = getAkvHouseSav(akvRes, lagnaNum);
 
   let charaKarakas: ReturnType<typeof calculateKarakas> = [];
   try {
@@ -355,8 +424,41 @@ export function generatePackageDossierHTML(
     console.warn("[package-dossier] calculateKarakas fallback:", err);
   }
 
-  const atmakaraka = charaKarakas.find((k) => k.role === "AK") || { planet: "Sun", sign: sunRashi };
-  const amatyakaraka = charaKarakas.find((k) => k.role === "AmK") || { planet: "Jupiter", sign: "Cancer" };
+  const atmakaraka = charaKarakas.find((k) => k.role === "AK") || { planet: lagnaLord, sign: lagnaRashiRaw };
+  const amatyakaraka = charaKarakas.find((k) => k.role === "AmK") || { planet: SIGN_LORDS[getSignFromHouse(lagnaNum, 10)], sign: getSignFromHouse(lagnaNum, 10) };
+  const darakaraka = charaKarakas.find((k) => k.role === "DK") || { planet: SIGN_LORDS[getSignFromHouse(lagnaNum, 7)], sign: getSignFromHouse(lagnaNum, 7) };
+
+  let jaiminiRes: JaiminiResult | null = null;
+  try {
+    jaiminiRes = buildJaiminiChart(chart);
+  } catch (err) {
+    console.warn("[package-dossier] buildJaiminiChart fallback:", err);
+  }
+
+  let medicalRes: MedicalResult | null = null;
+  try {
+    medicalRes = calculateMedical(chart);
+  } catch (err) {
+    console.warn("[package-dossier] calculateMedical fallback:", err);
+  }
+
+  let vastuRes: AstroVastuHitDossier | null = null;
+  try {
+    vastuRes = runAstroVastuHitEngine(chart);
+  } catch (err) {
+    console.warn("[package-dossier] runAstroVastuHitEngine fallback:", err);
+  }
+
+  // Birth-moment Panchang computed directly from natal Sun/Moon longitudes & birth date
+  const moonSunDiff = ((moonLon - sunLon) % 360 + 360) % 360;
+  const tithiIndex = Math.floor(moonSunDiff / 12);
+  const pakshaLabel = tithiIndex < 15 ? "Shukla" : "Krishna";
+  const tithiName = `${pakshaLabel} ${PANCHANG_TITHIS[tithiIndex % 15]}`;
+  const yogaIndex = Math.floor((((sunLon + moonLon) % 360 + 360) % 360) / (360 / 27));
+  const yogaName = PANCHANG_YOGAS[yogaIndex] || "Siddha";
+  const karanaName = getKaranaName(Math.floor(moonSunDiff / 6));
+  const dobDate = chart.dob ? new Date(`${chart.dob}T12:00:00Z`) : null;
+  const varaName = dobDate && Number.isFinite(dobDate.getTime()) ? WEEKDAYS_FULL[dobDate.getUTCDay()] : PLANET_WEEKDAYS[lagnaLord] || "Thursday";
 
   // Total pages: Always full 24 pages (watermarked in sample mode, clean official in paid mode)
   const totalPages = 24;
@@ -388,71 +490,111 @@ export function generatePackageDossierHTML(
   let themeP11 = "";
   let themeP12 = "";
 
+  const h2Sign = getSignFromHouse(lagnaNum, 2);
+  const h5Sign = getSignFromHouse(lagnaNum, 5);
+  const h5Lord = SIGN_LORDS[h5Sign] || "Sun";
+  const h7Sign = getSignFromHouse(lagnaNum, 7);
+  const h7Lord = SIGN_LORDS[h7Sign] || "Venus";
+  const h10Sign = getSignFromHouse(lagnaNum, 10);
+  const h10Lord = SIGN_LORDS[h10Sign] || "Saturn";
+  const h11Sign = getSignFromHouse(lagnaNum, 11);
+
   if (reportId.includes("union") || reportId.includes("family")) {
+    const nakMeta = getNakshatraMetadata(nakshatraRaw);
+    const marsP = chart.planets?.["Mars"];
+    const jupP = chart.planets?.["Jupiter"];
+    const venP = chart.planets?.["Venus"];
+    const marsHouse = marsP?.house || (marsP?.sign ? getHouseFromLagna(marsP.sign, lagnaNum) : 1);
+    const isManglikHouse = [1, 4, 7, 8, 12].includes(marsHouse);
+    const jupHouse = jupP?.house || (jupP?.sign ? getHouseFromLagna(jupP.sign, lagnaNum) : 1);
+    const jupAspectsMars = [1, 5, 7, 9].some((off) => ((jupHouse + off - 2) % 12) + 1 === marsHouse);
+    const jupAspectsH7 = [1, 5, 7, 9].some((off) => ((jupHouse + off - 2) % 12) + 1 === 7);
+    const h7LordP = chart.planets?.[h7Lord];
+    const h7LordDignity = h7LordP ? computeClassicalDignity(h7Lord, h7LordP.sign, getPlanetLon(h7LordP)) : "Balanced";
+    const venDignity = venP ? computeClassicalDignity("Venus", venP.sign, getPlanetLon(venP)) : "Balanced";
+    const ulSign = jaiminiRes?.arudhas?.find((a) => a.shortName === "UL")?.sign || getSignFromHouse(lagnaNum, 12);
+    const ulLord = SIGN_LORDS[ulSign] || "Jupiter";
+    const d7Lagna = d7Chart?.lagna || getSignFromHouse(lagnaNum, 5);
+
     themeP9 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Ashtakoota 36-Guna In-Depth Scorecard</h2>
-      <p class="body-text" style="margin-bottom:20px;">Evaluated under Brihat Parashara Hora Shastra Chapter 21. Examines 8 spiritual and psychological pillars governing marital longevity and mutual prosperity.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Ashtakoota 36-Guna In-Depth Baseline</h2>
+      <p class="body-text" style="margin-bottom:20px;">Evaluated under Brihat Parashara Hora Shastra Chapter 21 from your Janma Nakshatra <strong>${nakshatra}</strong> (${moonRashi} Moon).</p>
       <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px;">
-        <div class="luxury-card"><div class="card-title">1. NADI KOOTA (8 Points)</div><p class="body-text">Evaluates bio-genetic compatibility and nervous system alignment. No primary Nadi Vedha observed.</p></div>
-        <div class="luxury-card"><div class="card-title">2. BHAKOOT KOOTA (7 Points)</div><p class="body-text">Psychic joy and emotional sustenance. Auspicious 1-7 or 3-11 mutual dispositor axis.</p></div>
-        <div class="luxury-card"><div class="card-title">3. GANA KOOTA (6 Points)</div><p class="body-text">Temperament harmony (Deva, Manushya, Rakshasa). Sattvic mutual understanding.</p></div>
-        <div class="luxury-card"><div class="card-title">4. GRAHA MAITRI (5 Points)</div><p class="body-text">Planetary friendship between Moon sign lords. Intellectual rapport and shared worldviews.</p></div>
+        <div class="luxury-card"><div class="card-title">1. NADI KOOTA (8 Points)</div><p class="body-text">Your Janma Nadi is <strong>${escapeHtml(nakMeta.nadi)}</strong>. Partner selection should prioritize distinct Nadi alignment (${nakMeta.nadi === "Adya" ? "Madhya or Antya" : nakMeta.nadi === "Madhya" ? "Adya or Antya" : "Adya or Madhya"}) for genetic and nervous-system vitality.</p></div>
+        <div class="luxury-card"><div class="card-title">2. BHAKOOT KOOTA (7 Points)</div><p class="body-text">Evaluates psychic sustenance from <strong>${moonRashi}</strong> Moon. Harmonious 1–7, 3–11, or 4–10 lunar axes amplify emotional continuity.</p></div>
+        <div class="luxury-card"><div class="card-title">3. GANA &amp; YONI (10 Points)</div><p class="body-text">Your Gana is <strong>${escapeHtml(nakMeta.gana)}</strong> and Yoni is <strong>${escapeHtml(nakMeta.yoni)}</strong>. Top compatible nakshatras: ${escapeHtml(nakMeta.compatibleNakshatras.slice(0, 3).join(", "))}.</p></div>
+        <div class="luxury-card"><div class="card-title">4. GRAHA MAITRI (5 Points)</div><p class="body-text">Moon sign lord <strong>${escapeHtml(SIGN_LORDS[moonRashiRaw] || nakMeta.ruler)}</strong> sets intellectual rapport and shared life values.</p></div>
       </div>
     `;
     themeP10 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Mangal Dosha & Shastric Neutralization</h2>
-      <p class="body-text" style="margin-bottom:20px;">Mars placement in houses 1, 4, 7, 8, or 12 influences emotional intensity. Shastric cancellation rules confirm safety and marital stability.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Mangal Dosha &amp; Shastric Neutralization</h2>
+      <p class="body-text" style="margin-bottom:20px;">Mars placement in houses 1, 4, 7, 8, or 12 from Lagna (${lagnaRashi}) regulates relational intensity and protective drive.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ MARS DIGNITY & ASPECT AUDIT</div>
-        <p class="body-text">Mars is situated in ${escapeHtml(chart.planets?.["Mars"]?.sign || "Aries")} (House ${chart.planets?.["Mars"]?.house || 1}). Benefic Jupiter's aspect neutralizes aggressive impulsiveness.</p>
+        <div class="card-title">✦ MARS DIGNITY &amp; ASPECT AUDIT</div>
+        <p class="body-text">Mars is situated in <strong>${escapeHtml(marsP?.sign || "—")}</strong> (House ${marsHouse}). ${jupAspectsMars ? "Jupiter casts a protective benefic aspect onto Mars, softening impulsive heat." : isManglikHouse ? "Channeled dialogue, mutual pacing, and Kuja-shanti awareness preserve harmony." : "Mars sits outside primary Manglik houses from Lagna, indicating clean relational flow."}</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">MANGAL STATUS</span><span class="val">Neutralized / Safe</span></div>
-        <div class="matrix-item"><span class="kicker">JUPITER ASPECT</span><span class="val">Benefic Drishti</span></div>
-        <div class="matrix-item"><span class="kicker">7TH LORD STRENGTH</span><span class="val">Fortified</span></div>
-        <div class="matrix-item"><span class="kicker">SHUKRA STATUS</span><span class="val">Harmonious</span></div>
+        <div class="matrix-item"><span class="kicker">MANGAL STATUS</span><span class="val">${isManglikHouse ? (jupAspectsMars ? "Mitigated (Guru Drishti)" : `House ${marsHouse} Active`) : "Non-Manglik (Lagna)"}</span></div>
+        <div class="matrix-item"><span class="kicker">JUPITER ASPECT</span><span class="val">${jupAspectsH7 || jupAspectsMars ? "Direct Benefic Drishti" : `From House ${jupHouse}`}</span></div>
+        <div class="matrix-item"><span class="kicker">7TH LORD (${escapeHtml(h7Lord)})</span><span class="val">${escapeHtml(h7LordDignity)}</span></div>
+        <div class="matrix-item"><span class="kicker">SHUKRA STATUS</span><span class="val">${escapeHtml(venDignity)}</span></div>
       </div>
     `;
     themeP11 = `
-      <h2 class="display-l" style="margin-bottom:8px;">7th Bhava, Upapada & Darakaraka Dynamics</h2>
-      <p class="body-text" style="margin-bottom:20px;">Jaimini Upadesha Sutras reveal internal marriage destiny through Upapada Lagna (UL) and Darakaraka (planet with lowest degrees).</p>
+      <h2 class="display-l" style="margin-bottom:8px;">7th Bhava, Upapada &amp; Darakaraka Dynamics</h2>
+      <p class="body-text" style="margin-bottom:20px;">Jaimini Upadesha Sutras reveal marriage destiny through Upapada Lagna (${escapeHtml(ulSign)}) and Darakaraka (${escapeHtml(darakaraka.planet)}).</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ DARAKARAKA: SPOUSE PROFILE</div>
-        <p class="body-text">Your Darakaraka is ${charaKarakas[6]?.planet || "Venus"} in ${charaKarakas[6]?.sign || "Pisces"}. Indicates a partner with intellectual discernment, creative elegance, and enduring loyalty.</p>
+        <div class="card-title">✦ DARAKARAKA: ${escapeHtml(darakaraka.planet.toUpperCase())} IN ${escapeHtml(darakaraka.sign.toUpperCase())}</div>
+        <p class="body-text">Your lowest-degree Chara Karaka is <strong>${escapeHtml(darakaraka.planet)}</strong> placed in <strong>${escapeHtml(darakaraka.sign)}</strong>, shaping partner temperament, communication style, and shared dharmic commitment.</p>
       </div>
-      <div class="luxury-card"><div class="card-title">✦ UPAPADA LAGNA (UL) HARMONIZATION</div><p class="body-text">Second house from Upapada Lagna governs sustenance of the union. Fasting on the day of the UL lord preserves marital bliss.</p></div>
+      <div class="luxury-card"><div class="card-title">✦ UPAPADA LAGNA (${escapeHtml(ulSign)}) HARMONIZATION</div><p class="body-text">Upapada Lagna lord is <strong>${escapeHtml(ulLord)}</strong>. Mindful observance on <strong>${escapeHtml(PLANET_WEEKDAYS[ulLord] || "Thursday")}s</strong> strengthens marital longevity and domestic peace.</p></div>
     `;
     themeP12 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Family Lineage Karma & D-7 Saptamsha</h2>
-      <p class="body-text" style="margin-bottom:20px;">The D-7 Saptamsha varga examines lineage continuity, generational wealth, and prosperity through children.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Family Lineage Karma &amp; D-7 Saptamsha</h2>
+      <p class="body-text" style="margin-bottom:20px;">The D-7 Saptamsha varga (Saptamsha Lagna: <strong>${escapeHtml(d7Lagna)}</strong>) examines lineage continuity and generational legacy.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
         <div class="card-title">✦ SAPTAMSHA HARMONIC SUMMARY</div>
-        <p class="body-text">Benefic influences on the 5th and 9th houses in Saptamsha indicate pious progeny, strong family ethics, and generational support in later years.</p>
+        <p class="body-text">5th house falls in <strong>${escapeHtml(h5Sign)}</strong> (lord <strong>${escapeHtml(h5Lord)}</strong>) with SAV strength of <strong>${houseSav[4]} bindus</strong>, guiding creative progeny blessings and family stewardship.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">5TH LORD D1</span><span class="val">${escapeHtml(chart.houseCusps?.find((h) => h.house === 5)?.sign || "Leo")}</span></div>
-        <div class="matrix-item"><span class="kicker">JUPITER KARAKA</span><span class="val">Strong</span></div>
-        <div class="matrix-item"><span class="kicker">KULA DEVATA</span><span class="val">Lineage Guardian</span></div>
-        <div class="matrix-item"><span class="kicker">PROGENY AXIS</span><span class="val">Auspicious</span></div>
+        <div class="matrix-item"><span class="kicker">5TH LORD (${escapeHtml(h5Sign)})</span><span class="val">${escapeHtml(h5Lord)}</span></div>
+        <div class="matrix-item"><span class="kicker">D-7 LAGNA</span><span class="val">${escapeHtml(d7Lagna)}</span></div>
+        <div class="matrix-item"><span class="kicker">5TH SAV SCORE</span><span class="val">${houseSav[4]} Bindus</span></div>
+        <div class="matrix-item"><span class="kicker">JUPITER HOUSE</span><span class="val">House ${jupHouse}</span></div>
       </div>
     `;
   } else if (reportId.includes("wealth") || reportId.includes("raja") || reportId.includes("stock")) {
+    let induSign = h11Sign;
+    let induHouse = 11;
+    let induTier = "Balanced Accumulation";
+    try {
+      const indu = calculateInduLagna(chart);
+      induSign = indu.sign;
+      induHouse = indu.house;
+      induTier = indu.kuberYogaTier;
+    } catch {
+      // keep safe sign-derived fallback
+    }
+    const h2Lord = SIGN_LORDS[h2Sign] || "Venus";
+    const h11Lord = SIGN_LORDS[h11Sign] || "Jupiter";
+    const ageContext = seekerAge !== null ? `At your current age (${seekerAge}), ${dashaLord}–${antarLord} governs asset velocity.` : `Under ${dashaLord}–${antarLord}, structured capital discipline accelerates wealth.`;
+
     themeP9 = `
-      <h2 class="display-l" style="margin-bottom:8px;">2nd & 11th House Dhana Yoga Matrix</h2>
-      <p class="body-text" style="margin-bottom:20px;">Evaluation of Dhana (Accumulation) and Labha (Gains) bhavas. Identifies mutual receipt and trine linkages between wealth dispositors.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">2nd &amp; 11th House Dhana Yoga Matrix</h2>
+      <p class="body-text" style="margin-bottom:20px;">Evaluation of Dhana (House 2: ${escapeHtml(h2Sign)}, lord ${escapeHtml(h2Lord)}) and Labha (House 11: ${escapeHtml(h11Sign)}, lord ${escapeHtml(h11Lord)}) bhavas.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ INDU LAGNA (WEALTH SEED) SYNTHESIS</div>
-        <p class="body-text">Indu Lagna computed from 9th lord ray values. Benefic planets in Kendra/Trikona from Indu Lagna confirm exponential asset multiplication post age 32.</p>
+        <div class="card-title">✦ INDU LAGNA: ${escapeHtml(induSign.toUpperCase())} (HOUSE ${induHouse})</div>
+        <p class="body-text">Indu Lagna falls in <strong>${escapeHtml(induSign)}</strong> (House ${induHouse}) — tier: <strong>${escapeHtml(induTier)}</strong>. ${ageContext}</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">2ND HOUSE (DHANA)</span><span class="val">${escapeHtml(chart.houseCusps?.find((h) => h.house === 2)?.sign || "Taurus")} Stable</span></div>
-        <div class="matrix-item"><span class="kicker">11TH HOUSE (LABHA)</span><span class="val">${escapeHtml(chart.houseCusps?.find((h) => h.house === 11)?.sign || "Pisces")} High</span></div>
-        <div class="matrix-item"><span class="kicker">5TH HOUSE (LAKSHMI)</span><span class="val">Purva Punya Strong</span></div>
-        <div class="matrix-item"><span class="kicker">SAV LABHA BINDUS</span><span class="val">${akvRes?.sarva[10] || 32}+ Bindus</span></div>
+        <div class="matrix-item"><span class="kicker">2ND HOUSE (DHANA)</span><span class="val">${escapeHtml(h2Sign)} (${houseSav[1]}B)</span></div>
+        <div class="matrix-item"><span class="kicker">11TH HOUSE (LABHA)</span><span class="val">${escapeHtml(h11Sign)} (${houseSav[10]}B)</span></div>
+        <div class="matrix-item"><span class="kicker">5TH HOUSE (LAKSHMI)</span><span class="val">${escapeHtml(h5Sign)} (${houseSav[4]}B)</span></div>
+        <div class="matrix-item"><span class="kicker">SAV LABHA BINDUS</span><span class="val">${houseSav[10]} Bindus</span></div>
       </div>
     `;
     themeP10 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Classical Raja & Dhana Yogas in Chart</h2>
+      <h2 class="display-l" style="margin-bottom:8px;">Classical Raja &amp; Dhana Yogas in Chart</h2>
       <p class="body-text" style="margin-bottom:20px;">Vedic combinations formed by Kendra lords (Vishnu sthana) uniting with Trikona lords (Lakshmi sthana).</p>
       <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px;">
         ${detectedYogas.slice(0, 4).map((y) => `
@@ -461,185 +603,263 @@ export function generatePackageDossierHTML(
             <p class="body-text" style="font-size:11.5px;">${escapeHtml(y.description)}</p>
             <div class="body-s" style="color:var(--gold);margin-top:6px;">Impact: ${escapeHtml(y.impact)}</div>
           </div>
-        `).join("") || '<div class="luxury-card"><div class="card-title">Gajakesari Yoga</div><p class="body-text">Jupiter and Moon in Kendra bestow executive wisdom and lasting prosperity.</p></div>'}
+        `).join("") || `<div class="luxury-card"><div class="card-title">Kendra–Trikona Balance</div><p class="body-text">Lagna lord ${escapeHtml(lagnaLord)} and 9th/10th lords establish steady self-made institutional growth.</p></div>`}
       </div>
     `;
     themeP11 = `
-      <h2 class="display-l" style="margin-bottom:8px;">10th Bhava & D-10 Dasamsa Career Elevation</h2>
-      <p class="body-text" style="margin-bottom:20px;">The D-10 Dasamsa varga maps professional authority, executive reputation, and major business milestones.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">10th Bhava &amp; D-10 Dasamsa Career Elevation</h2>
+      <p class="body-text" style="margin-bottom:20px;">The D-10 Dasamsa varga (D-10 Lagna: <strong>${escapeHtml(d10Chart?.lagna || h10Sign)}</strong>) maps professional authority and career milestones.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
         <div class="card-title">✦ DASAMSA KARMIC OPERATING SYSTEM</div>
-        <p class="body-text">10th lord in D1 and D10 activates entrepreneurial autonomy. You succeed best in analytical leadership, advisory roles, and strategic asset management.</p>
+        <p class="body-text">10th house (${escapeHtml(h10Sign)}) is governed by <strong>${escapeHtml(h10Lord)}</strong> (${houseSav[9]} SAV bindus). Combined with Amatyakaraka <strong>${escapeHtml(amatyakaraka.planet)}</strong> in <strong>${escapeHtml(amatyakaraka.sign)}</strong>, leadership thrives through domain mastery.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">10TH LORD D1</span><span class="val">${escapeHtml(chart.houseCusps?.find((h) => h.house === 10)?.sign || "Capricorn")}</span></div>
-        <div class="matrix-item"><span class="kicker">AMATYAKARAKA</span><span class="val">${amatyakaraka.planet} in ${amatyakaraka.sign}</span></div>
-        <div class="matrix-item"><span class="kicker">LEADERSHIP QUOTIENT</span><span class="val">High Executive</span></div>
-        <div class="matrix-item"><span class="kicker">PEAK CAREER DECADE</span><span class="val">Age 35–52</span></div>
+        <div class="matrix-item"><span class="kicker">10TH LORD (${escapeHtml(h10Sign)})</span><span class="val">${escapeHtml(h10Lord)}</span></div>
+        <div class="matrix-item"><span class="kicker">AMATYAKARAKA</span><span class="val">${escapeHtml(amatyakaraka.planet)} in ${escapeHtml(amatyakaraka.sign)}</span></div>
+        <div class="matrix-item"><span class="kicker">10TH SAV SCORE</span><span class="val">${houseSav[9]} Bindus</span></div>
+        <div class="matrix-item"><span class="kicker">PEAK DASHA SPAN</span><span class="val">${dashaLord} (${dashaState.mdStartYear}–${dashaState.mdEndYear})</span></div>
       </div>
     `;
     themeP12 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Speculative Risk & Market Timing Guardrails</h2>
-      <p class="body-text" style="margin-bottom:20px;">Analysis of 5th house (speculative intellect) and 8th house (sudden windfalls vs uncalculated drawdown risks).</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Speculative Risk &amp; Market Timing Guardrails</h2>
+      <p class="body-text" style="margin-bottom:20px;">Analysis of 5th house (${escapeHtml(h5Sign)}, lord ${escapeHtml(h5Lord)}) and 11th vs 12th SAV net retention (${houseSav[10]} vs ${houseSav[11]} bindus).</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ HIGH-PROBABILITY TRADING & INVESTMENT WINDOWS</div>
-        <p class="body-text">Favorable equity and asset accumulation occurs when Jupiter transits trines to natal 2nd/11th lords. Avoid unhedged speculative leverage during Rahu sub-periods.</p>
+        <div class="card-title">✦ HIGH-PROBABILITY INVESTMENT GUARDRAILS</div>
+        <p class="body-text">${houseSav[10] >= houseSav[11] ? "Net positive 11th-vs-12th SAV ratio supports steady retained gains when position sizing stays disciplined." : "12th-house SAV matches or exceeds 11th-house SAV — enforce strict automated savings and hard stop-losses."} Align major allocations with ${dashaLord}–${antarLord} cycles.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">5TH LORD STATUS</span><span class="val">Fortified Intellect</span></div>
-        <div class="matrix-item"><span class="kicker">SARVATOBHADRA HIT</span><span class="val">Auspicious Vedha</span></div>
+        <div class="matrix-item"><span class="kicker">5TH LORD (${escapeHtml(h5Sign)})</span><span class="val">${escapeHtml(h5Lord)}</span></div>
+        <div class="matrix-item"><span class="kicker">11H VS 12H SAV</span><span class="val">${houseSav[10]} vs ${houseSav[11]}</span></div>
         <div class="matrix-item"><span class="kicker">VOLATILITY GUARD</span><span class="val">Strict Stop-Loss</span></div>
-        <div class="matrix-item"><span class="kicker">MAX ACCUMULATION</span><span class="val">Q2 & Q4 Cycles</span></div>
+        <div class="matrix-item"><span class="kicker">ACTIVE TIMING</span><span class="val">${dashaLord}–${antarLord}</span></div>
       </div>
     `;
   } else if (reportId.includes("bio") || reportId.includes("remed")) {
+    const fbGem = getDynamicGemstonePrescription(lagnaRashiRaw, resolvedGender);
+    const fbResonance = PLANET_RESONANCE_META[lagnaLord] || PLANET_RESONANCE_META.Jupiter;
+    let fbRud = { mukhi: "5-Mukhi", bead: "Panchamukhi", mantra: "Om Namah Shivaya" };
+    try {
+      const lp = chart.planets?.[lagnaLord];
+      const r = makeRudrakshaRecommendation(
+        lagnaLord as Parameters<typeof makeRudrakshaRecommendation>[0],
+        lp
+          ? {
+              planet: lagnaLord as Parameters<typeof makeRudrakshaRecommendation>[0],
+              sign: lp.sign as NonNullable<Parameters<typeof makeRudrakshaRecommendation>[1]>["sign"],
+              degree: getPlanetLon(lp) % 30,
+              house: lp.house,
+              isRetrograde: lp.retrograde,
+              nakshatra: lp.nakshatra,
+              nakshatraPada: lp.pada,
+            }
+          : undefined
+      );
+      fbRud = { mukhi: r.mukhi, bead: r.bead, mantra: r.mantra };
+    } catch {
+      // safe default
+    }
+
     themeP9 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Comprehensive Ratna Pariksha & Gemstones</h2>
-      <p class="body-text" style="margin-bottom:20px;">Authentic shastric gemstone prescription derived from the auspicious Anukul Graha principles (Lagna, 5th, 9th lords).</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Comprehensive Ratna Pariksha &amp; Gemstones</h2>
+      <p class="body-text" style="margin-bottom:20px;">Precision Ratna Pariksha prescription calibrated exclusively for ${escapeHtml(withArticle(lagnaRashiRaw))} Ascendant (${escapeHtml(lagnaLord)} Lagnesh) to harmonize vitality without aggravating dusthana lords.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ PRIMARY LIFE GEMSTONE: YELLOW SAPPHIRE (PUKHRAJ)</div>
-        <p class="body-text">Energizes the protective grace of Guru (Jupiter). Enhances decision clarity, financial wisdom, and spiritual shielding against lower astral disturbances.</p>
+        <div class="card-title">✦ PRIMARY LIFE GEMSTONE: ${escapeHtml(fbGem.primaryGem.toUpperCase())}</div>
+        <p class="body-text">${escapeHtml(fbGem.rationale)}</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">CARAT WEIGHT</span><span class="val">4.25 – 5.50 Ratti</span></div>
-        <div class="matrix-item"><span class="kicker">SETTING METAL</span><span class="val">Panchadhatu / Gold</span></div>
-        <div class="matrix-item"><span class="kicker">FINGER PLACEMENT</span><span class="val">Index Finger (Right)</span></div>
-        <div class="matrix-item"><span class="kicker">PURIFICATION DAY</span><span class="val">Thursday Sunrise</span></div>
+        <div class="matrix-item"><span class="kicker">UPARATNA OPTION</span><span class="val">${escapeHtml(fbGem.uparatna)}</span></div>
+        <div class="matrix-item"><span class="kicker">SETTING METAL</span><span class="val">${escapeHtml(fbGem.metal)}</span></div>
+        <div class="matrix-item"><span class="kicker">FINGER PLACEMENT</span><span class="val">${escapeHtml(fbGem.finger)}</span></div>
+        <div class="matrix-item"><span class="kicker">PURIFICATION DAY</span><span class="val">${escapeHtml(fbGem.day)}</span></div>
       </div>
     `;
     themeP10 = `
       <h2 class="display-l" style="margin-bottom:8px;">Sacred Rudraksha Mukhi Architecture</h2>
-      <p class="body-text" style="margin-bottom:20px;">Electromagnetic bead therapy based on Shiva Purana and Shrimad Devi Bhagavatam.</p>
+      <p class="body-text" style="margin-bottom:20px;">Electromagnetic bead therapy based on Shiva Purana and Shrimad Devi Bhagavatam for ${escapeHtml(withArticle(lagnaRashiRaw))} Lagna.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ PRIMARY RUDRAKSHA: 5-MUKHI & 7-MUKHI COMBINATION</div>
-        <p class="body-text">5-Mukhi (Kalagni Rudra) balances Jupiter, calming high blood pressure and mental chatter. 7-Mukhi (Mahalakshmi) dissolves financial debt and invites organic abundance.</p>
+        <div class="card-title">✦ LAGNESH (${escapeHtml(lagnaLord.toUpperCase())}) &amp; PROTECTION RUDRAKSHA PROTOCOL</div>
+        <p class="body-text">Select collector-grade <strong>${escapeHtml(fbRud.mukhi)} (${escapeHtml(fbRud.bead)})</strong> Rudraksha governed by your Lagnesh (${escapeHtml(lagnaLord)}) alongside active Mahadasha (${dashaLord}) support to stabilize autonomic balance.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">BEAD ORIGIN</span><span class="val">Nepal Premium</span></div>
-        <div class="matrix-item"><span class="kicker">THREAD COLOR</span><span class="val">Pure Yellow Silk</span></div>
-        <div class="matrix-item"><span class="kicker">ACTIVATION MANTRA</span><span class="val">Om Hreem Namah</span></div>
-        <div class="matrix-item"><span class="kicker">IMMUNITY BENEFIT</span><span class="val">Cellular Balance</span></div>
+        <div class="matrix-item"><span class="kicker">PRIMARY MUKHI</span><span class="val">${escapeHtml(fbRud.mukhi)}</span></div>
+        <div class="matrix-item"><span class="kicker">PURIFICATION DAY</span><span class="val">${escapeHtml(PLANET_WEEKDAYS[lagnaLord] || "Thursday")}</span></div>
+        <div class="matrix-item"><span class="kicker">ACTIVATION MANTRA</span><span class="val">${escapeHtml(fbRud.mantra)}</span></div>
+        <div class="matrix-item"><span class="kicker">LATERALIZATION</span><span class="val">${escapeHtml(genderLat.wrist)}</span></div>
       </div>
     `;
     themeP11 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Bio-Wearable & Spatial Environmental Resonance</h2>
-      <p class="body-text" style="margin-bottom:20px;">Harnessing bio-metallic conductivity (copper, silver, gold) and sacred color therapy to balance weak planetary rays.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Bio-Wearable &amp; Spatial Environmental Resonance</h2>
+      <p class="body-text" style="margin-bottom:20px;">Harnessing bio-metallic conductivity and sacred color therapy calibrated for ${escapeHtml(lagnaLord)} Lagnesh and ${moonRashi} Moon.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ METAL & SACRED THREAD PRESCRIPTION</div>
-        <p class="body-text">Wearing a solid pure silver bangle on the right hand anchors Moon stability, preventing impulsive emotional expenditure. Avoid wearing unpure iron or faux black onyx.</p>
+        <div class="card-title">✦ METAL &amp; SACRED THREAD PRESCRIPTION</div>
+        <p class="body-text">Wearing a pure <strong>${escapeHtml(fbGem.metal)}</strong> band on the <strong>${escapeHtml(genderLat.wrist.toLowerCase())}</strong> (${escapeHtml(genderLat.sanskritTerm)}) anchors ${moonRashi} Moon stability and supports ${escapeHtml(lagnaLord)} Lagnesh coherence.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">HARMONIZING HUE</span><span class="val">Warm Ivory & Gold</span></div>
-        <div class="matrix-item"><span class="kicker">AVOID COLOR</span><span class="val">Dull Grey / Mud Brown</span></div>
-        <div class="matrix-item"><span class="kicker">SOUND FREQUENCY</span><span class="val">528 Hz Healing</span></div>
-        <div class="matrix-item"><span class="kicker">PLANT RESONANCE</span><span class="val">Tulsi & Peepal</span></div>
+        <div class="matrix-item"><span class="kicker">HARMONIZING HUE</span><span class="val">${escapeHtml(fbResonance.hue)}</span></div>
+        <div class="matrix-item"><span class="kicker">AVOID COLOR</span><span class="val">${escapeHtml(fbResonance.avoid)}</span></div>
+        <div class="matrix-item"><span class="kicker">SOUND FREQUENCY</span><span class="val">${escapeHtml(fbResonance.hz)}</span></div>
+        <div class="matrix-item"><span class="kicker">PLANT RESONANCE</span><span class="val">${escapeHtml(fbResonance.plant)}</span></div>
       </div>
     `;
     themeP12 = `
       <h2 class="display-l" style="margin-bottom:8px;">Classical Lal Kitab Non-Destructive Upayas</h2>
-      <p class="body-text" style="margin-bottom:20px;">Simple, karmic, non-ritualistic adjustments from the 1952 Lal Kitab Shastra to realign stubborn planetary afflictions.</p>
+      <p class="body-text" style="margin-bottom:20px;">Simple, karmic, non-ritualistic adjustments from the 1952 Lal Kitab Shastra tailored to ${escapeHtml(withArticle(lagnaRashiRaw))} Lagna.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
         <div class="card-title">✦ THREE DAILY KARMIC CORRECTIONS</div>
-        <p class="body-text">1. Feed green grass or spinach to cows on Wednesdays (neutralizes Mercury affliction).<br/>2. Keep a silver square coin in your wallet (unbreakable Moon prosperity anchor).<br/>3. Never accept second-hand electronic items for free (prevents Rahu illusion debt).</p>
+        <p class="body-text">1. Honor your Lagnesh (${escapeHtml(lagnaLord)}) on ${escapeHtml(PLANET_WEEKDAYS[lagnaLord] || "Thursday")}s through nourishment seva and clean water offerings.<br/>2. Keep a small pure silver token in your wallet (${moonRashi} Moon stability anchor).<br/>3. Keep workspace electronics organized to neutralize stagnant ${dashaLord}–${antarLord} friction.</p>
       </div>
       <div class="matrix-grid">
         <div class="matrix-item"><span class="kicker">UPAYA TIER</span><span class="val">100% Free / Ethical</span></div>
-        <div class="matrix-item"><span class="kicker">NATURE DANA</span><span class="val">Bird Seeds at Dawn</span></div>
-        <div class="matrix-item"><span class="kicker">WATER SEED</span><span class="val">Flowing Clean Stream</span></div>
-        <div class="matrix-item"><span class="kicker">KARMIC EFFECT</span><span class="val">Immediate Relief</span></div>
+        <div class="matrix-item"><span class="kicker">SEVA DAY</span><span class="val">${escapeHtml(PLANET_WEEKDAYS[lagnaLord] || "Thursday")}</span></div>
+        <div class="matrix-item"><span class="kicker">ELEMENTAL SEAL</span><span class="val">${escapeHtml(fbResonance.plant)}</span></div>
+        <div class="matrix-item"><span class="kicker">KARMIC EFFECT</span><span class="val">Balanced Grounding</span></div>
       </div>
     `;
   } else {
+    const klSign = jaiminiRes?.karakamsha?.karakamshaLagna || d9Chart?.lagna || lagnaRashiRaw;
+    const alSign = jaiminiRes?.arudhas?.find((a) => a.shortName === "AL")?.sign || lagnaRashiRaw;
+    const charaSign = jaiminiRes?.currentDasha?.sign || lagnaRashiRaw;
+    const charaHouse = getHouseFromLagna(charaSign, lagnaNum);
+    const klSignIdx = SIGN_NAMES.findIndex((s) => s.toLowerCase() === klSign.toLowerCase());
+    const kl12thSign = getSignFromHouse(klSignIdx >= 0 ? klSignIdx : lagnaNum, 12);
+    const kl12thLord = SIGN_LORDS[kl12thSign] || "Jupiter";
+    const ishtaMap: Record<string, string> = {
+      Sun: "Surya Narayana / Sri Rama",
+      Moon: "Gauri / Sri Krishna",
+      Mars: "Lord Kartikeya / Hanuman",
+      Mercury: "Lord Vishnu / Narayana",
+      Jupiter: "Lord Dakshinamurthy / Shiva",
+      Venus: "Maa Lakshmi / Devi",
+      Saturn: "Lord Shiva / Hanuman",
+    };
+    const ishtaName = ishtaMap[kl12thLord] || "Lord Shiva / Vishnu";
+
     themeP9 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Jaimini Atmakaraka & Soul Purpose</h2>
-      <p class="body-text" style="margin-bottom:20px;">According to Maharishi Jaimini, the planet holding the highest degree (Atmakaraka) signifies your king pin of reincarnation.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Jaimini Atmakaraka &amp; Soul Purpose</h2>
+      <p class="body-text" style="margin-bottom:20px;">According to Maharishi Jaimini, the planet holding the highest degree (Atmakaraka) signifies your core axis of evolution.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ ATMAKARAKA: ${atmakaraka.planet} IN ${atmakaraka.sign}</div>
-        <p class="body-text">Your soul lessons revolve around cultivating selfless leadership, mastering ego boundaries, and creating sustainable institutions that outlive you.</p>
+        <div class="card-title">✦ ATMAKARAKA: ${escapeHtml(atmakaraka.planet)} IN ${escapeHtml(atmakaraka.sign)}</div>
+        <p class="body-text">${escapeHtml(jaiminiRes?.akAmkAnalysis?.akLifeSphere?.focus || "Your soul lessons revolve around cultivating principled stewardship, mastering ego boundaries, and building enduring dharmic institutions.")}</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">ATMAKARAKA</span><span class="val">${atmakaraka.planet}</span></div>
-        <div class="matrix-item"><span class="kicker">AMATYAKARAKA</span><span class="val">${amatyakaraka.planet}</span></div>
-        <div class="matrix-item"><span class="kicker">SOUL LESSON</span><span class="val">Ego Mastery</span></div>
-        <div class="matrix-item"><span class="kicker">DHARMA AXIS</span><span class="val">Sattvic Truth</span></div>
+        <div class="matrix-item"><span class="kicker">ATMAKARAKA</span><span class="val">${escapeHtml(atmakaraka.planet)}</span></div>
+        <div class="matrix-item"><span class="kicker">AMATYAKARAKA</span><span class="val">${escapeHtml(amatyakaraka.planet)}</span></div>
+        <div class="matrix-item"><span class="kicker">AK HOUSE</span><span class="val">House ${jaiminiRes?.akAmkAnalysis?.akHouseFromLagna || getHouseFromLagna(atmakaraka.sign, lagnaNum)}</span></div>
+        <div class="matrix-item"><span class="kicker">RAJAYOGA TIER</span><span class="val">${escapeHtml(jaiminiRes?.akAmkAnalysis?.rajayogaTier || "Dharmic Axis")}</span></div>
       </div>
     `;
     themeP10 = `
-      <h2 class="display-l" style="margin-bottom:8px;">Karakamsa & Spiritual Liberation (Moksha)</h2>
-      <p class="body-text" style="margin-bottom:20px;">The sign occupied by the Atmakaraka in D-9 Navamsha forms the Karakamsa Lagna, revealing inner meditation and Ishta Devata.</p>
+      <h2 class="display-l" style="margin-bottom:8px;">Karakamsa &amp; Spiritual Liberation (Moksha)</h2>
+      <p class="body-text" style="margin-bottom:20px;">The sign occupied by the Atmakaraka in D-9 Navamsha forms the Karakamsa Lagna (<strong>${escapeHtml(klSign)}</strong>), revealing Ishta Devata.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ KARAKAMSA DISPOSITOR PATH</div>
-        <p class="body-text">Your Karakamsa is infused with solar-jupiterian illumination. Contemplative silence, scriptural study, and charity bring profound inner peace.</p>
+        <div class="card-title">✦ KARAKAMSA LAGNA: ${escapeHtml(klSign.toUpperCase())}</div>
+        <p class="body-text">12th from Karakamsa falls in <strong>${escapeHtml(kl12thSign)}</strong> (lord <strong>${escapeHtml(kl12thLord)}</strong>). Contemplative silence, scriptural study, and selfless seva align your path with <strong>${escapeHtml(ishtaName)}</strong>.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">ISHTA DEVATA</span><span class="val">Lord Shiva / Vishnu</span></div>
-        <div class="matrix-item"><span class="kicker">12TH FROM KARAKAMSA</span><span class="val">Moksha Indicator</span></div>
+        <div class="matrix-item"><span class="kicker">ISHTA DEVATA</span><span class="val">${escapeHtml(ishtaName)}</span></div>
+        <div class="matrix-item"><span class="kicker">12TH FROM KL</span><span class="val">${escapeHtml(kl12thSign)} (${escapeHtml(kl12thLord)})</span></div>
         <div class="matrix-item"><span class="kicker">MEDITATION TIME</span><span class="val">Brahma Muhurta</span></div>
-        <div class="matrix-item"><span class="kicker">PRAYER FORM</span><span class="val">Gayatri / Mahamrityunjaya</span></div>
+        <div class="matrix-item"><span class="kicker">SOUL ANCHOR</span><span class="val">${escapeHtml(PLANET_SANSKRIT[atmakaraka.planet] || atmakaraka.planet)}</span></div>
       </div>
     `;
     themeP11 = `
       <h2 class="display-l" style="margin-bottom:8px;">Arudha Lagna (AL) vs Natal Lagna</h2>
-      <p class="body-text" style="margin-bottom:20px;">Natal Lagna is who you actually are. Arudha Lagna (AL) is how the world perceives your status, competence, and wealth.</p>
+      <p class="body-text" style="margin-bottom:20px;">Natal Lagna (${lagnaRashi}) is who you actually are. Arudha Lagna (AL in <strong>${escapeHtml(alSign)}</strong>) is how the world perceives your stature.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ PUBLIC IMAGE & SOCIAL PERCEPTION</div>
-        <p class="body-text">Your Arudha Lagna commands natural authority. Benefic planets aspecting AL shield you from false slander and elevate commercial credibility.</p>
+        <div class="card-title">✦ PUBLIC IMAGE: AL IN ${escapeHtml(alSign.toUpperCase())} (HOUSE ${getHouseFromLagna(alSign, lagnaNum)})</div>
+        <p class="body-text">Your Arudha Lagna is governed by <strong>${escapeHtml(SIGN_LORDS[alSign] || lagnaLord)}</strong>, projecting credibility through disciplined execution and reliable deliverables.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">NATAL REALITY</span><span class="val">Grounded Scholar</span></div>
-        <div class="matrix-item"><span class="kicker">PUBLIC STATURE</span><span class="val">Capable Executive</span></div>
-        <div class="matrix-item"><span class="kicker">10TH FROM AL</span><span class="val">Prosperous Career</span></div>
-        <div class="matrix-item"><span class="kicker">REPUTATION SHIELD</span><span class="val">Fortified</span></div>
+        <div class="matrix-item"><span class="kicker">NATAL LAGNA</span><span class="val">${lagnaRashi}</span></div>
+        <div class="matrix-item"><span class="kicker">ARUDHA LAGNA</span><span class="val">${escapeHtml(alSign)}</span></div>
+        <div class="matrix-item"><span class="kicker">AL LORD</span><span class="val">${escapeHtml(SIGN_LORDS[alSign] || lagnaLord)}</span></div>
+        <div class="matrix-item"><span class="kicker">UL SIGN</span><span class="val">${escapeHtml(jaiminiRes?.arudhas?.find((a) => a.shortName === "UL")?.sign || h11Sign)}</span></div>
       </div>
     `;
     themeP12 = `
       <h2 class="display-l" style="margin-bottom:8px;">Chara Dasha Sign-Based Timing Horizon</h2>
-      <p class="body-text" style="margin-bottom:20px;">Unlike nakshatra-based Vimshottari, Jaimini Chara Dasha tracks rashi mahadashas to pinpoint geographic moves and status jumps.</p>
+      <p class="body-text" style="margin-bottom:20px;">Jaimini Chara Dasha tracks rashi mahadashas (${escapeHtml(jaiminiRes?.direction || "Savya")} sequence) to pinpoint status shifts and moves.</p>
       <div class="luxury-card" style="margin-bottom:16px;">
-        <div class="card-title">✦ CURRENT RASHI CHARA DASHA CYCLE</div>
-        <p class="body-text">Your current sign dasha energizes your 9th house of fortune and long-distance pilgrimages. Favorable for academic, legal, and international ventures.</p>
+        <div class="card-title">✦ ACTIVE CHARA DASHA: ${escapeHtml(charaSign.toUpperCase())} RASHI</div>
+        <p class="body-text">Your active Chara Dasha activates <strong>House ${charaHouse} (${escapeHtml(charaSign)})</strong> from Natal Lagna, directing primary karmic focus toward that bhava's opportunities.</p>
       </div>
       <div class="matrix-grid">
-        <div class="matrix-item"><span class="kicker">ACTIVE RASHI DASHA</span><span class="val">${lagnaRashi} Cycle</span></div>
-        <div class="matrix-item"><span class="kicker">KEY ENERGIZED HOUSE</span><span class="val">House 9 (Bhagya)</span></div>
-        <div class="matrix-item"><span class="kicker">RELOCATION PROMISE</span><span class="val">High Probability</span></div>
-        <div class="matrix-item"><span class="kicker">TIMING PHASE</span><span class="val">Golden Harvest</span></div>
+        <div class="matrix-item"><span class="kicker">ACTIVE RASHI DASHA</span><span class="val">${escapeHtml(charaSign)} Cycle</span></div>
+        <div class="matrix-item"><span class="kicker">ACTIVATED BHAVA</span><span class="val">House ${charaHouse}</span></div>
+        <div class="matrix-item"><span class="kicker">PROGRESSION</span><span class="val">${escapeHtml(jaiminiRes?.direction || "Savya")}</span></div>
+        <div class="matrix-item"><span class="kicker">VIMSHOTTARI SYNC</span><span class="val">${dashaLord}–${antarLord}</span></div>
       </div>
     `;
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // SAMPLE LOCKED PAGE (Page 5 for sample users)
-  // ─────────────────────────────────────────────────────────────────────────
-  const sampleLockedPage = `
-    <section class="page sample-page">
-      ${headerRail("PRELIMINARY SAMPLE PREVIEW")}
+  // Prepare dynamic fallback metadata for Pages 15-22
+  const mdProfileMeta = DASHA_PROFILE_META[dashaLordRaw] || {
+    element: "Karmic Cycle",
+    chakra: "Central Axis",
+    field: "Steady Execution",
+    guardrail: "Consistent Discipline",
+  };
+  const activeAdIdx = dashaState.adSeq.findIndex(
+    (ad) =>
+      ad.planet === antarLordRaw &&
+      (!dashaState.activeAD ||
+        (ad.start instanceof Date ? ad.start.toISOString() : String(ad.start)) === dashaState.activeAD.start)
+  );
+  const upcomingAntardashas =
+    activeAdIdx >= 0
+      ? dashaState.adSeq.slice(activeAdIdx, activeAdIdx + 4)
+      : dashaState.adSeq.slice(0, 4);
 
-      <div class="locked-hero">
-        <div class="lock-icon">🔒</div>
-        <h2 class="display-s" style="color:var(--gold);margin-bottom:8px;">FULL OFFICIAL 24-PAGE MASTER DOSSIER LOCKED</h2>
-        <p class="body-text" style="text-align:center;max-width:540px;margin:0 auto 20px;">
-          You are viewing a watermarked sample preview of <strong>${reportTitle}</strong>. The complete official 24-page dossier contains all 35+ shastric computation modules:
-        </p>
+  const rollingNow = buildDynamicRollingMonths({
+    lagnaNum,
+    activeDasha: dashaLordRaw,
+    activeAntar: antarLordRaw,
+    domain: "general",
+    akvHouseSav: houseSav,
+    cityTz: tzNum,
+  })[0];
 
-        <div class="locked-features">
-          <div class="feat-row"><span>✦</span> <strong>Complete 9-Graha Placement Ledger, Degrees & Dignities (Page 5)</strong></div>
-          <div class="feat-row"><span>✦</span> <strong>Shadbala 6-Fold Planetary Strength & Ashtakavarga 337-Bindu Matrix (Pages 7-8)</strong></div>
-          <div class="feat-row"><span>✦</span> <strong>Specialized 4-Page Shastric Deep Dive & Classical Yogas (Pages 9-13)</strong></div>
-          <div class="feat-row"><span>✦</span> <strong>120-Year Vimshottari Dasha Horizon & Double-Transit Radar (Pages 14-17)</strong></div>
-          <div class="feat-row"><span>✦</span> <strong>Precision Bio-Remedies: Ratna, Rudraksha, Mantras & 12-Month Action Blueprint (Pages 19-24)</strong></div>
-        </div>
+  const fbPrimaryGem = getDynamicGemstonePrescription(lagnaRashiRaw, resolvedGender);
+  const fbResonanceFallback = PLANET_RESONANCE_META[lagnaLord] || PLANET_RESONANCE_META.Jupiter;
+  let fbRudrakshaFallback = { mukhi: "5-Mukhi", bead: "Panchamukhi", mantra: "Om Namah Shivaya" };
+  try {
+    const lp = chart.planets?.[lagnaLord];
+    const r = makeRudrakshaRecommendation(
+      lagnaLord as Parameters<typeof makeRudrakshaRecommendation>[0],
+      lp
+        ? {
+            planet: lagnaLord as Parameters<typeof makeRudrakshaRecommendation>[0],
+            sign: lp.sign as NonNullable<Parameters<typeof makeRudrakshaRecommendation>[1]>["sign"],
+            degree: getPlanetLon(lp) % 30,
+            house: lp.house,
+            isRetrograde: lp.retrograde,
+            nakshatra: lp.nakshatra,
+            nakshatraPada: lp.pada,
+          }
+        : undefined
+    );
+    fbRudrakshaFallback = { mukhi: r.mukhi, bead: r.bead, mantra: r.mantra };
+  } catch {
+    // keep safe default
+  }
 
-        <div class="cta-box">
-          <div class="cta-title">✦ HOW TO UNLOCK YOUR OFFICIAL 24-PAGE DOSSIER ✦</div>
-          <p class="body-s" style="color:var(--ivory-dim);margin:6px 0 12px;">Visit the AstroLife Reports Store to generate and download your certified personal dossier:</p>
-          <div class="cta-url">https://astrolife-ai.vercel.app/reports</div>
-        </div>
-      </div>
+  const fbMedicalDosha = medicalRes?.tridoshaBreakdown?.dominant || `${lagnaRashiRaw} Constitution`;
+  const fbMedicalFocus = medicalRes?.topConcerns?.[0] || medicalRes?.lagnaBodyZone || "Balanced Systemic Vitality";
+  const fbMedicalAgni = medicalRes?.agniProfile?.title || "Balanced Metabolic Rhythm";
+  const fbVastuStudy = vastuRes?.studyAndWorkDirection?.recommendedStudyZone || "North / East";
+  const fbVastuWork = vastuRes?.studyAndWorkDirection?.recommendedOnlineWorkZone || "North-East / North";
+  const fbVastuH4 = vastuRes?.studyAndWorkDirection?.fourthHouseDirection || "North-East";
+  const fbVastuH10 = vastuRes?.studyAndWorkDirection?.tenthHouseDirection || "North";
+  const fbVastuRationale =
+    vastuRes?.studyAndWorkDirection?.rationale ||
+    `Align workspace orientation with your ${lagnaRashiRaw} Lagna and 10th-house (${h10Sign}) directional axis.`;
 
-      ${footerRail("AstroLife Official Shastra Store", 5)}
-    </section>
-  `;
+  const rahuPlanet = chart.planets?.["Rahu"];
+  const ketuPlanet = chart.planets?.["Ketu"];
+  const rahuSign = rahuPlanet?.sign || "—";
+  const rahuHouse = rahuPlanet?.house || (rahuPlanet?.sign ? getHouseFromLagna(rahuPlanet.sign, lagnaNum) : "—");
+  const ketuSign = ketuPlanet?.sign || "—";
+  const ketuHouse = ketuPlanet?.house || (ketuPlanet?.sign ? getHouseFromLagna(ketuPlanet.sign, lagnaNum) : "—");
 
   // ─────────────────────────────────────────────────────────────────────────
   // FULL 24-PAGE MASTER DOSSIER HTML
@@ -941,7 +1161,7 @@ ${isSample ? `
       <div class="kicker" style="margin-bottom:10px;color:var(--gold);">CERTIFIED SEEKER PROFILE & ASTRONOMICAL ANCHOR</div>
       <div class="seeker-grid">
         <div><span class="kicker">SEEKER NAME</span><div style="font-size:14px;font-weight:600;color:var(--ivory);">${subjectName}</div></div>
-        <div><span class="kicker">DATE & TIME OF BIRTH</span><div style="font-size:13.5px;font-weight:600;color:var(--ivory);">${birthDate} · ${birthTime} IST</div></div>
+        <div><span class="kicker">DATE & TIME OF BIRTH</span><div style="font-size:13.5px;font-weight:600;color:var(--ivory);">${birthDate} · ${birthTime} ${escapeHtml(tzLabel)}</div></div>
         <div><span class="kicker">BIRTH LOCATION & COORD</span><div style="font-size:12.5px;color:var(--ivory-dim);">${birthCity} (${lat}°N, ${lon}°E)</div></div>
         <div><span class="kicker">LAGNA & NAKSHATRA</span><div style="font-size:12.5px;color:var(--gold-bright);">${lagnaRashi} Lagna · ${nakshatra} Nakshatra</div></div>
       </div>
@@ -973,10 +1193,10 @@ ${isSample ? `
     <div class="luxury-card">
       <div class="card-title">✦ PANCHANG AT BIRTH MOMENT</div>
       <div class="matrix-grid" style="margin-top:8px;">
-        <div class="matrix-item"><span class="kicker">TITHI</span><span class="val">Shukla / Krishna</span></div>
-        <div class="matrix-item"><span class="kicker">VARA (DAY)</span><span class="val">Planetary Day</span></div>
-        <div class="matrix-item"><span class="kicker">YOGA</span><span class="val">Auspicious Yoga</span></div>
-        <div class="matrix-item"><span class="kicker">KARANA</span><span class="val">Active Half-Tithi</span></div>
+        <div class="matrix-item"><span class="kicker">TITHI</span><span class="val">${escapeHtml(tithiName)}</span></div>
+        <div class="matrix-item"><span class="kicker">VARA (DAY)</span><span class="val">${escapeHtml(varaName)}</span></div>
+        <div class="matrix-item"><span class="kicker">YOGA</span><span class="val">${escapeHtml(yogaName)}</span></div>
+        <div class="matrix-item"><span class="kicker">KARANA</span><span class="val">${escapeHtml(karanaName)}</span></div>
       </div>
     </div>
   </div>
@@ -995,9 +1215,9 @@ ${isSample ? `
         ${renderNorthIndianSvg(chart, undefined, undefined, 330)}
       </div>
       <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
-        <div class="luxury-card" style="padding:12px 14px;"><span class="kicker">ASCENDANT (LAGNA)</span><div style="font-size:15px;font-weight:700;color:var(--gold);">${lagnaRashi} (${chart.lagnaLon !== undefined ? (chart.lagnaLon % 30).toFixed(2) : "12.45"}°)</div><div class="body-s">Physical vitality, temperament, and life purpose anchor.</div></div>
+        <div class="luxury-card" style="padding:12px 14px;"><span class="kicker">ASCENDANT (LAGNA)</span><div style="font-size:15px;font-weight:700;color:var(--gold);">${lagnaRashi} (${escapeHtml(formatDMS(typeof chart.lagnaLon === "number" && Number.isFinite(chart.lagnaLon) ? chart.lagnaLon : lagnaNum * 30))})</div><div class="body-s">Physical vitality, temperament, and life purpose anchor.</div></div>
         <div class="luxury-card" style="padding:12px 14px;"><span class="kicker">CHANDRA RASHI</span><div style="font-size:15px;font-weight:700;color:var(--ivory);">${moonRashi} (${nakshatra})</div><div class="body-s">Subconscious architecture and emotional responsiveness.</div></div>
-        <div class="luxury-card" style="padding:12px 14px;"><span class="kicker">ACTIVE MAHADASHA</span><div style="font-size:15px;font-weight:700;color:var(--saffron);">${dashaLord} Mahadasha</div><div class="body-s">Primary governing energetic cycle at current age.</div></div>
+        <div class="luxury-card" style="padding:12px 14px;"><span class="kicker">ACTIVE MAHADASHA</span><div style="font-size:15px;font-weight:700;color:var(--saffron);">${dashaLord}–${antarLord}</div><div class="body-s">Primary governing energetic cycle (${dashaState.mdStartYear}–${dashaState.mdEndYear}).</div></div>
       </div>
     </div>
   </div>
@@ -1010,14 +1230,14 @@ ${isSample ? `
   ${headerRail("CHAPTER 2: D-9 NAVAMSHA HARMONIC CHART")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">D-9 Navamsha: Soul Dharma & Maturity</h2>
-    <p class="body-text" style="margin-bottom:16px;">The 9th harmonic division (Navamsha) evaluates spiritual maturity, marital synastry, and refined planetary strength in the second half of life.</p>
+    <p class="body-text" style="margin-bottom:16px;">The 9th harmonic division (Navamsha) evaluates spiritual maturity, marital synastry, and refined planetary strength across life chapters.</p>
     <div style="display:flex;gap:20px;align-items:flex-start;">
       <div style="background:var(--bg-card);border:1px solid var(--border-gold);border-radius:8px;padding:10px;display:flex;justify-content:center;">
-        ${renderNorthIndianSvg(chart, undefined, d9Chart ? d9Chart.lagnaNum : ((chart.lagnaNum || 0) + 8) % 12, 330)}
+        ${renderNorthIndianSvg(chart, Object.keys(d9PlanetsMap).length ? d9PlanetsMap : undefined, d9Chart ? d9Chart.lagnaNum : ((chart.lagnaNum || 0) + 8) % 12, 330)}
       </div>
       <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
-        <div class="luxury-card"><div class="card-title">✦ NAVAMSHA LAGNA: ${d9Chart ? d9Chart.lagna : "Cancer"}</div><p class="body-text">Reveals internal character and subconscious spiritual direction.</p></div>
-        <div class="luxury-card"><div class="card-title">✦ VARGOTTAMA PLANETS</div><p class="body-text">Planets occupying identical signs in D1 and D9 acquire sovereign potency (Vargottama bala), acting as unyielding shields during dasha periods.</p></div>
+        <div class="luxury-card"><div class="card-title">✦ NAVAMSHA LAGNA: ${escapeHtml(d9Chart ? d9Chart.lagna : getSignFromHouse(lagnaNum, 9))}</div><p class="body-text">Reveals internal character and subconscious spiritual direction.</p></div>
+        <div class="luxury-card"><div class="card-title">✦ VARGOTTAMA PLANETS</div><p class="body-text">${vargottamaPlanets.length ? `<strong>${vargottamaPlanets.map(escapeHtml).join(", ")}</strong> occupy identical signs in D-1 and D-9, conferring sovereign Vargottama bala.` : "No planets occupy identical D-1 and D-9 signs; strength flows through Navamsha dispositor harmony."}</p></div>
       </div>
     </div>
   </div>
@@ -1040,8 +1260,8 @@ ${isSample ? `
             <td style="font-weight:600;color:var(--gold);">${escapeHtml(name)}</td>
             <td>${escapeHtml(p.sign)}</td>
             <td>Bhava ${p.house}</td>
-            <td style="font-family:'JetBrains Mono',monospace;">${p.degree ? Number(p.degree).toFixed(2) + "°" : "15.00°"}</td>
-            <td>${escapeHtml(p.nakshatra || "Rohini")} (${p.pada || 1})</td>
+            <td style="font-family:'JetBrains Mono',monospace;">${escapeHtml(formatDMS(getPlanetLon(p)))}</td>
+            <td>${escapeHtml(p.nakshatra || "—")} (${p.pada || 1})</td>
             <td><span style="color:${p.dignity?.includes("Exalted") || p.dignity?.includes("Own") ? "#6FB58A" : p.dignity?.includes("Debilitated") ? "#C9555F" : "var(--ivory)"};font-weight:600;">${escapeHtml(p.dignity || "Neutral")}</span></td>
             <td>${p.retrograde ? '<span style="color:#C9555F;font-weight:600;">Vakri (R)</span>' : '<span style="color:#6FB58A;">Direct</span>'}</td>
           </tr>
@@ -1077,14 +1297,14 @@ ${isSample ? `
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Shadbala Six-Fold Planetary Power Vectors</h2>
     <p class="body-text" style="margin-bottom:16px;">Shadbala quantifies planetary potency across Sthana (positional), Dig (directional), Kala (temporal), Chesta (motional), Naisargika (natural), and Drik (aspectual) virupas.</p>
-    <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
-      ${(shadbalaRes?.planets || []).slice(0, 6).map((sp) => `
-        <div class="luxury-card">
-          <div class="card-title">${escapeHtml(sp.planet)}: ${Number(sp.totalRupas || 7).toFixed(1)} Rupas (${Number(sp.shadbalaRatio || 1.1).toFixed(2)}x)</div>
-          <p class="body-text" style="font-size:11px;">Status: <strong>${escapeHtml(sp.grade || "Strong")}</strong> · Threshold: ${sp.passesThreshold ? "✓ Passed" : "Deficit"}</p>
+    <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 10px;">
+      ${(shadbalaRes?.planets || []).slice(0, 7).map((sp) => `
+        <div class="luxury-card" style="padding:12px 14px;">
+          <div class="card-title" style="font-size:14px;margin-bottom:4px;">${escapeHtml(sp.planet)}: ${Number(sp.totalRupas || 7).toFixed(1)} Rupas (${Number(sp.shadbalaRatio || 1.1).toFixed(2)}x)</div>
+          <p class="body-text" style="font-size:10.5px;">Status: <strong>${escapeHtml(sp.grade || "Strong")}</strong> · Threshold: ${sp.passesThreshold ? "✓ Passed" : "Deficit"}</p>
           <div class="matrix-grid" style="margin-top:6px;gap:6px;">
-            <div class="matrix-item"><span class="kicker">STHANA</span><span class="val">${Number(sp.sthanaVirupas || 120).toFixed(0)}</span></div>
-            <div class="matrix-item"><span class="kicker">DIG</span><span class="val">${Number(sp.digVirupas || 40).toFixed(0)}</span></div>
+            <div class="matrix-item" style="padding:6px 8px;"><span class="kicker">STHANA</span><span class="val">${Number(sp.sthanaVirupas || 120).toFixed(0)}</span></div>
+            <div class="matrix-item" style="padding:6px 8px;"><span class="kicker">DIG</span><span class="val">${Number(sp.digVirupas || 40).toFixed(0)}</span></div>
           </div>
         </div>
       `).join("") || '<div class="luxury-card"><div class="card-title">Planetary Potency Verified</div><p class="body-text">All 7 primary classical planets satisfy baseline Parashari virupa thresholds.</p></div>'}
@@ -1098,11 +1318,11 @@ ${isSample ? `
   ${headerRail("CHAPTER 6: ASHTAKAVARGA 337-BINDU MATRIX")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Sarvashtakavarga (SAV) House Strengths</h2>
-    <p class="body-text" style="margin-bottom:16px;">The 337 benefic bindu system calculates collective planetary support across all 12 houses. Houses exceeding 28 bindus represent natural fountains of success.</p>
+    <p class="body-text" style="margin-bottom:16px;">The 337 benefic bindu system calculates collective planetary support across all 12 houses for ${lagnaRashi} Lagna. Houses exceeding 28 bindus represent natural fountains of success.</p>
     <div class="matrix-grid" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
-      ${(akvRes?.sarva || [30,28,32,29,31,27,33,26,34,31,35,28]).map((score: number, idx: number) => `
+      ${houseSav.map((score: number, idx: number) => `
         <div class="matrix-item" style="border-color:${score >= 30 ? "rgba(201,169,97,0.4)" : "rgba(201,169,97,0.15)"};">
-          <span class="kicker">HOUSE ${idx + 1}</span>
+          <span class="kicker">HOUSE ${idx + 1} (${escapeHtml(getSignFromHouse(lagnaNum, idx + 1))})</span>
           <div class="val" style="font-size:14px;color:${score >= 30 ? "var(--gold-bright)" : "var(--ivory)"};">${score} Bindus</div>
           <div class="body-s" style="font-size:9.5px;">${score >= 30 ? "✦ High Yield" : score >= 26 ? "Balanced" : "Conserve"}</div>
         </div>
@@ -1195,16 +1415,16 @@ ${isSample ? `
   ${headerRail("CHAPTER 10: ACTIVE MAHADASHA OPERATING SYSTEM")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Current Mahadasha Strategy: ${dashaLord}</h2>
-    <p class="body-text" style="margin-bottom:18px;">How the active planetary period directs internal psychological energies and external real-world opportunities.</p>
+    <p class="body-text" style="margin-bottom:18px;">How the active planetary period (${dashaLord}–${antarLord}, ${dashaState.mdStartYear}–${dashaState.mdEndYear}) directs internal psychological energies and external real-world opportunities.</p>
     <div class="luxury-card" style="margin-bottom:16px;">
       <div class="card-title">✦ PRIMARY FOCUS & BEHAVIORAL PROTOCOL</div>
-      <p class="body-text">The ${dashaLord} cycle activates pivotal life sectors. Channel ambition into systematic competence, long-range planning, and unwavering ethics. Impulsive shortcuts will backfire during this cycle.</p>
+      <p class="body-text">The ${dashaLord} cycle activates pivotal life sectors for ${lagnaRashi} Lagna. Channel ambition into systematic competence, long-range planning, and unwavering ethics. Impulsive shortcuts create avoidable friction during this ${dashaLord}–${antarLord} window.</p>
     </div>
     <div class="matrix-grid">
-      <div class="matrix-item"><span class="kicker">PRIMARY ELEMENT</span><span class="val">Ether / Dharma</span></div>
-      <div class="matrix-item"><span class="kicker">DOMINANT CHAKRA</span><span class="val">Ajna / Intuition</span></div>
-      <div class="matrix-item"><span class="kicker">EXPANSION FIELD</span><span class="val">Knowledge & Career</span></div>
-      <div class="matrix-item"><span class="kicker">GUARDRAIL</span><span class="val">Avoid Procrastination</span></div>
+      <div class="matrix-item"><span class="kicker">PRIMARY ELEMENT</span><span class="val">${escapeHtml(mdProfileMeta.element)}</span></div>
+      <div class="matrix-item"><span class="kicker">DOMINANT CHAKRA</span><span class="val">${escapeHtml(mdProfileMeta.chakra)}</span></div>
+      <div class="matrix-item"><span class="kicker">EXPANSION FIELD</span><span class="val">${escapeHtml(mdProfileMeta.field)}</span></div>
+      <div class="matrix-item"><span class="kicker">GUARDRAIL</span><span class="val">${escapeHtml(mdProfileMeta.guardrail)}</span></div>
     </div>
   </div>
   ${footerRail("Active Mahadasha Strategy", 15)}
@@ -1215,11 +1435,11 @@ ${isSample ? `
   ${headerRail("CHAPTER 11: 5-YEAR ANTARDASHA HORIZON")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Upcoming Antardasha Sub-Cycles</h2>
-    <p class="body-text" style="margin-bottom:16px;">Sequential sub-period transitions directing monthly decision windows and emotional phases.</p>
+    <p class="body-text" style="margin-bottom:16px;">Sequential sub-period transitions under ${dashaLord} Mahadasha directing decision windows and emotional phases.</p>
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
-      ${(chart.antardasha || []).slice(0, 4).map((ad) => `
+      ${upcomingAntardashas.map((ad) => `
         <div class="luxury-card">
-          <div class="card-title">${escapeHtml(ad.planet)} Antardasha</div>
+          <div class="card-title">${escapeHtml(dashaLordRaw)}–${escapeHtml(ad.planet)} Antardasha</div>
           <p class="body-text" style="font-size:11px;">
             ${ad.start instanceof Date ? ad.start.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : String(ad.start).slice(0, 7)} to 
             ${ad.end instanceof Date ? ad.end.toLocaleDateString("en-US", { month: "short", year: "numeric" }) : String(ad.end).slice(0, 7)}
@@ -1248,14 +1468,14 @@ ${isSample ? `
   ${headerRail("CHAPTER 12: DOUBLE-TRANSIT GOCHAR RADAR")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Jupiter & Saturn Dual-Filter Analysis</h2>
-    <p class="body-text" style="margin-bottom:18px;">Vedic Shastras state that no major life event (marriage, promotion, property) occurs without the dual sanction of Saturn and Jupiter.</p>
+    <p class="body-text" style="margin-bottom:18px;">Vedic Shastras state that major life milestones crystallize under the dual sanction of Saturn and Jupiter for ${lagnaRashi} Lagna.</p>
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">✦ SATURN TRANSIT (SHANI GOCHAR)</div>
-      <p class="body-text">Saturn enforces foundational discipline and karmic pruning. Evaluate your Sade Sati or Kantaka Shani phase to strategically schedule long-term commitments.</p>
+      <div class="card-title">✦ SATURN TRANSIT (SHANI GOCHAR): ${escapeHtml(rollingNow.saturnSign.toUpperCase())} (HOUSE ${rollingNow.saturnHouse})</div>
+      <p class="body-text">In ${escapeHtml(rollingNow.label)}, Saturn transits <strong>${escapeHtml(rollingNow.saturnSign)}</strong> (House ${rollingNow.saturnHouse} from ${lagnaRashi} Lagna), enforcing structural consolidation and disciplined pacing in that house's domain.</p>
     </div>
     <div class="luxury-card">
-      <div class="card-title">✦ JUPITER TRANSIT (GURU GOCHAR)</div>
-      <p class="body-text">Jupiter's aspect expands grace and wisdom. Houses receiving Jupiter's 5th, 7th, and 9th drishti experience organic growth, reconciliation, and auspicious timing.</p>
+      <div class="card-title">✦ JUPITER TRANSIT (GURU GOCHAR): ${escapeHtml(rollingNow.jupiterSign.toUpperCase())} (HOUSE ${rollingNow.jupiterHouse})</div>
+      <p class="body-text">Jupiter transits <strong>${escapeHtml(rollingNow.jupiterSign)}</strong> (House ${rollingNow.jupiterHouse} from ${lagnaRashi} Lagna), casting auspicious 5th, 7th, and 9th aspects to expand growth and mentor alignment.</p>
     </div>
   </div>
   ${footerRail("Double-Transit Gochar Radar", 17)}
@@ -1270,11 +1490,11 @@ ${isSample ? `
     <div class="matrix-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px;">
       <div class="luxury-card">
         <div class="card-title">✦ RAHU: THE FORWARD OBSESSION</div>
-        <p class="body-text">Placed in ${escapeHtml(chart.planets?.["Rahu"]?.sign || "Pisces")} (House ${chart.planets?.["Rahu"]?.house || 11}). Urges you to innovate, conquer unconventional frontiers, and transcend ancestral boundaries.</p>
+        <p class="body-text">Placed in ${escapeHtml(rahuSign)} (House ${escapeHtml(rahuHouse)}). Urges you to innovate, conquer unconventional frontiers, and transcend ancestral boundaries.</p>
       </div>
       <div class="luxury-card">
         <div class="card-title">✦ KETU: THE INHERITED MASTERY</div>
-        <p class="body-text">Placed in ${escapeHtml(chart.planets?.["Ketu"]?.sign || "Virgo")} (House ${chart.planets?.["Ketu"]?.house || 5}). Innate discernment and analytical detachment. Release perfectionistic anxiety.</p>
+        <p class="body-text">Placed in ${escapeHtml(ketuSign)} (House ${escapeHtml(ketuHouse)}). Innate discernment and analytical detachment. Release perfectionistic anxiety.</p>
       </div>
     </div>
   </div>
@@ -1286,12 +1506,12 @@ ${isSample ? `
   ${headerRail("CHAPTER 14: AYURVEDIC TRIDOSHA CONSTITUTION")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Ayurvedic Bio-Dosha & Health Vulnerability</h2>
-    <p class="body-text" style="margin-bottom:18px;">Astrological mapping of Vata (Air/Ether), Pitta (Fire), and Kapha (Water/Earth) bio-energies.</p>
+    <p class="body-text" style="margin-bottom:18px;">Astrological mapping of Vata (Air/Ether), Pitta (Fire), and Kapha (Water/Earth) bio-energies for ${lagnaRashi} Lagna.</p>
     <div class="matrix-grid">
-      <div class="matrix-item"><span class="kicker">PRIMARY DOSHA</span><span class="val">Pitta-Vata</span></div>
-      <div class="matrix-item"><span class="kicker">ORGAN VULNERABILITY</span><span class="val">Digestive Fire / Nerves</span></div>
-      <div class="matrix-item"><span class="kicker">HEALING FREQUENCY</span><span class="val">528 Hz Cellular</span></div>
-      <div class="matrix-item"><span class="kicker">DIETARY BALANCE</span><span class="val">Cooling & Sattvic</span></div>
+      <div class="matrix-item"><span class="kicker">PRIMARY DOSHA</span><span class="val">${escapeHtml(fbMedicalDosha)}</span></div>
+      <div class="matrix-item"><span class="kicker">ORGAN FOCUS</span><span class="val">${escapeHtml(fbMedicalFocus)}</span></div>
+      <div class="matrix-item"><span class="kicker">HEALING FREQUENCY</span><span class="val">${escapeHtml(fbResonanceFallback.hz)}</span></div>
+      <div class="matrix-item"><span class="kicker">AGNI BALANCE</span><span class="val">${escapeHtml(fbMedicalAgni)}</span></div>
     </div>
   </div>
   ${footerRail("Ayurvedic Bio-Dosha", 19)}
@@ -1302,16 +1522,16 @@ ${isSample ? `
   ${headerRail("CHAPTER 15: ASTRO-VASTU SPATIAL HARMONY")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">16-Zone Astro-Vastu Environmental Alignment</h2>
-    <p class="body-text" style="margin-bottom:18px;">Harmonizing home and workspace compass directions with your ruling planetary dispositors.</p>
+    <p class="body-text" style="margin-bottom:18px;">Harmonizing home and workspace compass directions with your ${lagnaRashi} Lagna planetary dispositors.</p>
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">✦ NORTH-EAST (ISHAN) & NORTH DIRECTIONS</div>
-      <p class="body-text">Keep the North-East zone of your dwelling pristine, light, and clutter-free to preserve Jupiter's clarity. Position your work desk facing North or East for optimal cognitive flow.</p>
+      <div class="card-title">✦ PERSONALIZED DIRECTIONAL ANCHOR (${escapeHtml(fbVastuWork)})</div>
+      <p class="body-text">${escapeHtml(fbVastuRationale)}</p>
     </div>
     <div class="matrix-grid">
-      <div class="matrix-item"><span class="kicker">WORK FACING</span><span class="val">North / East</span></div>
-      <div class="matrix-item"><span class="kicker">SLEEP HEAD AXIS</span><span class="val">South / East</span></div>
-      <div class="matrix-item"><span class="kicker">WATER ELEMENT</span><span class="val">North-East Clean</span></div>
-      <div class="matrix-item"><span class="kicker">HEAVY STORAGE</span><span class="val">South-West (Nairutya)</span></div>
+      <div class="matrix-item"><span class="kicker">WORK ZONE</span><span class="val">${escapeHtml(fbVastuWork)}</span></div>
+      <div class="matrix-item"><span class="kicker">STUDY ZONE</span><span class="val">${escapeHtml(fbVastuStudy)}</span></div>
+      <div class="matrix-item"><span class="kicker">4TH BHAVA AXIS</span><span class="val">${escapeHtml(fbVastuH4)}</span></div>
+      <div class="matrix-item"><span class="kicker">10TH BHAVA AXIS</span><span class="val">${escapeHtml(fbVastuH10)}</span></div>
     </div>
   </div>
   ${footerRail("Astro-Vastu Spatial Harmony", 20)}
@@ -1322,16 +1542,16 @@ ${isSample ? `
   ${headerRail("CHAPTER 16: RATNA & RUDRAKSHA PRESCRIPTION")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Personalized Bio-Wearable Prescriptions</h2>
-    <p class="body-text" style="margin-bottom:18px;">Prescribed gems and electromagnetic beads to strengthen benefic dispositors without increasing malefic friction.</p>
+    <p class="body-text" style="margin-bottom:18px;">Prescribed gems and electromagnetic beads calibrated for ${escapeHtml(withArticle(lagnaRashiRaw))} Ascendant (${escapeHtml(lagnaLord)} Lagnesh) without aggravating dusthana lords.</p>
     <div class="luxury-card" style="margin-bottom:16px;">
       <div class="card-title">✦ CERTIFIED GEMSTONE & BEAD ARCHITECTURE</div>
-      <p class="body-text">Primary recommendation: Yellow Sapphire (Pukhraj) or natural White Coral. Sacred bead: 5-Mukhi and 7-Mukhi Rudraksha worn on yellow silk thread on Thursday morning post purification.</p>
+      <p class="body-text">Primary recommendation: <strong>${escapeHtml(fbPrimaryGem.primaryGem)}</strong> (or ${escapeHtml(fbPrimaryGem.uparatna)}). Sacred bead: <strong>${escapeHtml(fbRudrakshaFallback.mukhi)} (${escapeHtml(fbRudrakshaFallback.bead)})</strong> Rudraksha worn on ${escapeHtml(fbPrimaryGem.day)} post purification. ${escapeHtml(fbPrimaryGem.rationale)}</p>
     </div>
     <div class="matrix-grid">
-      <div class="matrix-item"><span class="kicker">PRIMARY RATNA</span><span class="val">Yellow Sapphire</span></div>
-      <div class="matrix-item"><span class="kicker">RUDRAKSHA</span><span class="val">5-Mukhi + 7-Mukhi</span></div>
-      <div class="matrix-item"><span class="kicker">METAL</span><span class="val">Gold / Panchadhatu</span></div>
-      <div class="matrix-item"><span class="kicker">FINGER</span><span class="val">Index (Right Hand)</span></div>
+      <div class="matrix-item"><span class="kicker">PRIMARY RATNA</span><span class="val">${escapeHtml(fbPrimaryGem.primaryGem)}</span></div>
+      <div class="matrix-item"><span class="kicker">RUDRAKSHA</span><span class="val">${escapeHtml(fbRudrakshaFallback.mukhi)}</span></div>
+      <div class="matrix-item"><span class="kicker">METAL</span><span class="val">${escapeHtml(fbPrimaryGem.metal)}</span></div>
+      <div class="matrix-item"><span class="kicker">FINGER / LATERALITY</span><span class="val">${escapeHtml(fbPrimaryGem.finger)}</span></div>
     </div>
   </div>
   ${footerRail("Ratna & Rudraksha Prescription", 21)}
@@ -1342,17 +1562,17 @@ ${isSample ? `
   ${headerRail("CHAPTER 17: SACRED JAPA & DANA UPAYAS")}
   <div>
     <h2 class="display-l" style="margin-bottom:6px;">Classical Upayas, Mantras & Charitable Seva</h2>
-    <p class="body-text" style="margin-bottom:18px;">Non-destructive, authentic Vedic remedies to clear past-life debts (Rinas).</p>
+    <p class="body-text" style="margin-bottom:18px;">Non-destructive, authentic Vedic remedies calibrated for your Lagnesh (${escapeHtml(lagnaLord)}) and ${moonRashi} Moon.</p>
     <div class="luxury-card" style="margin-bottom:16px;">
-      <div class="card-title">1. SACRED GAYATRI & SEED JAPA</div>
-      <p class="body-text">Chant the divine seed mantra 108 times at dawn facing East:</p>
-      <div style="font-family:'Noto Serif Devanagari',serif;font-size:16px;color:var(--gold-bright);margin-top:8px;font-weight:600;">
-        ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः ॥ (Om Gram Greem Groum Sah Gurave Namah)
+      <div class="card-title">1. LAGNESH (${escapeHtml(PLANET_SANSKRIT[lagnaLord] || lagnaLord).toUpperCase()}) BEEJ JAPA</div>
+      <p class="body-text">Chant your Lagnesh seed mantra 108 times on ${escapeHtml(PLANET_WEEKDAYS[lagnaLord] || "Thursday")} mornings facing East:</p>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-bright);margin-top:8px;font-weight:600;">
+        ${escapeHtml(fbPrimaryGem.mantra)}
       </div>
     </div>
     <div class="luxury-card">
       <div class="card-title">2. SELFLESS DANA & NATURE SEVA</div>
-      <p class="body-text">Feeding grains to birds at sunrise, sponsoring education for underprivileged students, and planting medicinal trees (Peepal, Neem, Tulsi) neutralizes afflictions faster than passive rituals.</p>
+      <p class="body-text">Nurturing ${escapeHtml(fbResonanceFallback.plant)}, offering wholesome grains at sunrise on ${escapeHtml(PLANET_WEEKDAYS[lagnaLord] || "Thursday")}s, and supporting education dissolves karmic friction cleanly.</p>
     </div>
   </div>
   ${footerRail("Sacred Japa & Dana Upayas", 22)}
@@ -1391,12 +1611,12 @@ ${isSample ? `
         ${isSample ? "SAMPLE PREVIEW RECORD · OFFICIAL CERTIFICATION LOCKED" : `VERIFIED IMMUTABLE SHASTRA RECORD · CERTIFICATE ID: ${paymentId}`}
       </div>
       <div style="font-size:10px;color:var(--ivory-mute);">
-        Certified for: ${subjectName} · Archive Ref: ${orderId} · www.astrolife-ai.vercel.app
+        Certified for: ${subjectName} · Archive Ref: ${orderId} · www.astrolife.io
       </div>
       ${isSample ? `
         <div style="margin-top:16px;background:rgba(201,169,97,0.12);border:1px solid var(--border-gold);border-radius:6px;padding:10px 14px;display:inline-block;">
           <div style="font-size:11px;font-weight:700;color:var(--gold-bright);margin-bottom:2px;">✦ OFFICIAL HIGH-DEFINITION DOSSIER UNLOCK ✦</div>
-          <div style="font-size:10px;color:var(--ivory-dim);">To generate your un-watermarked permanent archival copy, visit <span style="color:var(--gold);">astrolife-ai.vercel.app/reports</span></div>
+          <div style="font-size:10px;color:var(--ivory-dim);">To generate your un-watermarked permanent archival copy, visit <span style="color:var(--gold);">www.astrolife.io/reports</span></div>
         </div>
       ` : ""}
     </div>

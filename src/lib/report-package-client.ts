@@ -98,8 +98,11 @@ export const POWER_BUNDLE_DOSSIERS: PackageDossierMeta[] = [
 export async function downloadPackageDossierPDF(
   chart: ChartData,
   packageId: string,
-  packageTitle: string
+  packageTitle: string,
+  extraOptions?: { gender?: string }
 ): Promise<void> {
+  const resolvedGender =
+    extraOptions?.gender ?? (chart as ChartData & { gender?: string })?.gender;
   const response = await fetch("/api/reports/generate-pdf", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -107,8 +110,10 @@ export async function downloadPackageDossierPDF(
       reportId: packageId,
       reportTitle: packageTitle,
       chart,
+      gender: resolvedGender,
       customer: {
         name: chart.name || "Sacred Seeker",
+        ...(resolvedGender ? { gender: resolvedGender } : {}),
       },
       isSample: false,
     }),
@@ -149,14 +154,18 @@ export async function downloadPackageDossierPDF(
 export function previewPackageDossierHTML(
   chart: ChartData,
   packageId: string,
-  packageTitle: string
+  packageTitle: string,
+  extraOptions?: { gender?: string }
 ): void {
   try {
+    const resolvedGender =
+      extraOptions?.gender ?? (chart as ChartData & { gender?: string })?.gender;
     const html = generatePackageDossierHTML(chart, {
       reportId: packageId,
       reportTitle: packageTitle,
       customerName: chart.name || "Sacred Seeker",
       isSample: false,
+      ...(resolvedGender ? { gender: resolvedGender } : {}),
     });
     const win = window.open("", "_blank");
     if (win) {

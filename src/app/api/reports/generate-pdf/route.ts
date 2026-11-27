@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { buildPackageDossierPdf } from "@/lib/report/package-dossier-pdf";
 import { generatePackageDossierHTML } from "@/lib/report/package-dossier-html-generator";
+import { resolveGender } from "@/lib/report/dossier-shared-helpers";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { isEliteEmail, isAdminUser } from "@/lib/access";
 import { createClient } from "@/lib/supabase/server";
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
   let browser;
   try {
     const body = await request.json();
-    const { reportId, reportTitle, chart: rawChart, birth, customer, orderId, paymentId, signature } = body;
+    const { reportId, reportTitle, chart: rawChart, birth, customer, gender, orderId, paymentId, signature } = body;
 
     if (!reportId) {
       return NextResponse.json({ error: "Missing reportId" }, { status: 400 });
@@ -162,6 +163,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const resolvedGender = resolveGender(
+      { gender: gender || customer?.gender || birth?.gender },
+      rawChart
+    );
+    if (resolvedGender) {
+      (chart as ChartData & { gender?: string }).gender = resolvedGender;
+    }
+
     const dossierOptions = {
       reportId: String(reportId),
       reportTitle: String(reportTitle || "AstroLife Sacred Dossier"),
@@ -172,6 +181,7 @@ export async function POST(request: NextRequest) {
       paymentId: isSample ? "SAMPLE_PREVIEW" : paymentId,
       isSample,
       reportCode,
+      gender: resolvedGender,
     };
 
     let pdfBuffer: Buffer;

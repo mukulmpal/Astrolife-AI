@@ -12,6 +12,7 @@
 
 import type { ChartData } from "../../astro-engine/calculations";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getActiveDashaState, getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 import { buildJaiminiChart, type JaiminiResult } from "../../astro-engine/jaimini";
 import {
   houseFromLagna,
@@ -115,7 +116,7 @@ export function generateJaiminiSoulDossierHTML(
   const orderId = escapeHtml(options.orderId || `AL-ORD-${Date.now().toString(36).toUpperCase()}`);
   const certificateId = escapeHtml(options.paymentId || `AL-CERT-${Date.now().toString(36).toUpperCase()}`);
 
-  const birthDate = chart.dob || "1995-07-04";
+  const birthDate = chart.dob || "Recorded";
   const birthTime = chart.tob || "12:00";
   const birthCity = escapeHtml(chart.city || "Delhi");
   const lat = chart.lat ?? 28.6139;
@@ -126,6 +127,15 @@ export function generateJaiminiSoulDossierHTML(
   const moonP = chart.planets?.Moon;
   const moonNakshatra = moonP?.nakshatra || "Ashwini";
   const moonRashi = moonP?.sign || "Aries";
+  const moonPada = moonP?.pada || 1;
+
+  const resolvedGender = resolveGender(options, chart);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
+
+  const dashaState = getActiveDashaState(chart);
+  const activeDashaName = dashaState.activeDasha || "Jupiter";
+  const activeAntarName = dashaState.activeAntar || "Saturn";
 
   // Build authentic Jaimini Chart
   const jaimini: JaiminiResult = buildJaiminiChart(chart);
@@ -641,8 +651,16 @@ body {
         <div style="color:var(--ivory);">${birthCity} (${lat}°N, ${lon}°E)</div>
       </div>
       <div>
+        <span class="kicker">Seeker Age &amp; Gender</span>
+        <div style="color:var(--ivory);">${seekerAgeStr} · ${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</div>
+      </div>
+      <div>
         <span class="kicker">Ascendant &amp; Moon Sign</span>
-        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonRashi} Moon (${moonNakshatra} 1)</div>
+        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonRashi} Moon (${moonNakshatra} Pada ${moonPada})</div>
+      </div>
+      <div>
+        <span class="kicker">Operating Vimshottari Dasha</span>
+        <div style="color:var(--gold-bright);">${activeDashaName} — ${activeAntarName}</div>
       </div>
       <div>
         <span class="kicker">Atmakaraka (AK · Soul King)</span>
@@ -1631,9 +1649,9 @@ body {
     <!-- Upaya Cards -->
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
       <div class="luxury-card" style="border-left:3px solid var(--purple-bright);">
-        <strong style="color:var(--purple-bright);font-size:11.5px;">1. THE 15-MINUTE BRAHMAMUHURTA SILENCE (AK ALIGNMENT):</strong>
+        <strong style="color:var(--purple-bright);font-size:11.5px;">1. THE 15-MINUTE BRAHMAMUHURTA SILENCE (AK ALIGNMENT &amp; SOMA POLARITY):</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Because your Atmakaraka is ${ak.planet} in ${ak.sign} (${akHouse}), sit in quiet reflection for 15 minutes before engaging with screens upon waking. Breathe deeply and allow the mind to establish centered stillness.
+          Because your Atmakaraka is ${ak.planet} in ${ak.sign} (${akHouse}), sit in quiet reflection for 15 minutes before engaging with screens upon waking. Hold your personal meditation mala with your ${resolvedGender === "female" ? "Left hand (Vama Anga / lunar receptive channel)" : "Right hand (Dakshina Anga / solar projective channel)"}. Breathe deeply and allow the mind to establish centered stillness.
         </p>
       </div>
 

@@ -11,8 +11,8 @@
 import PDFDocument from "pdfkit";
 import * as fs from "fs";
 import { execSync } from "child_process";
-import type { ChartData } from "../astro-engine/calculations";
 import { renderVectorNorthIndianKundli } from "./vector-chart-renderer";
+type ChartData = Parameters<typeof renderVectorNorthIndianKundli>[4];
 import type {
   EvidenceFirstReportPayload,
   EvidenceFirstSection,
@@ -248,7 +248,7 @@ function renderDocumentHeader(
   doc
     .fontSize(20)
     .fillColor("#1A1A1A")
-    .text("KP PREDICTIVE INTELLIGENCE DOSSIER", { align: "center" });
+    .text("ASTROLIFE KP PREDICTIVE INTELLIGENCE", { align: "center" });
 
   doc
     .fontSize(10)
@@ -277,7 +277,7 @@ function renderDocumentHeader(
   doc.fontSize(9).fillColor("#8C6508").text("Krishnamurti Paddhati (KP Readers I–VI)", 395, startY + 30);
 
   doc.fontSize(8.5).fillColor("#4A4238").text("Analytical Engine:", 310, startY + 46);
-  doc.fontSize(9).fillColor("#16A34A").text("100% Deterministic & Verified", 395, startY + 46);
+  doc.fontSize(9).fillColor("#16A34A").text("Deterministic & Epistemically Audited", 395, startY + 46);
 
   if (chart) {
     doc.fontSize(8.5).fillColor("#4A4238").text("Birth Lagna & Moon:", 60, startY + 64);
@@ -371,9 +371,9 @@ function renderHumanSection(doc: PDFDoc, section: EvidenceFirstSection) {
   doc
     .fontSize(8.5)
     .fillColor("#FAF7F0")
-    .text(`[ ${statusLabel} ]`, 320, sectionTop + 9, {
+    .text(`[ ${statusLabel} · ${section.synthesis.state} ]`, 260, sectionTop + 9, {
       align: "right",
-      width: 220,
+      width: 280,
       lineBreak: false,
     });
 
@@ -395,6 +395,68 @@ function renderHumanSection(doc: PDFDoc, section: EvidenceFirstSection) {
 
   // 2. Actionable Seeker Advice & Practical Implication
   renderActionableAdviceCard(doc, section.fivePartNarrative, isPositive, isNegative);
+
+  // 2b. Why It Matters (Full Narrative)
+  if (section.fivePartNarrative.whyItMatters) {
+    if (doc.y > 680) doc.addPage();
+    doc.fontSize(8.5).fillColor("#8C6508").text("Why It Matters", 55, doc.y);
+    doc.moveDown(0.2);
+    doc.fontSize(8.2).fillColor("#3A3530").text(section.fivePartNarrative.whyItMatters, 55, doc.y, {
+      width: 485,
+      lineGap: 2.5,
+    });
+    doc.moveDown(0.5);
+  }
+
+  // 2c. What Remains Uncertain
+  if (doc.y > 690) doc.addPage();
+  doc.fontSize(8.5).fillColor("#8C6508").text("What Remains Uncertain", 55, doc.y);
+  doc.moveDown(0.2);
+  doc.fontSize(8.2).fillColor("#4A4238").text(
+    section.fivePartNarrative.whatRemainsUncertain ||
+      "Active Dasha and sub-period timing window bounds apply.",
+    55,
+    doc.y,
+    { width: 485, lineGap: 2.5 }
+  );
+  doc.moveDown(0.5);
+
+  // 2d. Epistemic Safeguard for Reference_Pending
+  const hasPending =
+    section.synthesis.state.includes("REFERENCE_PENDING") ||
+    section.synthesis.state.includes("EVALUATION_PENDING") ||
+    JSON.stringify(section.findings).includes("REFERENCE_PENDING") ||
+    JSON.stringify(section.findings).includes("EVALUATION_PENDING");
+  if (hasPending) {
+    if (doc.y > 650) doc.addPage();
+    doc.fontSize(8.2).fillColor("#B45309").text("EPISTEMIC SAFEGUARD [EVALUATION_PENDING]:", 55, doc.y);
+    doc.fontSize(8.2).fillColor("#B45309").text("Precedence resolution is deliberately withheld.", 55, doc.y, { width: 500, lineBreak: false });
+    doc.moveDown(0.8);
+  }
+
+  // 2e. Evidence Node IDs & Provenance Citations
+  if (section.findings.length > 0) {
+    if (doc.y > 700) doc.addPage();
+    for (const finding of section.findings) {
+      const sourceBook = finding.provenance?.sourceBook || "Classical KP Reference";
+      const pages = finding.provenance?.pages ? ` (pp. ${finding.provenance.pages})` : "";
+      doc.fontSize(7.2).fillColor("#6B635B").text(
+        `Source: ${sourceBook}${pages}`,
+        55,
+        doc.y,
+        { width: 485, lineGap: 1.5 }
+      );
+      if (finding.evidence?.nodeIds?.length) {
+        for (const nodeId of finding.evidence.nodeIds) {
+          doc.fontSize(7).fillColor("#6B635B").text(`Node: ${nodeId}`, 65, doc.y, {
+            width: 475,
+            lineBreak: false,
+          });
+        }
+      }
+    }
+    doc.moveDown(0.4);
+  }
 
   // 3. Classical Authority Citation (Single Discreet Line)
   renderClassicalFootnote(doc, section);
@@ -510,7 +572,7 @@ function renderHumanBoundaries(doc: PDFDoc) {
 
   doc.rect(45, top, 505, 75).fillAndStroke("#FFFFFF", "#E0D7C6");
 
-  doc.fontSize(9.5).fillColor("#8C6508").text("✦ एस्ट्रोलाइफ का नैतिक एवं आध्यात्मिक संकल्प", 55, top + 10);
+  doc.fontSize(9.5).fillColor("#8C6508").text("✦ STANDARD CONSTITUTIONAL & ETHICAL BOUNDARIES", 55, top + 10);
 
   doc.fontSize(8.2).fillColor("#4A4238").text(
     "वैदिक ज्योतिष किसी अपरिवर्तनीय भाग्य का बंधन नहीं है, बल्कि यह आत्मा के विकास और आत्म-जागृति का एक दिव्य मानचित्र है। आपकी इच्छाशक्ति, सकारात्मक कर्म और ईश्वरीय कृपा किसी भी प्रतिकूल समय को अनुकूल बनाने की पूर्ण सामर्थ्य रखते हैं। यह रिपोर्ट किसी भी प्रकार के भय या अंधविश्वास के बिना, केवल आपके सजग जीवन-निर्माण के लिए तैयार की गई है।",
@@ -520,6 +582,9 @@ function renderHumanBoundaries(doc: PDFDoc) {
   );
 
   doc.y = top + 85;
+  if (doc.y > 680) doc.addPage();
+  doc.fontSize(9).fillColor("#8C6508").text("APPENDIX: SYSTEM AUDIT & PROVENANCE REGISTRY", 45, doc.y);
+  doc.moveDown(0.5);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -612,7 +677,7 @@ function applyPageNumberingAndFooters(doc: PDFDoc, reportId: string, subject: st
       .fontSize(7.5)
       .fillColor("#8C6508")
       .text(
-        `AstroLife KP Predictive Dossier • ${subject} • Verified Shastric Synthesis`,
+        `AstroLife Evidence-First Report • ${subject} • Verified Shastric Synthesis`,
         45,
         792 - 38,
         { lineBreak: false }

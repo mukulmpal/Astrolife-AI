@@ -954,11 +954,9 @@ export default function Dashboard() {
                 <span>{birth.city} &middot; Lagna {chart.lagnaRashi} &middot; {activeDasha.planet} MD{activeAntardasha ? ` / ${activeAntardasha.planet} AD` : ""}</span>
                 {activeDasha?.start && activeDasha?.end && (
                   <DashaProgressCapsule
-                    planet={activeDasha.planet}
-                    startYear={new Date(activeDasha.start).getFullYear()}
-                    endYear={new Date(activeDasha.end).getFullYear()}
-                    exactStartDate={activeDasha.start}
-                    exactEndDate={activeDasha.end}
+                    start={activeDasha.start}
+                    end={activeDasha.end}
+                    label={`${activeDasha.planet} Mahadasha`}
                   />
                 )}
               </div>

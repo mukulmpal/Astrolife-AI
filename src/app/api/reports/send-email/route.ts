@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildPackageDossierPdf } from "@/lib/report/package-dossier-pdf";
 import { generatePackageDossierHTML } from "@/lib/report/package-dossier-html-generator";
+import { getActiveDashaState, resolveGender } from "@/lib/report/dossier-shared-helpers";
 import { calculateChart, type ChartData } from "@/lib/astro-engine/calculations";
 import { buildDossierEmailHtml, buildDossierEmailText } from "@/lib/email/dossier-email-template";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
@@ -90,6 +91,8 @@ export async function POST(request: NextRequest) {
       paymentId = `PAY_${Date.now().toString(36).toUpperCase()}`,
       chart: rawChart,
       birth,
+      customer,
+      gender,
     } = body;
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
@@ -136,6 +139,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const resolvedGender = resolveGender(
+      { gender: gender || customer?.gender || birth?.gender },
+      rawChart
+    );
+    if (resolvedGender) {
+      (chart as ChartData & { gender?: string }).gender = resolvedGender;
+    }
+
     // 3. Compile high-grade 24-page vector PDF dossier
     const dossierOptions = {
       reportId: String(reportId),
@@ -145,6 +156,7 @@ export async function POST(request: NextRequest) {
       orderId,
       paymentId,
       isSample: false,
+      gender: resolvedGender,
     };
 
     let pdfBuffer: Buffer;
@@ -194,6 +206,7 @@ export async function POST(request: NextRequest) {
       .replace(/\s+/g, "-");
 
     // 4. Construct rich royal email content
+    const activeDashaPlanet = getActiveDashaState(chart).activeDasha;
     const emailParams = {
       seekerName,
       reportTitle,
@@ -204,8 +217,8 @@ export async function POST(request: NextRequest) {
       lagnaRashi: chart.lagnaRashi || "Ascendant",
       moonSign: chart.planets?.Moon?.sign || "Moon Sign",
       nakshatra: chart.planets?.Moon?.nakshatra || "Janma Nakshatra",
-      mahadasha: chart.dashas?.[0] ? `${chart.dashas[0].planet} Mahadasha` : "Active Dasha",
-      downloadUrl: "https://astrolife-ai.vercel.app/dashboard/history",
+      mahadasha: activeDashaPlanet ? `${activeDashaPlanet} Mahadasha` : "Active Dasha",
+      downloadUrl: "https://www.astrolife.io/dashboard/history",
     };
 
     const htmlContent = buildDossierEmailHtml(emailParams);

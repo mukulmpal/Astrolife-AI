@@ -251,13 +251,22 @@ export function buildEvidenceDrawerViewModel(section: EvidenceFirstSection): Evi
   const boundaries = buildBoundaryPresentation(section);
   const navigationChains = section.findings.map(buildEvidenceNavigationChain);
 
+  const cuspMatch = section.progressiveDisclosure.curious.cuspEvidence.match(/Cusp\s+(\d+)/)?.[1];
+  let casualSummary = section.progressiveDisclosure.casual.summary;
+  if (cuspMatch && !casualSummary.includes(cuspMatch)) {
+    casualSummary = `${casualSummary} (Cusp ${cuspMatch})`;
+  }
+  if (section.eventName && !casualSummary.includes(section.eventName)) {
+    casualSummary = `${casualSummary} · ${section.eventName}`;
+  }
+
   return {
     sectionId: section.sectionId,
     eventName: section.eventName,
     synthesisState: section.synthesis.state,
     casual: {
       title: section.progressiveDisclosure.casual.title,
-      summary: section.progressiveDisclosure.casual.summary,
+      summary: casualSummary,
       practicalInterpretation: section.progressiveDisclosure.casual.practicalInterpretation,
     },
     curious: {

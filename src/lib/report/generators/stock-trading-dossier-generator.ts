@@ -27,6 +27,7 @@ import { calculateSarvatobhadraGrid } from "../../astro-engine/sarvatobhadra-gri
 import { evaluateTradingRisk } from "../../astro-engine/trading-risk-guardrail";
 import { calculateAshtakavarga } from "../../astro-engine/ashtakavarga";
 import type { PackageDossierOptions } from "../package-dossier-html-generator";
+import { getActiveDashaState, getPlanetLon, getSeekerAge, resolveGender } from "../dossier-shared-helpers";
 import {
   getSignLord,
   houseFromLagna,
@@ -241,7 +242,7 @@ export function generateStockTradingDossierHTML(
   const orderId = escapeHtml(options.orderId || `ORD_${Date.now().toString(36).toUpperCase()}`);
   const certificateId = escapeHtml(options.paymentId || `CERT_${Date.now().toString(36).toUpperCase()}`);
 
-  const birthDate = chart.dob || "1995-07-04";
+  const birthDate = chart.dob || "Recorded";
   const birthTime = chart.tob || "12:00";
   const birthCity = escapeHtml(chart.city || "Delhi");
   const lat = chart.lat ?? 28.6139;
@@ -252,11 +253,15 @@ export function generateStockTradingDossierHTML(
   const moonP = chart.planets?.Moon;
   const moonNakshatra = moonP?.nakshatra || "Ashwini";
   const moonRashi = moonP?.sign || "Aries";
+  const moonPada = moonP?.pada || 1;
 
-  const activeMdObj = (chart.dashas as any[])?.find((d) => d.active);
-  const activeAdObj = activeMdObj?.antardashas?.find((a: any) => a.active);
-  const activeDasha = activeMdObj?.planet || chart.dasha?.currentMahadasha?.planet || chart.dashas?.[0]?.planet || "Jupiter";
-  const activeAntar = activeAdObj?.planet || chart.dasha?.currentAntardasha?.planet || "Saturn";
+  const resolvedGender = resolveGender(options, chart);
+  const seekerAge = getSeekerAge(chart.dob);
+  const seekerAgeStr = typeof seekerAge === "number" ? `${seekerAge} years` : "Recorded";
+
+  const dashaState = getActiveDashaState(chart);
+  const activeDasha = dashaState.activeDasha || "Jupiter";
+  const activeAntar = dashaState.activeAntar || "Saturn";
 
   // Compute Sarvatobhadra Grid
   const sbResult = calculateSarvatobhadraGrid(chart);
@@ -294,7 +299,7 @@ export function generateStockTradingDossierHTML(
   // Real AmK (2nd highest degree among 7 grahas)
   const sevenGrahas = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
   const sortedDeg = sevenGrahas
-    .map(p => ({ p, deg: ((chart.planets?.[p]?.longitude ?? chart.planets?.[p]?.degree ?? 0) % 30 + 30) % 30 }))
+    .map(p => ({ p, deg: ((getPlanetLon(chart.planets?.[p]) || chart.planets?.[p]?.degree || 0) % 30 + 30) % 30 }))
     .sort((a, b) => b.deg - a.deg);
   const amkPlanet = sortedDeg[1]?.p || lagnesh;
   const amkData = chart.planets?.[amkPlanet];
@@ -751,8 +756,12 @@ body {
         <div style="color:var(--ivory);">${birthCity} (${lat}°N, ${lon}°E)</div>
       </div>
       <div>
+        <span class="kicker">Seeker Age &amp; Gender</span>
+        <div style="color:var(--ivory);">${seekerAgeStr} · ${resolvedGender ? (resolvedGender === "female" ? "Female" : "Male") : "Recorded"}</div>
+      </div>
+      <div>
         <span class="kicker">Ascendant &amp; Moon Sign</span>
-        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonRashi} Moon (${moonNakshatra} 1)</div>
+        <div style="color:var(--ivory);">${lagnaRashi} Lagna · ${moonRashi} Moon (${moonNakshatra} Pada ${moonPada})</div>
       </div>
       <div>
         <span class="kicker">5th House Speculation Lord</span>
@@ -832,7 +841,7 @@ body {
           <strong style="color:var(--ruby-bright);">PILLAR IV (Pages 14&ndash;16): Trading Psychology &amp; Anti-Ruin Circuit Breakers</strong> &mdash; Eliminating FOMO and revenge trading, strict 2% risk rule, and the systematic quant imperative for ${lagnaRashi} Lagna.
         </div>
         <div style="background:var(--surface-elevated);padding:5px 8px;border-radius:4px;border-left:3px solid var(--emerald);">
-          <strong style="color:var(--emerald-bright);">PILLAR V (Pages 17&ndash;22): Sectoral Graha Mapping, Asset Risk &amp; Timing Muhurat</strong> &mdash; Tech, defense, and green energy asset allocation, lucky trading horas, and month-by-month 2026&ndash;2027 market timing.
+          <strong style="color:var(--emerald-bright);">PILLAR V (Pages 17&ndash;22): Sectoral Graha Mapping, Asset Risk &amp; Timing Muhurat</strong> &mdash; Tech, defense, and green energy asset allocation, lucky trading horas, and month-by-month sequential market timing.
         </div>
       </div>
     </div>
@@ -905,7 +914,7 @@ body {
         </div>
         <div>
           <span class="kicker">Sign Lord:</span>
-          <div style="color:var(--gold-bright);font-weight:700;">${eleventhLord} in ${chart.planets?.[eleventhLord]?.sign || eleventhSign} (${formatDMS(chart.planets?.[eleventhLord]?.longitude ?? chart.planets?.[eleventhLord]?.degree ?? 0).slice(0, 6)})</div>
+          <div style="color:var(--gold-bright);font-weight:700;">${eleventhLord} in ${chart.planets?.[eleventhLord]?.sign || eleventhSign} (${formatDMS(getPlanetLon(chart.planets?.[eleventhLord]) || chart.planets?.[eleventhLord]?.degree || 0).slice(0, 6)})</div>
         </div>
         <div>
           <span class="kicker">SAV Bindus:</span>
@@ -962,7 +971,7 @@ body {
     <!-- Rahu Box -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--sapphire-bright);">
       <div class="card-title" style="color:var(--sapphire-bright);font-size:12px;">
-        ✦ RAHU IN ${ordinal(rahuHouse).toUpperCase()} HOUSE (${(rahuP?.sign || "Libra").toUpperCase()} &middot; ${formatDMS(rahuP?.longitude ?? rahuP?.degree ?? 0).slice(0, 6)}): AMPLIFICATION &amp; FOMO TRAP
+        ✦ RAHU IN ${ordinal(rahuHouse).toUpperCase()} HOUSE (${(rahuP?.sign || "Libra").toUpperCase()} &middot; ${formatDMS(getPlanetLon(rahuP) || rahuP?.degree || 0).slice(0, 6)}): AMPLIFICATION &amp; FOMO TRAP
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
         Rahu in ${rahuP?.sign || "Libra"} in the ${ordinal(rahuHouse)} house drives strong ambition and attraction to high-momentum financial vehicles. Supported by <strong>${h2Score} Bindus in your 2nd House (${secondSign})</strong>, your treasury requires disciplined boundaries against hype.
@@ -975,7 +984,7 @@ body {
     <!-- Ketu Box -->
     <div class="luxury-card" style="margin-bottom:10px;border-left:3px solid var(--ruby-bright);">
       <div class="card-title" style="color:var(--ruby-bright);font-size:12px;">
-        ✦ KETU IN ${ordinal(ketuHouse).toUpperCase()} HOUSE (${(ketuP?.sign || "Aries").toUpperCase()} &middot; ${formatDMS(ketuP?.longitude ?? ketuP?.degree ?? 0).slice(0, 6)}): SUDDEN REVERSALS &amp; INTUITIVE SENSING
+        ✦ KETU IN ${ordinal(ketuHouse).toUpperCase()} HOUSE (${(ketuP?.sign || "Aries").toUpperCase()} &middot; ${formatDMS(getPlanetLon(ketuP) || ketuP?.degree || 0).slice(0, 6)}): SUDDEN REVERSALS &amp; INTUITIVE SENSING
       </div>
       <p class="body-text" style="font-size:11.5px;margin-top:4px;">
         Ketu in ${ketuP?.sign || "Aries"} (${ordinal(ketuHouse)} house) brings sharp, unexpected reversals whenever leverage is excessive. Avoid over-leveraged positions that invite forced margin liquidation.
@@ -1200,12 +1209,12 @@ body {
     <div class="luxury-card" style="border:1.5px solid var(--emerald);margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="card-title" style="color:var(--emerald-bright);font-size:13px;">
-          ✦ EXECUTIVE SARVATOBHADRA ASSESSMENT: STABLE VEDHA DEFENSE
+          ✦ EXECUTIVE SARVATOBHADRA ASSESSMENT: ${sbResult.vedhaRays.length > 0 ? "VEDHA RAYS DETECTED" : "STABLE VEDHA DEFENSE"}
         </span>
-        <span class="tag-badge tag-emerald">STABLE DEFENSE</span>
+        <span class="tag-badge ${sbResult.vedhaRays.length > 0 ? "tag-ruby" : "tag-emerald"}">${sbResult.vedhaRays.length > 0 ? "ACTIVE VEDHA" : "STABLE DEFENSE"}</span>
       </div>
       <p class="body-text" style="font-size:11.8px;margin-top:6px;">
-        According to the classical 81-Square Sarvatobhadra Chakra, your natal Moon Nakshatra (<strong>${janmaNak}</strong>) and primary financial points currently maintain an un-afflicted shield with zero direct malefic strikes from Saturn, Mars, or Rahu. This provides a clear psychological runway for methodical swing position sizing and rules-based execution.
+        According to the classical 81-Square Sarvatobhadra Chakra, your natal Moon Nakshatra (<strong>${janmaNak}</strong>) and primary financial points currently register <strong>${sbResult.vedhaRays.length} active ray strike${sbResult.vedhaRays.length === 1 ? "" : "s"}</strong>. ${sbResult.vedhaRays.length > 0 ? "Exercise disciplined risk sizing and honor defensive stops." : "This provides a clear psychological runway for methodical swing position sizing and rules-based execution."}
       </p>
     </div>
 
@@ -1223,13 +1232,13 @@ body {
         <tr>
           <td><strong>${janmaNak}</strong></td>
           <td>Janma (Self)</td>
-          <td><span style="color:var(--emerald-bright);font-weight:700;">0 Malefic Strikes</span></td>
+          <td><span style="color:${sbResult.vedhaRays.filter(r => r.targetNakshatra === janmaNak).length > 0 ? "var(--ruby-bright)" : "var(--emerald-bright)"};font-weight:700;">${sbResult.vedhaRays.filter(r => r.targetNakshatra === janmaNak).length > 0 ? `${sbResult.vedhaRays.filter(r => r.targetNakshatra === janmaNak).length} Active Strike(s)` : "Un-afflicted"}</span></td>
           <td>Clear mental focus · High analytical execution</td>
         </tr>
         <tr>
           <td><strong>${karmaNak}</strong></td>
           <td>Karma (Status)</td>
-          <td><span style="color:var(--emerald-bright);font-weight:700;">0 Malefic Strikes</span></td>
+          <td><span style="color:${sbResult.vedhaRays.filter(r => r.targetNakshatra === karmaNak).length > 0 ? "var(--ruby-bright)" : "var(--emerald-bright)"};font-weight:700;">${sbResult.vedhaRays.filter(r => r.targetNakshatra === karmaNak).length > 0 ? `${sbResult.vedhaRays.filter(r => r.targetNakshatra === karmaNak).length} Active Strike(s)` : "Un-afflicted"}</span></td>
           <td>Favorable for closing institutional retainers</td>
         </tr>
         <tr>
@@ -1241,8 +1250,8 @@ body {
         <tr>
           <td><strong>${vinaashaNak}</strong></td>
           <td>Vinaasha (Critical)</td>
-          <td><span style="color:var(--emerald-bright);font-weight:700;">Zero Strikes</span></td>
-          <td>No catastrophic liquidation risk detected</td>
+          <td><span style="color:${sbResult.vedhaRays.filter(r => r.targetNakshatra === vinaashaNak).length > 0 ? "var(--ruby-bright)" : "var(--emerald-bright)"};font-weight:700;">${sbResult.vedhaRays.filter(r => r.targetNakshatra === vinaashaNak).length > 0 ? `${sbResult.vedhaRays.filter(r => r.targetNakshatra === vinaashaNak).length} Active Strike(s)` : "Un-afflicted"}</span></td>
+          <td>${sbResult.vedhaRays.filter(r => r.targetNakshatra === vinaashaNak).length > 0 ? "Defensive caution on volatile swings" : "No catastrophic liquidation risk detected"}</td>
         </tr>
       </tbody>
     </table>
@@ -1717,7 +1726,7 @@ body {
 <section class="page">
   ${headerRail("PILLAR V: 12-MONTH TIMING RADAR")}
   <div>
-    <h2 class="display-l" style="margin-bottom:6px;">12-Month Market Timing Radar (2026–2027)</h2>
+    <h2 class="display-l" style="margin-bottom:6px;">12-Month Market Timing Radar (${new Date().getFullYear()}–${new Date().getFullYear() + 1})</h2>
     <p class="body-text" style="margin-bottom:10px;">
       Synchronized macroeconomic roadmap mapping Jupiter, Saturn, and nodal transits to your financial houses.
     </p>
@@ -1855,9 +1864,9 @@ body {
       </div>
 
       <div class="luxury-card" style="border-left:3px solid var(--sapphire-bright);">
-        <strong style="color:var(--sapphire-bright);font-size:11.5px;">3. NATURAL JADE CRYSTAL PYRAMID:</strong>
+        <strong style="color:var(--sapphire-bright);font-size:11.5px;">3. NATURAL JADE CRYSTAL PYRAMID &amp; POLARITY ANCHOR:</strong>
         <p style="font-size:11.2px;color:var(--ivory-dim);margin-top:2px;">
-          Place a natural Green Jade or Aventurine crystal pyramid on the right side of your laptop keyboard. Green mineral crystal absorbs electromagnetic radiation from multiple monitors and grounds Mercury mental static.
+          Place a natural Green Jade or Aventurine crystal pyramid on the ${resolvedGender === "female" ? "left side (Vama Anga / receptive polarity)" : "right side (Dakshina Anga / projective polarity)"} of your laptop keyboard. When wearing your trading gemstone, mount it on the ${resolvedGender === "female" ? "Left hand" : "Right hand"}. Green mineral crystal absorbs electromagnetic radiation from multiple monitors and grounds Mercury mental static.
         </p>
       </div>
     </div>
